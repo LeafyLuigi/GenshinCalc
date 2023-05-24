@@ -1,0 +1,170 @@
+body {
+	line-height: 1.6;
+}
+.fakeTextbox {
+	overflow: auto;
+	resize: both;
+	&:empty {
+		display: none;
+	}
+}
+.notes {
+	font-style: italic;
+	margin-bottom: 4px;
+}
+.addButtons {
+	display: flex;
+	margin-bottom: 4px;
+	align-items: center;
+	gap: 8px;
+}
+.vertFlex {
+	display: flex;
+	flex-flow: column wrap;
+	margin-bottom: 8px;
+}
+.invBlock {
+	margin-top: 8px;
+	&.empty{display:none;}
+}
+.fakeTextbox, .weaponBlock, .charBlock, .invBlock {
+	border: 1px solid #495366;
+	border-radius: 8px;
+	padding: 8px;
+	margin-bottom: 8px;
+}
+.boxName {
+	font-size: 24px;
+	font-weight: 600;
+	gap: 4px;
+	display: flex;
+	align-items: center;
+	> img {
+		width: 64px;
+	}
+}
+.boxTitle {
+	font-size: 20px;
+}
+.boxSubtitle {
+	font-size: 16px;
+}
+.topFlex {
+	display: flex;
+	justify-content: space-between;
+}
+.removeButton {
+	height: fit-content;
+}
+.charDropdown,.weaponDropdown {
+	position: relative;
+	max-width: 200px;
+	min-width: 200px;
+	> button {
+		min-height: 48px;
+		min-width: inherit;
+		display: flex;
+		align-items: center;
+		> img {
+			margin-right: 8px;
+		}
+	}
+	&:hover .dropdownContent {
+		display: block;
+	}
+}
+.dropdownContent {
+	display: none;
+	position: absolute;
+	z-index: 1;
+	max-height: 250px;
+	overflow-y: scroll;
+	min-width: inherit;
+	scrollbar-width: thin; 
+	> button {
+		display: flex;
+		align-items: center;
+		min-width: inherit;
+		> img {
+			margin-right: 8px;
+		}
+		&[disabled],&:disabled {
+			display: none;
+		}
+	}
+}
+.dropdownWeaponImg,.dropdownCharImg {
+	width: 32px;
+}
+.testButton {
+	height: fit-content;
+	margin-right: 4px;
+}
+.itemIcon {
+	--size: 256px;
+	display: flex;
+	flex-flow: column nowrap;
+	align-items: center;
+	justify-content: center;
+	color: #495366;
+	height: calc(var(--size) * (17 / 14));
+	width: var(--size);
+	line-height: 1;
+	font-size: calc(var(--size) * (17 / 14) - var(--size));
+	background: top/cover no-repeat;
+	&.normal {
+		--size: 112px;
+	}
+	&.small {
+		--size: 96px;
+	}
+	&.mini {
+		--size: 72px;
+	}
+	&.tiny {
+		--size: 56px;
+	}
+	&.micro {
+		--size: 36px;
+	}
+	&:is(.micro,.tiny,.mini,.small,.normal) {
+		background-image: url(images/rarity/mini-1.png);
+		&.rarity-2 {
+			background-image: url(images/rarity/mini-2.png);
+		}
+		&.rarity-3 {
+			background-image: url(images/rarity/mini-3.png);
+		}
+		&.rarity-4 {
+			background-image: url(images/rarity/mini-4.png);
+		}
+		&.rarity-5 {
+			background-image: url(images/rarity/mini-5.png);
+		}
+	}
+}
+.itemIconImg {
+	height: var(--size);
+	width: var(--size);
+}
+.rarity-0,.rarity-1 {
+	background-image: url(images/rarity/1.png);
+}
+.rarity-2 {
+	background-image: url(images/rarity/2.png);
+}
+.rarity-3 {
+	background-image: url(images/rarity/3.png);
+}
+.rarity-4 {
+	background-image: url(images/rarity/4.png);
+}
+.rarity-5 {
+	background-image: url(images/rarity/5.png);
+}
+
+.outputRequired {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+}
