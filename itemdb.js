@@ -1251,47 +1251,47 @@ const itemGroupDB = {
 		"items":["Tile of Decarabian's Tower","Debris of Decarabian's City","Fragment of Decarabian's Epic","Scattered Piece of Decarabian's Dream"]
 	},
 	"borealWolfTeeth": {
-		"priority": 0,
+		"priority": 1,
 		"items":["Boreal Wolf's Milk Tooth","Boreal Wolf's Cracked Tooth","Boreal Wolf's Broken Fang","Boreal Wolf's Nostalgia"]
 	},
 	"gladiatorShackles": {
-		"priority": 0,
+		"priority": 2,
 		"items":["Fetters of the Dandelion Gladiator","Chains of the Dandelion Gladiator","Shackles of the Dandelion Gladiator","Dream of the Dandelion Gladiator"]
 	},
 	"guyunPillars": {
-		"priority": 0,
+		"priority": 3,
 		"items":["Luminous Sands from Guyun","Lustrous Stone from Guyun","Relic from Guyun","Divine Body from Guyun"]
 	},
 	"elixirs": {
-		"priority": 0,
+		"priority": 4,
 		"items":["Mist Veiled Lead Elixir","Mist Veiled Mercury Elixir","Mist Veiled Gold Elixir","Mist Veiled Primo Elixir"]
 	},
 	"aerosiderite": {
-		"priority": 0,
+		"priority": 5,
 		"items":["Grain of Aerosiderite","Piece of Aerosiderite","Bit of Aerosiderite","Chunk of Aerosiderite"]
 	},
 	"distantSeaBranches": {
-		"priority": 0,
+		"priority": 6,
 		"items":["Coral Branch of a Distant Sea","Jeweled Branch of a Distant Sea","Jade Branch of a Distant Sea","Golden Branch of a Distant Sea"]
 	},
 	"narukami": {
-		"priority": 0,
+		"priority": 7,
 		"items":["Narukami's Wisdom","Narukami's Joy","Narukami's Affection","Narukami's Valor"]
 	},
 	"oniMasks": {
-		"priority": 0,
+		"priority": 8,
 		"items":["Mask of the Wicked Lieutenant","Mask of the Tiger's Bite","Mask of the One-Horned","Mask of the Kijin"]
 	},
 	"forestDewTalismans": {
-		"priority": 0,
+		"priority": 9,
 		"items":["Copper Talisman of the Forest Dew","Iron Talisman of the Forest Dew","Silver Talisman of the Forest Dew","Golden Talisman of the Forest Dew"]
 	},
 	"oasisGardens": {
-		"priority": 0,
+		"priority": 10,
 		"items":["Oasis Garden's Reminiscence","Oasis Garden's Kindness","Oasis Garden's Mourning","Oasis Garden's Truth"]
 	},
 	"scorchingMights": {
-		"priority": 0,
+		"priority": 11,
 		"items":["Echo of Scorching Might","Remnant Glow of Scorching Might","Dream of Scorching Might","Olden Days of Scorching Might"]
 	},
 

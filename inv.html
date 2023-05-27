@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+	<link rel="stylesheet" href="style.css">
+	<script type="text/javascript" src="chardb.js"></script>
+	<script type="text/javascript" src="itemdb.js"></script>
+	<script type="text/javascript" src="weapdb.js"></script>
+	<script type="text/javascript" src="ascdb.js"></script>
+	<script type="text/javascript" src="scripts.js"></script>
+	<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+	<script type="text/javascript" src="scripts/inventory.js"></script>
+	<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
+	<body>
+		<div>
+			<a href="index.html">Home</a>
+		</div>
+		<div class="invBlock" id="inventory"></div>
+	</body>
+	<script>
+	'use strict';
+	window.addEventListener("load", () => {
+		var html = "<div class=\"boxName\">Inventory</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><br><div class=\"outputRequired\">";
+		var maxInputSize = 4;
+		var items = [];
+		var inv = loadInventory();
+		var value = 0;
+		for(var i in itemDB) {
+			items[items.length] = {"name": i, "count": 0};
+		}
+		orderItems(items);
+		// console.log(items);
+		// console.log(inv)
+		for(var i in items) {
+			if(inv != "" && inv[items[i].name]) {value = inv[items[i].name]} else {value = 0}
+			// console.log(i,inv[i]);
+			html+="<div class=\"askForItem\">"+makeItemIcon(items[i].name,"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(items[i].name)+"\">",-1,"mini")+"</div>";
+		}
+		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveInventory()\">Save Inventory</button><button id=\"clearinvbutton\" onClick=\"clearInventory()\">Clear Inventory</button></div></div>";
+		get("inventory").innerHTML = html;
+	});
+	</script>
+</html>
