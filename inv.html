@@ -30,7 +30,7 @@
 		// console.log(items);
 		// console.log(inv)
 		for(var i in items) {
-			if(inv != "" && inv[items[i].name]) {value = inv[items[i].name]} else {value = 0}
+			if(inv != null && inv[items[i].name]) {value = inv[items[i].name]} else {value = 0}
 			// console.log(i,inv[i]);
 			html+="<div class=\"askForItem\">"+makeItemIcon(items[i].name,"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(items[i].name)+"\">",-1,"mini")+"</div>";
 		}
