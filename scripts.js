@@ -355,7 +355,7 @@ var askUserForItems = (_items) => {
 	// console.log(inv)
 	_html += "<div class=\"boxTitle\">How many items do you have?</div><div class=\"outputRequired\">";
 	for (var _i = 0; _i < _items.length; _i++) {
-		if(inv != null && inv[items[_i].name]) {value = inv[items[_i].name]} else {value = 0}
+		if(inv != null && inv[_items[_i].name] != undefined) {value = inv[_items[_i].name]} else {value = 0}
 		_html += "<div class=\"askForItem\">"+makeItemIcon(_items[_i].name,"<input class=\"userInvInput\" type=\"number\" size=\""+_maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(_items[_i].name)+"\">",-1,"mini")+"</div>";
 		// _html += "<div class=\"askForItem\">"+makeItemIcon(_items[_i].name,"<input class=\"userInvInput\" type=\"number\" size=\""+_maxInputSize+"\" min=\"0\" value=\""+_items[_i].count+"\" id=\"userItemCount"+spaceToUnderscore(_items[_i].name)+"\">",-1,"mini")+"</div>";
 	}
