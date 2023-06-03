@@ -429,22 +429,6 @@ const itemDB = {
 		"type": "elite"
 	},
 
-	"Agnidus Agate Chunk": {
-		"rarity": 4,
-		"type": "gem"
-	},
-	"Agnidus Agate Fragment": {
-		"rarity": 3,
-		"type": "gem"
-	},
-	"Agnidus Agate Gemstone": {
-		"rarity": 5,
-		"type": "gem"
-	},
-	"Agnidus Agate Sliver": {
-		"rarity": 2,
-		"type": "gem"
-	},
 	"Brilliant Diamond Chunk": {
 		"rarity": 4,
 		"type": "gem"
@@ -461,6 +445,38 @@ const itemDB = {
 		"rarity": 2,
 		"type": "gem"
 	},
+	"Agnidus Agate Chunk": {
+		"rarity": 4,
+		"type": "gem"
+	},
+	"Agnidus Agate Fragment": {
+		"rarity": 3,
+		"type": "gem"
+	},
+	"Agnidus Agate Gemstone": {
+		"rarity": 5,
+		"type": "gem"
+	},
+	"Agnidus Agate Sliver": {
+		"rarity": 2,
+		"type": "gem"
+	},
+	"Varunada Lazurite Chunk": {
+		"rarity": 4,
+		"type": "gem"
+	},
+	"Varunada Lazurite Fragment": {
+		"rarity": 3,
+		"type": "gem"
+	},
+	"Varunada Lazurite Gemstone": {
+		"rarity": 5,
+		"type": "gem"
+	},
+	"Varunada Lazurite Sliver": {
+		"rarity": 2,
+		"type": "gem"
+	},
 	"Nagadus Emerald Chunk": {
 		"rarity": 4,
 		"type": "gem"
@@ -474,6 +490,38 @@ const itemDB = {
 		"type": "gem"
 	},
 	"Nagadus Emerald Sliver": {
+		"rarity": 2,
+		"type": "gem"
+	},
+	"Vajrada Amethyst Chunk": {
+		"rarity": 4,
+		"type": "gem"
+	},
+	"Vajrada Amethyst Fragment": {
+		"rarity": 3,
+		"type": "gem"
+	},
+	"Vajrada Amethyst Gemstone": {
+		"rarity": 5,
+		"type": "gem"
+	},
+	"Vajrada Amethyst Sliver": {
+		"rarity": 2,
+		"type": "gem"
+	},
+	"Vayuda Turquoise Chunk": {
+		"rarity": 4,
+		"type": "gem"
+	},
+	"Vayuda Turquoise Fragment": {
+		"rarity": 3,
+		"type": "gem"
+	},
+	"Vayuda Turquoise Gemstone": {
+		"rarity": 5,
+		"type": "gem"
+	},
+	"Vayuda Turquoise Sliver": {
 		"rarity": 2,
 		"type": "gem"
 	},
@@ -509,55 +557,7 @@ const itemDB = {
 		"rarity": 5,
 		"type": "gem"
 	},
-	"Vajrada Amethyst Chunk": {
-		"rarity": 4,
-		"type": "gem"
-	},
-	"Vajrada Amethyst Fragment": {
-		"rarity": 3,
-		"type": "gem"
-	},
-	"Vajrada Amethyst Gemstone": {
-		"rarity": 5,
-		"type": "gem"
-	},
-	"Vajrada Amethyst Sliver": {
-		"rarity": 2,
-		"type": "gem"
-	},
-	"Varunada Lazurite Chunk": {
-		"rarity": 4,
-		"type": "gem"
-	},
-	"Varunada Lazurite Fragment": {
-		"rarity": 3,
-		"type": "gem"
-	},
-	"Varunada Lazurite Gemstone": {
-		"rarity": 5,
-		"type": "gem"
-	},
-	"Varunada Lazurite Sliver": {
-		"rarity": 2,
-		"type": "gem"
-	},
-	"Vayuda Turquoise Chunk": {
-		"rarity": 4,
-		"type": "gem"
-	},
-	"Vayuda Turquoise Fragment": {
-		"rarity": 3,
-		"type": "gem"
-	},
-	"Vayuda Turquoise Gemstone": {
-		"rarity": 5,
-		"type": "gem"
-	},
-	"Vayuda Turquoise Sliver": {
-		"rarity": 2,
-		"type": "gem"
-	},
-
+	
 	"Guide to Admonition": {
 		"rarity": 3,
 		"type": "books"
