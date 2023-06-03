@@ -189,26 +189,6 @@ body {
   width: var(--size);
 }
 
-/* .rarity-0, .rarity-1 {
-  background-image: url(images/rarity/1.png);
-}
-
-.rarity-2 {
-  background-image: url(images/rarity/2.png);
-}
-
-.rarity-3 {
-  background-image: url(images/rarity/3.png);
-}
-
-.rarity-4 {
-  background-image: url(images/rarity/4.png);
-}
-
-.rarity-5 {
-  background-image: url(images/rarity/5.png);
-} */
-
 .outputRequired {
   display: flex;
   flex-wrap: wrap;

@@ -21,19 +21,17 @@
 	window.addEventListener("load", () => {
 		var html = "<div class=\"boxName\">Inventory</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><br><div class=\"outputRequired\">";
 		var maxInputSize = 4;
-		var items = [];
 		var inv = loadInventory();
 		var value = 0;
+		var itemKeys = [];
 		for(var i in itemDB) {
-			items[items.length] = {"name": i, "count": 0};
+			itemKeys[itemKeys.length] = i;
 		}
-		orderItems(items);
-		// console.log(items);
-		// console.log(inv)
-		for(var i in items) {
-			if(inv != null && inv[items[i].name]) {value = inv[items[i].name]} else {value = 0}
-			// console.log(i,inv[i]);
-			html+="<div class=\"askForItem\">"+makeItemIcon(items[i].name,"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(items[i].name)+"\">",-1,"mini")+"</div>";
+		orderItems(itemKeys);
+		if(inv == null) inv = {};
+		for(var i in itemKeys) {
+			if(inv != null && inv[itemKeys[i]]) {value = inv[itemKeys[i]]} else {value = 0}
+			html+="<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(itemKeys[i])+"\">",-1,"mini")+"</div>";
 		}
 		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveInventory()\">Save Inventory</button><button id=\"clearinvbutton\" onClick=\"clearInventory()\">Clear Inventory</button></div></div>";
 		get("inventory").innerHTML = html;
