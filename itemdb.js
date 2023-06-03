@@ -703,39 +703,27 @@ const itemDB = {
 		"type": "books"
 	},
 
-	"Amakumo Fruit": {
+	"Wolfhook": {
 		"rarity": 1,
 		"type": "local"
 	},
-	"Crystal Marrow": {
+	"Valberry": {
 		"rarity": 1,
 		"type": "local"
 	},
-	"Glaze Lily": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Mourning Flower": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Onikabuto": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Rukkhashava Mushrooms": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Scarab": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Starconch": {
+	"Cecilia": {
 		"rarity": 1,
 		"type": "local"
 	},
 	"Windwheel Aster": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Philanemo Mushroom": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Small Lamp Grass": {
 		"rarity": 1,
 		"type": "local"
 	},
@@ -747,75 +735,7 @@ const itemDB = {
 		"rarity": 1,
 		"type": "local"
 	},
-	"Henna Berry": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Naku Weed": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Padisarah": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Sakura Bloom": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Sea Ganoderma": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Trishiraite": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Wolfhook": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Cecilia": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Dendrobium": {
-		"rarity": 1,
-		"type": "local"
-	},
 	"Jueyun Chili": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Nilotpala Lotus": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Philanemo Mushroom": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Sand Grease Pupa": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Silk Flower": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Valberry": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Cor Lapis": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Fluorescent Fungus": {
-		"rarity": 1,
-		"type": "local"
-	},
-	"Kalpalata Lotus": {
 		"rarity": 1,
 		"type": "local"
 	},
@@ -823,7 +743,51 @@ const itemDB = {
 		"rarity": 1,
 		"type": "local"
 	},
+	"Silk Flower": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Glaze Lily": {
+		"rarity": 1,
+		"type": "local"
+	},
 	"Qingxin": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Starconch": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Violetgrass": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Cor Lapis": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Onikabuto": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Sakura Bloom": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Crystal Marrow": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Dendrobium": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Naku Weed": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Sea Ganoderma": {
 		"rarity": 1,
 		"type": "local"
 	},
@@ -831,11 +795,47 @@ const itemDB = {
 		"rarity": 1,
 		"type": "local"
 	},
-	"Small Lamp Grass": {
+	"Amakumo Fruit": {
 		"rarity": 1,
 		"type": "local"
 	},
-	"Violetgrass": {
+	"Fluorescent Fungus": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Rukkhashava Mushrooms": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Padisarah": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Nilotpala Lotus": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Kalpalata Lotus": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Henna Berry": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Sand Grease Pupa": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Mourning Flower": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Trishiraite": {
+		"rarity": 1,
+		"type": "local"
+	},
+	"Scarab": {
 		"rarity": 1,
 		"type": "local"
 	},
