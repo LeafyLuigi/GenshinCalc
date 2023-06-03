@@ -74,32 +74,32 @@
 	</body>
 	
 	<script>
+	'use strict';
 	window.addEventListener("load", () => {
 		// Generate Dropdown HTML
-		var _html = "";
-		for (var _i in chars) {
-			var _name = _i;
-			var _img = spaceToUnderscore(_name);
-			if (_name != "Traveler") {
-				_html += "<button onclick=\"pickChar(this.name)\" name=\"" + _name + "\"><img class=\"dropdownCharImg\" src=\"images/char/" + _img + ".png\"><span>" + _name + "</span></button>";
+		var html = "";
+		for (var i in chars) {
+			var charName = i;
+			var img = spaceToUnderscore(charName);
+			if (charName != "Traveler") {
+				html += "<button onclick=\"pickChar(this.name)\" name=\"" + charName + "\"><img class=\"dropdownCharImg\" src=\"images/char/" + img + ".png\"><span>" + charName + "</span></button>";
 			} else {
-				for (var _j = 0; _j < chars[_i].regions.length; _j++) {
-					var _travVariant = chars[_i].regions[_j];
-					var _name2 = _travVariant.type + " " + _name;
-					_html += "<button onclick=\"pickChar(this.name,this.getAttribute(&quot;num&quot;))\" name=\"" + _name2 + "\" num=\"" + _j + "\"><img class=\"dropdownCharImg\" src=\"images/char/" + _img + ".png\"><span>" + _name2 + "</span></button>";
+				for (var j = 0; j < chars[i].regions.length; j++) {
+					var travVariant = chars[i].regions[j];
+					html += "<button onclick=\"pickChar(this.name,this.getAttribute(&quot;num&quot;))\" name=\"" + charName + "\" num=\"" + j + "\"><img class=\"dropdownCharImg\" src=\"images/char/" + img + ".png\"><span>" + travVariant.type + " " + charName + "</span></button>";
 				}
 			}
 		}
-		get("dropdownCharContent").innerHTML = _html; _html = "";
-		for (var _i in weapDB) {
-			var _name = _i;
-			var _title = _name;
-			var _rarity = weapDB[_i].rarity;
-			var _img = spaceToUnderscore(_name);
-			if (weapDB[_i].title != undefined) _title = weapDB[_i].title;
-			_html += "<button onclick=\"pickWeapon(this.name,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + _rarity + "\" name=\"" + _name + "\"><img class=\"dropdownWeaponImg\" src=\"images/weapon/" + _img + ".png\"><span>" + _title + "</span></button>";
+		get("dropdownCharContent").innerHTML = html; html = "";
+		for (var i in weapDB) {
+			var weapName = i;
+			var title = weapName;
+			var rarity = weapDB[i].rarity;
+			var img = spaceToUnderscore(weapName);
+			if (weapDB[i].title != undefined) title = weapDB[i].title;
+			html += "<button onclick=\"pickWeapon(this.name,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><img class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></button>";
 		}
-		get("dropdownWeaponContent").innerHTML = _html; _html = "";
+		get("dropdownWeaponContent").innerHTML = html; html = "";
 
 		// try {
 		// 	selectedChars = JSON.parse(getLSItem("selectedChars"))

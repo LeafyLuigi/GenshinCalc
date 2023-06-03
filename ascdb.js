@@ -1,5 +1,5 @@
 // What's needed per level for Ascension and Talents
-const _ascValues = [
+const ascValues = [
 	{
 		"cost": 20000,
 		"common": {"count": 3, "rank": 0},
@@ -42,7 +42,7 @@ const _ascValues = [
 		"boss": 20
 	},
 ];
-const _talValues = [
+const talValues = [
 	{
 		"cost": 12500,
 		"common": {"count": 6, "rank": 0},
@@ -94,14 +94,14 @@ const _talValues = [
 		"crown": 1
 	}
 ];
-const _weapRefinementCost = [
+const weapRefinementCost = [
 	null,
 	null,
 	[500,1000,2000,4000],
 	[1000,2000,4000,8000],
 	[2000,4000,8000,16000]
 ];
-const _weapAscValues = [
+const weapAscValues = [
 	[
 		{
 			"weapon": {"count": 1, "rank": 0},

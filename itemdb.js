@@ -1382,7 +1382,7 @@ const itemGroupDB = {
 }
 // adds the group to the item
 for (var groupItem in itemGroupDB) {
-	for (var _i = 0; _i < itemGroupDB[groupItem].items.length; _i++) {
-		itemDB[itemGroupDB[groupItem].items[_i]].group = groupItem;
+	for (var i = 0; i < itemGroupDB[groupItem].items.length; i++) {
+		itemDB[itemGroupDB[groupItem].items[i]].group = groupItem;
 	}
 }
