@@ -9,47 +9,7 @@ const itemDB = {
 		"type": "other"
 	},
 	
-	"Basalt Pillar": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Cleansing Heart": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Crystalline Bloom": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Dew of Repudiation": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Dragonheir's False Fin": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Everflame Seed": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Evergloom Ring": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Hoarfrost Core": {
-		"rarity": 4,
-		"type": "boss"
-	},
 	"Hurricane Seed": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Juvenile Jade": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Light Guiding Tetrahedron": {
 		"rarity": 4,
 		"type": "boss"
 	},
@@ -57,7 +17,27 @@ const itemDB = {
 		"rarity": 4,
 		"type": "boss"
 	},
-	"Majestic Hooked Beak": {
+	"Basalt Pillar": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Hoarfrost Core": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Everflame Seed": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Cleansing Heart": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Juvenile Jade": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Crystalline Bloom": {
 		"rarity": 4,
 		"type": "boss"
 	},
@@ -65,27 +45,7 @@ const itemDB = {
 		"rarity": 4,
 		"type": "boss"
 	},
-	"Perpetual Caliber": {
-		"rarity": 4,
-		"type": "boss"
-	},
 	"Perpetual Heart": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Pseudo-Stamens": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Quelled Creeper": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Riftborn Regalia": {
-		"rarity": 4,
-		"type": "boss"
-	},
-	"Runic Fang": {
 		"rarity": 4,
 		"type": "boss"
 	},
@@ -93,11 +53,51 @@ const itemDB = {
 		"rarity": 4,
 		"type": "boss"
 	},
+	"Dew of Repudiation": {
+		"rarity": 4,
+		"type": "boss"
+	},
 	"Storm Beads": {
 		"rarity": 4,
 		"type": "boss"
 	},
+	"Riftborn Regalia": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Dragonheir's False Fin": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Runic Fang": {
+		"rarity": 4,
+		"type": "boss"
+	},
 	"Thunderclap Fruitcore": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Majestic Hooked Beak": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Perpetual Caliber": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Light Guiding Tetrahedron": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Quelled Creeper": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Pseudo-Stamens": {
+		"rarity": 4,
+		"type": "boss"
+	},
+	"Evergloom Ring": {
 		"rarity": 4,
 		"type": "boss"
 	},
