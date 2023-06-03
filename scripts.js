@@ -102,13 +102,16 @@ var mergeItems = (_firstList,_secondList,_deleteZeroOrLess=false) => {
 	}
 	return _mergedList;
 }
+// Items can also be manually sorted in the itemdb.js file
 const typeOrder = ["charExp","local","common","elite","gem","books","weaponAsc","boss","weeklyBoss","other"];
 const intraTypeOrder = ["group","rarity","count"]; // "Group" is arbitrary and until multiple inputs are added, will be skipped.
 var orderItems = (_items) => {
 	// var _index = _items.map(i => i.name);
 	_items.sort((a,b) => {
 		if(a.name == "Mora") return -1; // "Mora" is placed first
+		if(b.name == "Mora") return 1;
 		if(a.name == "Crown of Insight") return 1; // Crowns are last
+		if(b.name == "Crown of Insight") return -1;
 		var aItem = itemDB[a.name];
 		var bItem = itemDB[b.name];
 		var aType = typeOrder.indexOf(aItem.type);
@@ -131,6 +134,7 @@ var orderItems = (_items) => {
 var makeItemIcon = (_item,_count=1,_rarity=-1,_size="mini") => {
 	var _fallback = _item;
 	var _validSizes = ["micro","tiny","mini","small","normal","big"];
+	var _pixels = [36, 56, 72, 96, 112, 256];
 	if (_validSizes.indexOf(_size) == -1) {
 		console.warn("Invalid size used. Using default (\"mini\"). Valid sizes: "+_validSizes)
 		_size = "mini";
@@ -148,10 +152,10 @@ var makeItemIcon = (_item,_count=1,_rarity=-1,_size="mini") => {
 		if(_rarity == -1) _rarity = itemDB[_item].rarity;
 	}
 	_html = "<div class=\"itemIcon ";
-	if(_size == "micro" || _size == "tiny" || _size == "mini" || _size == "small" || _size == "normal") _html+=_size;
-	_html +=" rarity-"+_rarity+"\"><img ";
+	if(_size == "micro" || _size == "tiny" || _size == "mini" || _size == "small" || _size == "normal") _html+=_size+" ";
+	_html +="rarity-"+_rarity+"\"><img ";
 	if(_fallback != _item) _html+="fallback=\""+_fallback+"\" ";
-	_html +="class=\"itemIconImg\" src=\"images/"+_type+"/"+_img+".png\">"+_count+"</div>";
+	_html +="class=\"itemIconImg\" src=\"images/"+_type+"/"+_img+".png\" width=\""+_pixels[_validSizes.indexOf(_size)]+"\" height=\""+_pixels[_validSizes.indexOf(_size)]+"\">"+_count+"</div>";
 	return _html;
 }
 
@@ -242,57 +246,28 @@ var test = () => {
 			get(_id+"-charOutput").innerHTML = _html;
 			items = mergeItems(_charItems,items);
 		} else {
-			var selectedWeapon = get(_id).children[0].children[0].innerText;
 			var _weapAsc = val(_id+"-asc");
 			var _target = val(_id+"-targetAsc");
 			if(_weapAsc == _target) continue;
-								
-			const _order = [_ascValues,_talValues,_talValues,_talValues];
+			
+			var selectedWeapon = selectedChars[idNameIndex.indexOf(_id)].name;
 			var _weapData = weapDB[selectedWeapon];
+			var _weaponAscOfRarirty = _weapAscValues[Math.floor(_weapData.rarity - 1)];
 			var _weapItems = [];
-
-			const _valueNames = ["ascension", "normal attack", "skill", "burst"];
-			const _gemSuffix = [" Sliver", " Fragment", " Chunk", " Gemstone"];
-			const _booksPrefix = ["Teachings of ", "Guide to ", "Philosophies of "];
-
 			
 			_neededItemsForAscTal = [];
-			for(var _j = _weapAsc ;_j < _weapAsc;_j++) {
-				for(var _k in _order[_i][_j]) {
+			for(var _j = _weapAsc ;_j < _target;_j++) {
+				for(var _k in _weaponAscOfRarirty[_j]) {
 					if(_k == "cost") {
-						_neededItemsForAscTal = addItem("Mora",_order[_i][_j][_k],_neededItemsForAscTal);
-					} else if(_k == "crown") {
-						_neededItemsForAscTal = addItem("Crown of Insight",_order[_i][_j][_k],_neededItemsForAscTal);
-					} else if (_k == "local" || _k == "weeklyBoss" || _k == "boss") {
-						if(_charData[_k] == null) continue;
-						_neededItemsForAscTal = addItem(_charData[_k],_order[_i][_j][_k],_neededItemsForAscTal);
-					} else if (_k == "gem" || _k == "books") {
-						var _rank = _order[_i][_j][_k].rank;
-						var _name = "";
-						if (typeof(_charData[_k])=="string") {
-							_name = _charData[_k];
-						} else if (_k != "books" && selectedWeapon != "Traveler") {
-							_name = _charData[_k][_rank];
-						} else {
-							_name = _charData[_k][_j % 3]
-						}
-						if (_k == "gem") _name = _name+_gemSuffix[_rank];
-						if (_k == "books") _name = _booksPrefix[_rank]+_name;
-						_neededItemsForAscTal = addItem(_name,_order[_i][_j][_k].count,_neededItemsForAscTal);
-					} else if (_k == "common") {
-						var _rank = _order[_i][_j][_k].rank;
-						var _group = itemGroupDB[_charData[_k]].items;
-						_neededItemsForAscTal = addItem(_group[_rank],_order[_i][_j][_k].count,_neededItemsForAscTal);
+						_weapItems = addItem("Mora",_weaponAscOfRarirty[_j][_k],_weapItems);
+					} else {
+						var _rank = _weaponAscOfRarirty[_j][_k].rank;
+						var _group = itemGroupDB[_weapData[_k]].items;
+						_weapItems = addItem(_group[_rank],_weaponAscOfRarirty[_j][_k].count,_weapItems);
 					}
 				}
 			}
-			_weapItems = mergeItems(_neededItemsForAscTal,_weapItems);
-			_html += "The required materials for leveling ";
-			_html += _valueNames[_i];
-			_html += " from " + _weapAsc + " to " + _target + " are:";
-			_html += "<div class=\"outputRequired\">" + getItemsNeeded(_neededItemsForAscTal,"tiny") + "</div>";
-
-			_html += "<br><div class=\"boxTitle\">The total for "+selectedWeapon+" is:</div>";
+			_html += "The required materials for leveling ascension from " + _weapAsc + " to " + _target + " are:";
 			_html += "<div class=\"outputRequired\">" + getItemsNeeded(_weapItems,"mini") + "</div>";
 			get(_id+"-weapOutput").innerHTML = _html;
 			items = mergeItems(_weapItems,items);
@@ -318,13 +293,14 @@ var resetItemLists = () => {
 		var _boxType = ids[_perID].type;
 		if (_boxType == "char") {
 			get(_id + "-charOutput").innerHTML = "";
+		} else {
+			get(_id + "-weapOutput").innerHTML = "";
 		}
 	}
 }
 
 // loop MakeItemIcon (above) with defaults (sans size) for needed items
 var getItemsNeeded = (_items,_size="mini",_hideBelowZero=true) => {
-	var _j = orderItems(_items)
 	var _html = "";
 	for (var _i = 0; _i < _items.length; _i++) {
 		if(_items[_i].name == null) continue;
@@ -352,12 +328,10 @@ var askUserForItems = (_items) => {
 	orderItems(_items);
 	var inv = loadInventory();
 	var value = 0;
-	// console.log(inv)
 	_html += "<div class=\"boxTitle\">How many items do you have?</div><div class=\"outputRequired\">";
 	for (var _i = 0; _i < _items.length; _i++) {
 		if(inv != null && inv[_items[_i].name] != undefined) {value = inv[_items[_i].name]} else {value = 0}
 		_html += "<div class=\"askForItem\">"+makeItemIcon(_items[_i].name,"<input class=\"userInvInput\" type=\"number\" size=\""+_maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(_items[_i].name)+"\">",-1,"mini")+"</div>";
-		// _html += "<div class=\"askForItem\">"+makeItemIcon(_items[_i].name,"<input class=\"userInvInput\" type=\"number\" size=\""+_maxInputSize+"\" min=\"0\" value=\""+_items[_i].count+"\" id=\"userItemCount"+spaceToUnderscore(_items[_i].name)+"\">",-1,"mini")+"</div>";
 	}
 	_html += "</div><br><button onclick=\"getItemsRemaining()\">Submit</button>";
 	return _html;
@@ -371,131 +345,94 @@ var getItemsRemaining = () => {
 	userItemsLeft = [];
 	saveInventory();
 	var _userInvInputs = getByClass("userInvInput");
-	var _userItems = [];
-	var _html = "";
-	for(var _i = 0; _i < _userInvInputs.length; _i++) {
-		_userItems[_i] = {"name": underscoreToSpace(_userInvInputs[_i].id.slice(13)),"count":Math.floor(-1 * val(_userInvInputs[_i].id))};
+	var itemsIndex = items.map(i=>i.name);
+	var html = "";
+	for (var i = 0; i < _userInvInputs.length; i++) {
+		var itemName = underscoreToSpace(_userInvInputs[i].id.slice(13));
+		var count = -1 * val(_userInvInputs[i],true);
+		if (itemsIndex.indexOf(itemName) != -1) {
+			count += items[itemsIndex.indexOf(itemName)].count;
+		}
+		userItemsLeft[userItemsLeft.length] = {"name": itemName, "count": count}
 	}
-	userItemsLeft = mergeItems(items,_userItems);
-	_html += "<div class=\"boxTitle\">You need to obtain the following:</div><div class=\"outputRequired\">";
+	html += "<div class=\"boxTitle\">You need to obtain the following:</div><div class=\"outputRequired\">";
 	for(var _i = 0; _i < userItemsLeft.length;_i++) {
 		if(userItemsLeft[_i].count < 1) continue;
-		_html += makeItemIcon(userItemsLeft[_i].name,userItemsLeft[_i].count,-1,"small");
+		html += makeItemIcon(userItemsLeft[_i].name,userItemsLeft[_i].count,-1,"small");
 	}
-	_html += "</div>";
-	getByClass("invBlock")[1].classList.remove("empty");
+	html += "</div>";
 
 	var _inputs = userItemsLeft;
-	var _lowest = [];
-	var _remove = [];
-	var _remainder = [];
-	var groupItems = [];
-	var groupItemsIndex = [];
+	var remainder = [];
+	var testedGroups = [];
+	var nonGrouped = [];
+	var neededGrouped = [];
 
-	// This codeblock calculates the lowest-tier item within a group.
-	for(var _i in _inputs) {
-		if(itemDB[_inputs[_i].name].group == undefined) continue; // skip items without a group
-		if(itemGroupDB[itemDB[_inputs[_i].name].group].craftUp == false) continue; // skip non-craft-up groups ("Brilliant Diamond" cannot be crafted up for example)
-		
-		var name = _inputs[_i].name;
+	for(var i in _inputs) {
+		if(itemDB[_inputs[i].name].group == undefined) {
+			nonGrouped = addItem(_inputs[i].name,_inputs[i].count,nonGrouped);
+			continue; // skip items without a group
+		}
+		if(itemGroupDB[itemDB[_inputs[i].name].group].craftUp == false) continue; // skip non-craft-up groups ("Brilliant Diamond" cannot be crafted up for example)
+		var name = _inputs[i].name;
+		var _inputsIndex = _inputs.map(i=>i.name);
 		var group = itemDB[name].group;
-		
-		var groupItemsItem;
-		
-		groupItemsIndex = groupItems.map(i => i.group);
-		if(groupItemsIndex.indexOf(group) == -1) {
-			var _groupItems = [];
-			_groupItems[itemGroupDB[group].items.indexOf(name)] = -1 * _inputs[_i].count
-			groupItems[groupItems.length] = {"group": group, "items": _groupItems};
-			groupItemsIndex = groupItems.map(i => i.group);
-		} else {
-			groupItemsItem = groupItems[groupItemsIndex.indexOf(group)];
-			groupItemsItem.items[itemGroupDB[group].items.indexOf(name)] = -1 * _inputs[_i].count;
+		if(testedGroups.indexOf(group) != -1) continue;
+		testedGroups[testedGroups.length] = group;
+		var groupItems = [];
+		var groupDBItems = itemGroupDB[group].items;
+
+		for(var j = 0; j < groupDBItems.length; j++) {
+			groupItems[j] = -1 * _inputs[_inputsIndex.indexOf(groupDBItems[j])].count;
 		}
-		
-		// if(_inputs[_i].count == 0) continue; // skip empty items 
-		// if(itemGroupDB[group].items.indexOf(name) == 0) continue; // skip lowest items, because those can't be crafted
-	}
 
-	// "Craft up" calculations; it takes the count of lower rarity items.
-	groupItemsIndex = groupItems.map(i => i.group);
-	var _convert = [];
-	for(var _i in groupItems) {
-		var group = groupItems[_i];
-		var _groupItemNames = itemGroupDB[groupItems[_i].group].items; 
-		for(var _j = group.items.length - 1; 0 < _j; _j--) {
-			// console.log(_j);
-			// _j = Math.floor(_j);
-			var _itemName = _groupItemNames[_j];
-			var _itemToGetCount = group.items[_j]; // positive means "need to obtain", negative means "already has"
-
-			// console.log("_j,name,count: "+_j,_itemName,_itemToGetCount)
-
-			if(_j != 0) {
-				var _needed = _itemToGetCount; // positive numbers are "excess", negative are "need"
-				var _maxCraftable = -1 * Math.floor(_itemToGetCount / 3);
-				var _used = 0;
-				// console.log(_needed);
-				// console.log(_maxCraftable);
-				while(_needed < 0 && _used < _maxCraftable) {
-					_needed++;
-					_used++;
-				}
-				// console.log(_itemName,_needed,_used)
-				if(_used != 0) {
-					_convert = addItem(_itemName,-1 * _used,_convert);
-					_convert = addItem(_groupItemNames[_j - 1],_used * 3,_convert);
-					group.items[_j - 1] += _used * -3;
+		for(var j = groupDBItems.length - 1; j >= 0; j--) {
+			if(groupItems[j] < 0) {
+				if(j > 0) {
+					while(groupItems[j] != 0) {
+						groupItems[j]++;
+						groupItems[j-1]-=3;
+					}
+				} else {
+					neededGrouped = addItem(groupDBItems[j],-1*groupItems[j],neededGrouped)
 				}
 			}
-
+			if(groupItems[j] > 0) {
+				neededGrouped = addItem(groupDBItems[j],-1 * groupItems[j],neededGrouped);
+			}
 		}
 	}
-	_inputs = mergeItems(_convert,_inputs);
-	// console.log(_convert);
 
-	// find lowest tier
-	_lowest = []; _remove = [];
-	for(var _i = 0; _i < _inputs.length; _i++) {
-		if(_inputs[_i].count <= 0 || itemDB[_inputs[_i].name].group == undefined) continue;
-		var _name = _inputs[_i].name;
-		var _count = _inputs[_i].count;
-		var _groupNames = itemGroupDB[itemDB[_name].group].items;
-		var _rank = _groupNames.indexOf(_name);
-		_lowest = addItem(_groupNames[0],_count * 3 ** _rank,_lowest);
-		_remove = addItem(_name,-1*_count,_remove);
+	_inputs = mergeItems(nonGrouped,neededGrouped)
+	orderItems(_inputs)
 
-	}
-	// console.log(_lowest,_remove)
-	_inputs = mergeItems(_lowest,mergeItems(_remove,_inputs))
-	// console.log(_inputs);
-	
 	if(_inputs.length != 0) {
-		_html += "<div class=\"boxTitle\">You need to further obtain the following items to craft or match the above items:</div><div><em>This assumes no crafting bonuses.</em></div><div class=\"outputRequired\">";
-		for(var _i = 0; _i < _inputs.length;_i++) {
-			if(_inputs[_i].count < 1) continue;
-			_html += makeItemIcon(_inputs[_i].name,_inputs[_i].count,-1,"small");
+		html += "<div class=\"boxTitle\">You need to further obtain the following items to craft or match the above items:</div><div><em>This assumes no crafting bonuses.</em></div><div class=\"outputRequired\">";
+		for(var i = 0; i < _inputs.length; i++) {
+			if(_inputs[i].count < 1) continue;
+			html += makeItemIcon(_inputs[i].name,_inputs[i].count,-1,"small");
 		}
-		_html +="</div>";
-		var _textOutput = "You need to obtain the following lowest-tier equivalents:";
-		for (var _i in _inputs) {
-			if(_inputs[_i].count < 1) continue;
-			_textOutput += "<br>"+_inputs[_i].name+" x "+_inputs[_i].count;
+		html +="</div>";
+		var textOutput = "You need to obtain the following lowest-tier equivalents:";
+		for (var i in _inputs) {
+			if(_inputs[i].count < 1) continue;
+			textOutput += "<br>"+_inputs[i].name+" x "+_inputs[i].count;
 		}
-		get("textOutput").innerHTML = _textOutput;
-		for (var _i in _inputs) {
-			if(_inputs[_i].count >= 0) continue;
-			_remainder[_remainder.length] = {"name": _inputs[_i].name,"count": -1 * _inputs[_i].count}
+		get("textOutput").innerHTML = textOutput;
+		for (var i in _inputs) {
+			if(_inputs[i].count >= 0) continue;
+			remainder[remainder.length] = {"name": _inputs[i].name,"count": -1 * _inputs[i].count}
 		}
-		if(_remainder.length != 0) {
-			_html+="<div class=\"boxSubtitle\">You will be left with the following items:</div><div class=\"outputRequired\">";
-			for (var _i in _remainder) {
-				_html+=makeItemIcon(_remainder[_i].name,_remainder[_i].count,-1,"tiny");
+		if(remainder.length != 0) {
+			html+="<div class=\"boxSubtitle\">You will be left with the following items:<br><small><em>(assuming all higher rarity items are used first)</em></small></div><div class=\"outputRequired\">";
+			for (var i in remainder) {
+				html+=makeItemIcon(remainder[i].name,remainder[i].count,-1,"tiny");
 			}
-			_html+="</div>";
+			html+="</div>";
 		}  
 	} else {
-		_html += "<div>You already have all the required items. All you need to do now is craft the above items.</div>"
+		html += "<div>You already have all the required items. All you need to do now is craft the above items.</div>"
 	}
-	get("whatToObtain").innerHTML = _html;
+	getByClass("invBlock")[1].classList.remove("empty");
+	get("whatToObtain").innerHTML = html;
 }

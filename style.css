@@ -130,8 +130,18 @@ body {
   height: calc(var(--size) * 1.2142857143);
   width: var(--size);
   line-height: 1;
-  font-size: calc(var(--size) * 1.2142857143 - var(--size));
+  font-size: calc(var(--size) * 0.2142857143);
+  border-radius: calc(var(--size) / 10);
   background: top/cover no-repeat;
+}
+.itemIcon input {
+  border-width: 0;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  color: #495366;
+  max-height: calc(var(--size) * 0.2142857143);
+  line-height: 1;
 }
 .itemIcon.normal {
   --size: 112px;
@@ -149,18 +159,28 @@ body {
   --size: 36px;
 }
 .itemIcon:is(.micro, .tiny, .mini, .small, .normal) {
+  background-color: #a2a2a2;
+  background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-1.png);
 }
 .itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-2 {
+  background-color: #6cad8d;
+  background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-2.png);
 }
 .itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-3 {
+  background-color: #6eaace;
+  background-image: linear-gradient(to bottom, #667896 0%, #6eaace 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-3.png);
 }
 .itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-4 {
+  background-color: #9674c5;
+  background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-4.png);
 }
 .itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-5 {
+  background-color: #e09552;
+  background-image: linear-gradient(to bottom, #946a43 0%, #e09552 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-5.png);
 }
 
@@ -169,7 +189,7 @@ body {
   width: var(--size);
 }
 
-.rarity-0, .rarity-1 {
+/* .rarity-0, .rarity-1 {
   background-image: url(images/rarity/1.png);
 }
 
@@ -187,7 +207,7 @@ body {
 
 .rarity-5 {
   background-image: url(images/rarity/5.png);
-}
+} */
 
 .outputRequired {
   display: flex;

@@ -5,18 +5,16 @@ var saveInventory = () => {
 	var inv = loadInventory();
 	var tested = [];
 	for(var i = 0; i < userInvInputs.length; i++) {
-		if(val(userInvInputs[i].id) == 0) continue;
+		if(inv == null) {inv = []}
+		if(val(userInvInputs[i].id) == 0 && inv[underscoreToSpace(userInvInputs[i].id.slice(13))] == undefined) continue;
 		tested[tested.length] = underscoreToSpace(userInvInputs[i].id.slice(13));
 		userItems += "\""+underscoreToSpace(userInvInputs[i].id.slice(13))+"\":"+val(userInvInputs[i].id)+",";
 	}
-	// console.log(tested);
 	for(var i in inv) {
 		if(tested.indexOf(i) != -1) continue;
 		userItems += "\""+i+"\":"+inv[i]+",";
 	}
 	userItems = "{"+userItems.slice(0,-1)+"}";
-	// console.log(userItems)
-	// console.log("inv length: "+userItems.length)
 	if(userItems == "{}") return;
 	setLSItem("inv",encodeURIComponent(userItems));
 }

@@ -13,8 +13,6 @@ var addSelectedChar = (type,char,id) => {
 		var target = val(id+"-targetAsc");
 		var maxAsc = Math.floor(get(id+"-targetAsc").max);
 	}
-	// console.log(selectedChars,id)
-	// console.log(selectedCharsIndex.indexOf(char))
 	if(selectedCharsIndex.indexOf(id) != -1) {
 		selectedChars[selectedCharsIndex.indexOf(id)].current = current;
 		selectedChars[selectedCharsIndex.indexOf(id)].target = target;
@@ -135,12 +133,10 @@ var addWeapon = (char="The Catch",fromInit=false,forcedId=null) => {
 	}
 	var id = createId("weapon",char,null,7,forcedId);
 	var html = "<div class='weaponBlock' id=\""+id+"\"><div class='topFlex'><div class='boxName'><img src='images/weapon/"+spaceToUnderscore(char)+".png'>"+title+"</div><button class='removeButton' onclick='removeId(&quot;"+id+"&quot;)'>Remove</button></div><div class='boxTitle'>Weapon Stats:</div><div><span>Ascension level: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+current+"' id='"+id+"-asc'></div><br><div class='boxTitle'>Targeted Stats:</div><div><span>Ascension level: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+target+"' id='"+id+"-targetAsc'></div><div id='"+id+"-weapOutput'></div></div>";
-	// console.log(html);
 	get("inputs").innerHTML += html;
 	if(!fromInit) addSelectedChar("weapon",char,id);
 	var j = ["asc","targetAsc"]
 	for(var i in j) {
-		// console.log(get(id+"-"+j[i]))
 		get(id+"-"+j[i]).setAttribute("onchange","addSelectedChar(\"weapon\",\""+char+"\",\""+id+"\");forceValue(this.id,this.value)")
 	}
 }

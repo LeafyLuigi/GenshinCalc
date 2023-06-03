@@ -118,13 +118,13 @@ const _weapAscValues = [
 			"cost": 5000,
 			"weapon": {"count": 2, "rank": 1},
 			"elite": {"count": 2, "rank": 2},
-			"common": {"count": 2, "rank": 2}
+			"common": {"count": 2, "rank": 1}
 		},
 		{
 			"cost": 10000,
 			"weapon": {"count": 1, "rank": 2},
 			"elite": {"count": 4, "rank": 2},
-			"common": {"count": 3, "rank": 2}
+			"common": {"count": 3, "rank": 1}
 		}
 	],
 	[
