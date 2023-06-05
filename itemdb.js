@@ -2,6 +2,15 @@
 const itemDB = {
 	"Mora": {
 		"rarity": 3,
+		"source": "Can be obtained by completing events, defeating monsters or selling meth.",
+		"type": "other"
+	},
+	"Dust of Azoth": {
+		"rarity": 2,
+		"type": "other"
+	},
+	"Dream Solvent": {
+		"rarity": 4,
 		"type": "other"
 	},
 	"Crown of Insight": {
@@ -1132,10 +1141,7 @@ const itemDB = {
 };
 
 const itemGroupDB = {
-	// NOTE:
-	// THIS LIST DOES NOT CONTAIN BOOKS BECAUSE I HAVE NOT SORTED THEM YET.
-	// WEEKLY BOSS DROPS ARE NOT INCLUDED HERE EITHER.
-	// LOCALS AND BOSS DROPS LACK GROUPS.
+	// NOTE: LOCALS AND BOSS DROPS LACK GROUPS. THEY ARE SORTED MANUALLY IN THE LIST ABOVE.
 
 	// common mats
 	"slime": {
@@ -1295,42 +1301,57 @@ const itemGroupDB = {
 		"items":["Echo of Scorching Might","Remnant Glow of Scorching Might","Dream of Scorching Might","Olden Days of Scorching Might"]
 	},
 
-	// gem groups - sorted by element in loading screen bar
+	// gem groups - sorted here by element in loading screen bar
 	"Brilliant Diamond": {
 		"priority": 0,
 		"craftUp": false,
+		"canConvertTo": false,
 		"items": ["Brilliant Diamond Sliver","Brilliant Diamond Fragment","Brilliant Diamond Chunk","Brilliant Diamond Gemstone"]
 	},
 	"Agnidus Agate": {
 		"priority": 1,
+		"convertType": "inter",
+		"convertTo": "gem",
 		"items": ["Agnidus Agate Sliver","Agnidus Agate Fragment","Agnidus Agate Chunk","Agnidus Agate Gemstone"]
 	},
 	"Varunada Lazurite": {
 		"priority": 2,
+		"convertType": "inter",
+		"convertTo": "gem",
 		"items": ["Varunada Lazurite Sliver","Varunada Lazurite Fragment","Varunada Lazurite Chunk","Varunada Lazurite Gemstone"]
 	},
 	"Vayuda Turquoise": {
-		"priority": 3,
+		"priority": 5,
+		"convertType": "inter",
+		"convertTo": "gem",
 		"items": ["Vayuda Turquoise Sliver","Vayuda Turquoise Fragment","Vayuda Turquoise Chunk","Vayuda Turquoise Gemstone"]
 	},
 	"Vajrada Amethyst": {
 		"priority": 4,
+		"convertType": "inter",
+		"convertTo": "gem",
 		"items": ["Vajrada Amethyst Sliver","Vajrada Amethyst Fragment","Vajrada Amethyst Chunk","Vajrada Amethyst Gemstone"]
 	},
 	"Nagadus Emerald": {
-		"priority": 5,
+		"priority": 3,
+		"convertType": "inter",
+		"convertTo": "gem",
 		"items": ["Nagadus Emerald Sliver","Nagadus Emerald Fragment","Nagadus Emerald Chunk","Nagadus Emerald Gemstone"]
 	},
 	"Shivada Jade": {
 		"priority": 6,
+		"convertType": "inter",
+		"convertTo": "gem",
 		"items": ["Shivada Jade Sliver","Shivada Jade Fragment","Shivada Jade Chunk","Shivada Jade Gemstone"]
 	},
 	"Prithiva Topaz": {
 		"priority": 7,
+		"convertType": "inter",
+		"convertTo": "gem",
 		"items": ["Prithiva Topaz Sliver","Prithiva Topaz Fragment","Prithiva Topaz Chunk","Prithiva Topaz Gemstone"]
 	},
 	
-	// books or talent materials
+	// books/talent materials
 	"Admonition": {
 		"priority": 9,
 		"items": ["Teachings of Admonition", "Guide to Admonition", "Philosophies of Admonition"]
@@ -1379,6 +1400,56 @@ const itemGroupDB = {
 		"priority": 6,
 		"items": ["Teachings of Transience", "Guide to Transience", "Philosophies of Transience"]
 	},
+
+	// Weekly Boss Drops
+	"Stormterror": {
+		"priority": 0,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Dvalin's Plume", "Dvalin's Claw", "Dvalin's Sigh"]
+	},
+	"Andrius": {
+		"priority": 1,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Tail of Boreas", "Ring of Boreas", "Spirit Locket of Boreas"]
+	},
+	"Childe": {
+		"priority": 2,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Tusk of Monoceros Caeli", "Shard of a Foul Legacy", "Shadow of the Warrior"]
+	},
+	"Azhdaha": {
+		"priority": 3,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Dragon Lord's Crown", "Bloodjade Branch", "Gilded Scale"]
+	},
+	"La Signora": {
+		"priority": 4,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Molten Moment", "Hellfire Butterfly", "Ashen Heart"]
+	},
+	"Shogun": {
+		"priority": 5,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Mudra of the Malefic General", "Tears of the Calamitous God", "The Meaning of Aeons"]
+	},
+	"Puppet": {
+		"priority": 6,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Puppet Strings", "Mirror of Mushin", "Daka's Bell"]
+	},
+	"Apep": {
+		"priority": 7,
+		"craftUp": false,
+		"convertType": "intra",
+		"items": ["Worldspan Fern", "Primordial Greenbloom", "Everamber"]
+	}
 }
 // adds the group to the item
 for (var groupItem in itemGroupDB) {
