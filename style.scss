@@ -25,7 +25,9 @@ body {
 }
 .invBlock {
 	margin-top: 8px;
-	&.empty{display:none;}
+	&.empty{
+		display:none;
+	}
 }
 .fakeTextbox, .weaponBlock, .charBlock, .invBlock {
 	border: 1px solid #495366;
@@ -56,7 +58,7 @@ body {
 .removeButton {
 	height: fit-content;
 }
-.charDropdown,.weaponDropdown {
+:is(.charDropdown,.weaponDropdown) {
 	position: relative;
 	max-width: 200px;
 	min-width: 200px;
@@ -65,11 +67,13 @@ body {
 		min-width: inherit;
 		display: flex;
 		align-items: center;
+		max-width: inherit;
 		> img {
 			margin-right: 8px;
 		}
 	}
-	&:hover .dropdownContent {
+	&:hover .dropdownContent,
+	&.active .dropdownContent {
 		display: block;
 	}
 }
@@ -85,6 +89,7 @@ body {
 		display: flex;
 		align-items: center;
 		min-width: inherit;
+		max-width: inherit;
 		> img {
 			margin-right: 8px;
 		}
@@ -113,6 +118,7 @@ body {
 	font-size: calc(var(--size) * (3 / 14));
 	border-radius: calc(var(--size) / 10);
 	background: top/cover no-repeat;
+	transform: rotate(0deg);
 	input {
 		border-width: 0;
 		padding: 0;
@@ -190,4 +196,38 @@ body {
 	display: flex;
 	flex-wrap: wrap;
 	gap: 8px;
+}
+
+.itemSource {
+	display: block;
+	position: absolute;
+	top: 0;
+	right: 0;
+	background: url(images/info.svg);
+}
+.itemSourceTooltip {
+	display: inline-block;
+	visibility: hidden;
+	background: #e9e5dc;
+	border: 2px solid currentColor;
+	border-radius: 8px;
+	padding: 4px;
+	position: absolute;
+	z-index: 1;
+	width: 120px;
+	bottom: 110%;
+	left: 0;
+	text-align: center;
+	user-select: none;
+	.itemSource:hover+&,
+	.active+& {
+		visibility: visible;
+	}
+}
+
+.convert {
+	display: none;
+	.showConvert & {
+		display: block;
+	}
 }

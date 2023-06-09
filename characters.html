@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html>
+	<title>Genshin Calculator - Characters</title>
+	<link rel="stylesheet" href="style.css">
+	<script type="text/javascript" src="chardb.js"></script>
+	<script type="text/javascript" src="itemdb.js"></script>
+	<script type="text/javascript" src="weapdb.js"></script>
+	<script type="text/javascript" src="ascdb.js"></script>
+	<script type="text/javascript" src="scripts.js"></script>
+	<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+	<script type="text/javascript" src="scripts/inventory.js"></script>
+	<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
+	<body>
+		<div>
+			<a href="index.html">Home</a>
+			<a href="inv.html">Inventory</a>
+		</div>
+		<div class="invBlock" id="characters"></div>
+	</body>
+	<script>
+	'use strict';
+	var idsToSave = [];
+	var idsToDelete = [];
+	var ownedChars = {};
+	window.addEventListener("load", () => {
+		var html = "<div class=\"boxName\">Characters</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><br><div class=\"characterList\">";
+		var maxInputSize = 3;
+		var value = 0;
+		var charKeys = [];
+		var charsDone = {};
+		ownedChars = loadCharacters();
+		for(var i in chars) {
+			charKeys[charKeys.length] = i;
+		}
+		for(var i in charKeys) {
+			if(charKeys[i] == "Traveler") {
+				for(var j = 0; j < chars[charKeys[i]].regions.length; j++) {
+					var unaligned = false;
+					if (j == chars[charKeys[i]].regions.length - 1) unaligned = true;
+					var travName = chars[charKeys[i]].regions[j].type + " " + charKeys[i];
+					var output = addCharacter(travName,true,null,true,unaligned);
+					html += output[0];
+					charsDone[output[2]] = output[1];
+					if(j == chars[charKeys[i]].regions.length - 1) idsToSave[idsToSave.length] = output[2];
+				}
+			} else {
+				var output = addCharacter(charKeys[i],true,null,true);
+				html += output[0];
+				charsDone[output[2]] = output[1];
+			}
+		}
+		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveCharacters()\">Save Characters</button><!--<button id=\"clearcharactersbutton\" onClick=\"clearInventory()\">Clear Inventory</button>--></div></div>";
+		get("characters").innerHTML = html;
+		var j = ["asc","tal1","tal2","tal3"]
+		for(var i in charsDone) {
+			for(var k in j) {
+				get(i+"-"+j[k]).setAttribute("onchange","forceValue(this.id,this.value)")
+			}
+			get(i+"-owned").setAttribute("onchange","updateCharList(this.id,this.checked)")
+		}
+	});
+	var updateCharList = (id,isChecked) => {
+		var realId = id.slice(0,7);
+		if(isChecked) {
+			idsToSave[idsToSave.length] = realId;
+			if(idsToDelete.indexOf(realId) != -1) idsToDelete.splice(idsToDelete.indexOf(realId),1);
+		} else {
+			idsToSave.splice(idsToSave.indexOf(realId),1);
+			idsToDelete[idsToDelete.length] = realId;
+		}
+	};
+	</script>
+</html>

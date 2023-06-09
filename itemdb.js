@@ -2,112 +2,138 @@
 const itemDB = {
 	"Mora": {
 		"rarity": 3,
-		"source": "Can be obtained by completing events, defeating monsters or selling meth.",
+		"source": "Can be obtained by completing quests, defeating monsters or from blossoms of wealth.",
 		"type": "other"
 	},
 	"Dust of Azoth": {
 		"rarity": 2,
+		"source": "Purchased from Paimon's Bargains.",
 		"type": "other"
 	},
 	"Dream Solvent": {
 		"rarity": 4,
+		"source": "Reward from weekly bosses.",
 		"type": "other"
 	},
 	"Crown of Insight": {
 		"rarity": 5,
+		"source": "Purchased from Limited-Time Flagship Event shops or Offerings.",
 		"type": "other"
 	},
 	
 	"Hurricane Seed": {
 		"rarity": 4,
+		"source": "Dropped by Anemo Hypostasis.",
 		"type": "boss"
 	},
 	"Lightning Prism": {
 		"rarity": 4,
+		"source": "Dropped by Electro Hypostasis.",
 		"type": "boss"
 	},
 	"Basalt Pillar": {
 		"rarity": 4,
+		"source": "Dropped by Geo Hypostasis.",
 		"type": "boss"
 	},
 	"Hoarfrost Core": {
 		"rarity": 4,
+		"source": "Dropped by Cryo Regisvine.",
 		"type": "boss"
 	},
 	"Everflame Seed": {
 		"rarity": 4,
+		"source": "Dropped by Pyro Regisvine.",
 		"type": "boss"
 	},
 	"Cleansing Heart": {
 		"rarity": 4,
+		"source": "Dropped by Rhodeia of Loch.",
 		"type": "boss"
 	},
 	"Juvenile Jade": {
 		"rarity": 4,
+		"source": "Dropped by Primo Geovishap.",
 		"type": "boss"
 	},
 	"Crystalline Bloom": {
 		"rarity": 4,
+		"source": "Dropped by Cryo Hypostasis.",
 		"type": "boss"
 	},
 	"Marionette Core": {
 		"rarity": 4,
+		"source": "Dropped by Maguu Kenki.",
 		"type": "boss"
 	},
 	"Perpetual Heart": {
 		"rarity": 4,
+		"source": "Dropped by Perpetual Mechanical Array.",
 		"type": "boss"
 	},
 	"Smoldering Pearl": {
 		"rarity": 4,
+		"source": "Dropped by Pyro Hypostasis.",
 		"type": "boss"
 	},
 	"Dew of Repudiation": {
 		"rarity": 4,
+		"source": "Dropped by Hydro Hypostasis.",
 		"type": "boss"
 	},
 	"Storm Beads": {
 		"rarity": 4,
+		"source": "Dropped by Thunder Manifestation.",
 		"type": "boss"
 	},
 	"Riftborn Regalia": {
 		"rarity": 4,
+		"source": "Dropped by Golden Wolflord.",
 		"type": "boss"
 	},
 	"Dragonheir's False Fin": {
 		"rarity": 4,
+		"source": "Dropped by Coral Defenders.",
 		"type": "boss"
 	},
 	"Runic Fang": {
 		"rarity": 4,
+		"source": "Dropped by Ruin Serpent.",
 		"type": "boss"
 	},
 	"Thunderclap Fruitcore": {
 		"rarity": 4,
+		"source": "Dropped by Electro Regisvine.",
 		"type": "boss"
 	},
 	"Majestic Hooked Beak": {
 		"rarity": 4,
+		"source": "Dropped by Jadeplume Terrorshroom.",
 		"type": "boss"
 	},
 	"Perpetual Caliber": {
 		"rarity": 4,
+		"source": "Dropped by Aeonblight Drake.",
 		"type": "boss"
 	},
 	"Light Guiding Tetrahedron": {
 		"rarity": 4,
+		"source": "Dropped by Algorithm of Semi-Intransient Matrix of Overseer Network.",
 		"type": "boss"
 	},
 	"Quelled Creeper": {
 		"rarity": 4,
+		"source": "Dropped by Dendro Hypostasis.",
 		"type": "boss"
 	},
 	"Pseudo-Stamens": {
 		"rarity": 4,
+		"source": "Dropped by Setekh Wenut.",
 		"type": "boss"
 	},
 	"Evergloom Ring": {
 		"rarity": 4,
+		"source": "Dropped by Iniquitous Baptist.",
 		"type": "boss"
 	},
 
@@ -1042,19 +1068,7 @@ const itemDB = {
 		"type": "weaponAsc"
 	},
 
-	"Ashen Heart": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Bloodjade Branch": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Daka's Bell": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Dragon Lord's Crown": {
+	"Dvalin's Plume": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
@@ -1062,43 +1076,11 @@ const itemDB = {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Dvalin's Plume": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
 	"Dvalin's Sigh": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Everamber": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Gilded Scale": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Hellfire Butterfly": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Mirror of Mushin": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Molten Moment": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Mudra of the Malefic General": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Primordial Greenbloom": {
-		"rarity": 5,
-		"type": "weeklyBoss"
-	},
-	"Puppet Strings": {
+	"Tail of Boreas": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
@@ -1106,7 +1088,11 @@ const itemDB = {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Shadow of the Warrior": {
+	"Spirit Locket of Boreas": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Tusk of Monoceros Caeli": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
@@ -1114,11 +1100,35 @@ const itemDB = {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Spirit Locket of Boreas": {
+	"Shadow of the Warrior": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Tail of Boreas": {
+	"Dragon Lord's Crown": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Bloodjade Branch": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Gilded Scale": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Molten Moment": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Hellfire Butterfly": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Ashen Heart": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Mudra of the Malefic General": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
@@ -1130,11 +1140,27 @@ const itemDB = {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Tusk of Monoceros Caeli": {
+	"Puppet Strings": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Mirror of Mushin": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Daka's Bell": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
 	"Worldspan Fern": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Primordial Greenbloom": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Everamber": {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
@@ -1146,158 +1172,196 @@ const itemGroupDB = {
 	// common mats
 	"slime": {
 		"priority": 0,
+		"source": "Dropped by Slimes of all kinds.",
 		"items":["Slime Condensate", "Slime Secretions", "Slime Concentrate"]
 	},
 	"hilichurl": {
 		"priority": 1,
+		"source": "Dropped by Hilichurls and similar kinds.",
 		"items":["Damaged Mask", "Stained Mask", "Ominous Mask"]
 	},
 	"samachurl": {
 		"priority": 2,
+		"source": "Dropped by Samachurls.",
 		"items":["Divining Scroll", "Sealed Scroll", "Forbidden Curse Scroll"]
 	},
 	"hilichurlShooter": {
 		"priority": 3,
+		"source": "Dropped by Hilichurl Shooters.",
 		"items":["Firm Arrowhead", "Sharp Arrowhead", "Weathered Arrowhead"]
 	},
 	"fatuiSkirmisher": {
 		"priority": 4,
+		"source": "Dropped by Fatui Skirmishers.",
 		"items":["Recruit's Insignia", "Sergeant's Insignia", "Lieutenant's Insignia"]
 	},
 	"treasureHoarder": {
 		"priority": 5,
+		"source": "Dropped by Treasure Hoarders.",
 		"items":["Treasure Hoarder Insignia", "Silver Raven Insignia", "Golden Raven Insignia"]
 	},
 	"whopperflower": {
 		"priority": 6,
+		"source": "Dropped by Whopperflowers.",
 		"items":["Whopperflower Nectar", "Shimmering Nectar", "Energy Nectar"]
 	},
 	"nobushi": {
 		"priority": 7,
+		"source": "Dropped by Nobushi and Kairagi.",
 		"items":["Old Handguard", "Kageuchi Handguard", "Famed Handguard"]
 	},
 	"specter": {
 		"priority": 8,
+		"source": "Dropped by Specters.",
 		"items":["Spectral Husk", "Spectral Heart", "Spectral Nucleus"]
 	},
 	"fungus": {
 		"priority": 9,
+		"source": "Dropped by Fungi.",
 		"items":["Fungal Spores", "Luminescent Pollen", "Crystalline Cyst Dust"]
 	},
 	"eremites": {
 		"priority": 10,
+		"source": "Dropped by Emerites.",
 		"items":["Faded Red Satin", "Trimmed Red Silk", "Rich Red Brocade"]
 	},
 
 	// elite mats
 	"mitachurl": {
 		"priority": 0,
+		"source": "Dropped by Mitachurls.",
 		"items":["Heavy Horn", "Black Bronze Horn", "Black Crystal Horn"]
 	},
 	"abyssMage": {
 		"priority": 1,
+		"source": "Dropped by Abyss Mages and Abyss Heralds.",
 		"items":["Dead Ley Line Branch", "Dead Ley Line Leaves", "Ley Line Sprout"]
 	},
 	"ruinHumainoid": {
 		"priority": 2,
+		"source": "Dropped by Ruin Guards, Ruin Hunters and Ruin Graders.",
 		"items":["Chaos Device", "Chaos Circuit", "Chaos Core"]
 	},
 	"fatuiCicinMage": {
 		"priority": 3,
+		"source": "Dropped by Fatui Cincin Mages.",
 		"items":["Mist Grass Pollen", "Mist Grass", "Mist Grass Wick"]
 	},
 	"fatuiPyroAgent": {
 		"priority": 4,
+		"source": "Dropped by Fatui Pyro Agents.",
 		"items":["Hunter's Sacrificial Knife", "Agent's Sacrificial Knife", "Inspector's Sacrificial Knife"]
 	},
 	"vishap": {
 		"priority": 5,
+		"source": "Dropped by Geovishaps and Bathysmal Vishaps.",
 		"items":["Fragile Bone Shard", "Sturdy Bone Shard", "Fossilized Bone Shard"]
 	},
 	"ruinSentinel": {
 		"priority": 6,
+		"source": "Dropped by Droped by Ruin Cruisers, Ruin Destroyers, Ruin Defenders and Ruin Scouts.",
 		"items":["Chaos Gear", "Chaos Axis", "Chaos Oculus"]
 	},
 	"mirrorMaiden": {
 		"priority": 7,
+		"source": "Dropped by Mirror Maidens.",
 		"items":["Dismal Prism", "Crystal Prism", "Polarizing Prism"]
 	},
 	"riftwolf": {
 		"priority": 8,
+		"source": "Dropped by Rifthounds.",
 		"items":["Concealed Claw", "Concealed Unguis", "Concealed Talon"]
 	},
 	"blackSerpents": {
 		"priority": 9,
+		"source": "Dropped by Black Serpents and Abyss Lectors.",
 		"items":["Gloomy Statuette", "Dark Statuette", "Deathly Statuette"]
 	},
 	"fungusStateShifted": {
 		"priority": 10,
+		"source": "Dropped by State-Shifted Fungi.",
 		"items":["Inactivated Fungal Nucleus", "Dormant Fungal Nucleus", "Robust Fungal Nucleus"]
 	},
 	"ruinDrake": {
 		"priority": 11,
+		"source": "Dropped by Ruin Drakes.",
 		"items":["Chaos Storage", "Chaos Module", "Chaos Bolt"]
 	},
 	"primalConstruct": {
 		"priority": 12,
+		"source": "Dropped by Primordial Contructs.",
 		"items":["Damaged Prism", "Turbid Prism", "Radiant Prism"]
 	},
 	"consecratedBeast": {
 		"priority": 13,
+		"source": "Dropped by Consecrated Beasts.",
 		"items":["Desiccated Shell", "Sturdy Shell", "Marked Shell"]
 	},
 	"hilichurlRogue": {
 		"priority": 14,
+		"source": "Dropped by Hilichurl Rogues.",
 		"items":["A Flower Yet to Bloom", "Treasured Flower", "Wanderer's Blooming Flower"]
 	},
 	
 	// weapon asc mats
 	"decarabianTiles": {
 		"priority": 0,
+		"source": "Can be obtained from Cecilia Garden in Mondstadt on Monday, Thursday and Sunday.",
 		"items":["Tile of Decarabian's Tower","Debris of Decarabian's City","Fragment of Decarabian's Epic","Scattered Piece of Decarabian's Dream"]
 	},
 	"borealWolfTeeth": {
 		"priority": 1,
+		"source": "Can be obtained from Cecilia Garden in Mondstadt on Tuesday, Friday and Sunday.",
 		"items":["Boreal Wolf's Milk Tooth","Boreal Wolf's Cracked Tooth","Boreal Wolf's Broken Fang","Boreal Wolf's Nostalgia"]
 	},
 	"gladiatorShackles": {
 		"priority": 2,
+		"source": "Can be obtained from Cecilia Garden in Mondstadt on Wednesday, Saturday and Sunday.",
 		"items":["Fetters of the Dandelion Gladiator","Chains of the Dandelion Gladiator","Shackles of the Dandelion Gladiator","Dream of the Dandelion Gladiator"]
 	},
 	"guyunPillars": {
 		"priority": 3,
+		"source": "Can be obtained from Hidden Palace of Lanshan Formula in Liyue on Monday, Thursday and Sunday.",
 		"items":["Luminous Sands from Guyun","Lustrous Stone from Guyun","Relic from Guyun","Divine Body from Guyun"]
 	},
 	"elixirs": {
 		"priority": 4,
+		"source": "Can be obtained from Hidden Palace of Lanshan Formula in Liyue on Tuesday, Friday and Sunday.",
 		"items":["Mist Veiled Lead Elixir","Mist Veiled Mercury Elixir","Mist Veiled Gold Elixir","Mist Veiled Primo Elixir"]
 	},
 	"aerosiderite": {
 		"priority": 5,
+		"source": "Can be obtained from Hidden Palace of Lanshan Formula in Liyue on Wednesday, Saturday and Sunday.",
 		"items":["Grain of Aerosiderite","Piece of Aerosiderite","Bit of Aerosiderite","Chunk of Aerosiderite"]
 	},
 	"distantSeaBranches": {
 		"priority": 6,
+		"source": "Can be obtained from Court of Flowing Sand in Inazuma on Monday, Thursday and Sunday.",
 		"items":["Coral Branch of a Distant Sea","Jeweled Branch of a Distant Sea","Jade Branch of a Distant Sea","Golden Branch of a Distant Sea"]
 	},
 	"narukami": {
 		"priority": 7,
+		"source": "Can be obtained from Court of Flowing Sand in Inazuma on Tuesday, Friday and Sunday.",
 		"items":["Narukami's Wisdom","Narukami's Joy","Narukami's Affection","Narukami's Valor"]
 	},
 	"oniMasks": {
 		"priority": 8,
+		"source": "Can be obtained from Court of Flowing Sand in Inazuma on Wednesday, Saturday and Sunday.",
 		"items":["Mask of the Wicked Lieutenant","Mask of the Tiger's Bite","Mask of the One-Horned","Mask of the Kijin"]
 	},
 	"forestDewTalismans": {
 		"priority": 9,
+		"source": "Can be obtained from Tower of Abject Pride in Sumeru on Monday, Thursday and Sunday.",
 		"items":["Copper Talisman of the Forest Dew","Iron Talisman of the Forest Dew","Silver Talisman of the Forest Dew","Golden Talisman of the Forest Dew"]
 	},
 	"oasisGardens": {
 		"priority": 10,
+		"source": "Can be obtained from Tower of Abject Pride in Sumeru on Tuesday, Friday and Sunday.",
 		"items":["Oasis Garden's Reminiscence","Oasis Garden's Kindness","Oasis Garden's Mourning","Oasis Garden's Truth"]
 	},
 	"scorchingMights": {
 		"priority": 11,
+		"source": "Can be obtained from Tower of Abject Pride in Sumeru on Wednesday, Saturday and Sunday.",
 		"items":["Echo of Scorching Might","Remnant Glow of Scorching Might","Dream of Scorching Might","Olden Days of Scorching Might"]
 	},
 
@@ -1306,99 +1370,119 @@ const itemGroupDB = {
 		"priority": 0,
 		"craftUp": false,
 		"canConvertTo": false,
+		"source": "Adventure Rank Rewards. You cannot craft these into the next rarity.",
 		"items": ["Brilliant Diamond Sliver","Brilliant Diamond Fragment","Brilliant Diamond Chunk","Brilliant Diamond Gemstone"]
 	},
 	"Agnidus Agate": {
 		"priority": 1,
 		"convertType": "inter",
 		"convertTo": "gem",
+		"source": "Can be dropped from various normal and weekly bosses. Can be converted from and to other elemental gems.",
 		"items": ["Agnidus Agate Sliver","Agnidus Agate Fragment","Agnidus Agate Chunk","Agnidus Agate Gemstone"]
 	},
 	"Varunada Lazurite": {
 		"priority": 2,
 		"convertType": "inter",
 		"convertTo": "gem",
+		"source": "Can be dropped from various normal and weekly bosses. Can be converted from and to other elemental gems.",
 		"items": ["Varunada Lazurite Sliver","Varunada Lazurite Fragment","Varunada Lazurite Chunk","Varunada Lazurite Gemstone"]
 	},
 	"Vayuda Turquoise": {
 		"priority": 5,
 		"convertType": "inter",
 		"convertTo": "gem",
+		"source": "Can be dropped from various normal and weekly bosses. Can be converted from and to other elemental gems.",
 		"items": ["Vayuda Turquoise Sliver","Vayuda Turquoise Fragment","Vayuda Turquoise Chunk","Vayuda Turquoise Gemstone"]
 	},
 	"Vajrada Amethyst": {
 		"priority": 4,
 		"convertType": "inter",
 		"convertTo": "gem",
+		"source": "Can be dropped from various normal and weekly bosses. Can be converted from and to other elemental gems.",
 		"items": ["Vajrada Amethyst Sliver","Vajrada Amethyst Fragment","Vajrada Amethyst Chunk","Vajrada Amethyst Gemstone"]
 	},
 	"Nagadus Emerald": {
 		"priority": 3,
 		"convertType": "inter",
 		"convertTo": "gem",
+		"source": "Can be dropped from various normal and weekly bosses. Can be converted from and to other elemental gems.",
 		"items": ["Nagadus Emerald Sliver","Nagadus Emerald Fragment","Nagadus Emerald Chunk","Nagadus Emerald Gemstone"]
 	},
 	"Shivada Jade": {
 		"priority": 6,
 		"convertType": "inter",
 		"convertTo": "gem",
+		"source": "Can be dropped from various normal and weekly bosses. Can be converted from and to other elemental gems.",
 		"items": ["Shivada Jade Sliver","Shivada Jade Fragment","Shivada Jade Chunk","Shivada Jade Gemstone"]
 	},
 	"Prithiva Topaz": {
 		"priority": 7,
 		"convertType": "inter",
 		"convertTo": "gem",
+		"source": "Can be dropped from various normal and weekly bosses. Can be converted from and to other elemental gems.",
 		"items": ["Prithiva Topaz Sliver","Prithiva Topaz Fragment","Prithiva Topaz Chunk","Prithiva Topaz Gemstone"]
 	},
 	
 	// books/talent materials
-	"Admonition": {
-		"priority": 9,
-		"items": ["Teachings of Admonition", "Guide to Admonition", "Philosophies of Admonition"]
-	},
-	"Ballad": {
-		"priority": 2,
-		"items": ["Teachings of Ballad", "Guide to Ballad", "Philosophies of Ballad"]
-	},
-	"Diligence": {
-		"priority": 4,
-		"items": ["Teachings of Diligence", "Guide to Diligence", "Philosophies of Diligence"]
-	},
-	"Elegance": {
-		"priority": 7,
-		"items": ["Teachings of Elegance", "Guide to Elegance", "Philosophies of Elegance"]
-	},
 	"Freedom": {
 		"priority": 0,
+		"source": "Can be obtained from Forsaken Rift in Mondstadt on Monday, Thursday and Sunday.",
 		"items": ["Teachings of Freedom", "Guide to Freedom", "Philosophies of Freedom"]
-	},
-	"Gold": {
-		"priority": 5,
-		"items": ["Teachings of Gold", "Guide to Gold", "Philosophies of Gold"]
-	},
-	"Ingenuity": {
-		"priority": 10,
-		"items": ["Teachings of Ingenuity", "Guide to Ingenuity", "Philosophies of Ingenuity"]
-	},
-	"Light": {
-		"priority": 8,
-		"items": ["Teachings of Light", "Guide to Light", "Philosophies of Light"]
-	},
-	"Praxis": {
-		"priority": 11,
-		"items": ["Teachings of Praxis", "Guide to Praxis", "Philosophies of Praxis"]
-	},
-	"Prosperity": {
-		"priority": 3,
-		"items": ["Teachings of Prosperity", "Guide to Prosperity", "Philosophies of Prosperity"]
 	},
 	"Resistance": {
 		"priority": 1,
+		"source": "Can be obtained from Forsaken Rift in Mondstadt on Tuesday, Friday and Sunday.",
 		"items": ["Teachings of Resistance", "Guide to Resistance", "Philosophies of Resistance"]
+	},
+	"Ballad": {
+		"priority": 2,
+		"source": "Can be obtained from Forsaken Rift in Mondstadt on Wednesday, Saturday and Sunday.",
+		"items": ["Teachings of Ballad", "Guide to Ballad", "Philosophies of Ballad"]
+	},
+	"Prosperity": {
+		"priority": 3,
+		"source": "Can be obtained from Taishan Mansion in Liyue on Monday, Thursday and Sunday.",
+		"items": ["Teachings of Prosperity", "Guide to Prosperity", "Philosophies of Prosperity"]
+	},
+	"Diligence": {
+		"priority": 4,
+		"source": "Can be obtained from Taishan Mansion in Liyue on Tuesday, Friday and Sunday.",
+		"items": ["Teachings of Diligence", "Guide to Diligence", "Philosophies of Diligence"]
+	},
+	"Gold": {
+		"priority": 5,
+		"source": "Can be obtained from Taishan Mansion in Liyue on Wednesday, Saturday and Sunday.",
+		"items": ["Teachings of Gold", "Guide to Gold", "Philosophies of Gold"]
 	},
 	"Transience": {
 		"priority": 6,
+		"source": "Can be obtained from Violet Court in Inazuma on Monday, Thursday and Sunday.",
 		"items": ["Teachings of Transience", "Guide to Transience", "Philosophies of Transience"]
+	},
+	"Elegance": {
+		"priority": 7,
+		"source": "Can be obtained from Violet Court in Inazuma on Tuesday, Friday and Sunday.",
+		"items": ["Teachings of Elegance", "Guide to Elegance", "Philosophies of Elegance"]
+	},
+	"Light": {
+		"priority": 8,
+		"source": "Can be obtained from Violet Court in Inazuma on Wednesday, Saturday and Sunday.",
+		"items": ["Teachings of Light", "Guide to Light", "Philosophies of Light"]
+	},
+	"Admonition": {
+		"priority": 9,
+		"source": "Can be obtained from Steeple of Ignorance in Sumeru on Monday, Thursday and Sunday.",
+		"items": ["Teachings of Admonition", "Guide to Admonition", "Philosophies of Admonition"]
+	},
+	"Ingenuity": {
+		"priority": 10,
+		"source": "Can be obtained from Steeple of Ignorance in Sumeru on Tuesday, Friday and Sunday.",
+		"items": ["Teachings of Ingenuity", "Guide to Ingenuity", "Philosophies of Ingenuity"]
+	},
+	"Praxis": {
+		"priority": 11,
+		"source": "Can be obtained from Steeple of Ignorance in Sumeru on Wednesday, Saturday and Sunday.",
+		"items": ["Teachings of Praxis", "Guide to Praxis", "Philosophies of Praxis"]
 	},
 
 	// Weekly Boss Drops
@@ -1406,48 +1490,56 @@ const itemGroupDB = {
 		"priority": 0,
 		"craftUp": false,
 		"convertType": "intra",
-		"items": ["Dvalin's Plume", "Dvalin's Claw", "Dvalin's Sigh"]
+		"source": "Dropped in Confront Stormterror at domain levels 4 and higher.",
+		"items": ["Dvalin's Claw", "Dvalin's Plume", "Dvalin's Sigh"]
 	},
 	"Andrius": {
 		"priority": 1,
 		"craftUp": false,
 		"convertType": "intra",
+		"source": "Dropped by the Wolf of the North at world level 5 and higher.",
 		"items": ["Tail of Boreas", "Ring of Boreas", "Spirit Locket of Boreas"]
 	},
 	"Childe": {
 		"priority": 2,
 		"craftUp": false,
 		"convertType": "intra",
+		"source": "Dropped in Enter the Golden House at domain levels 2 and higher.",
 		"items": ["Tusk of Monoceros Caeli", "Shard of a Foul Legacy", "Shadow of the Warrior"]
 	},
 	"Azhdaha": {
 		"priority": 3,
 		"craftUp": false,
 		"convertType": "intra",
-		"items": ["Dragon Lord's Crown", "Bloodjade Branch", "Gilded Scale"]
+		"source": "Dropped in Beneath the Dragon-Queller at domain levels 2 and higher.",
+		"items": ["Bloodjade Branch", "Dragon Lord's Crown", "Gilded Scale"]
 	},
 	"La Signora": {
 		"priority": 4,
 		"craftUp": false,
 		"convertType": "intra",
+		"source": "Dropped in Narukami Island: Tenshukaku at domain levels 2 and higher.",
 		"items": ["Molten Moment", "Hellfire Butterfly", "Ashen Heart"]
 	},
 	"Shogun": {
 		"priority": 5,
 		"craftUp": false,
 		"convertType": "intra",
+		"source": "Dropped in End of the Oneiric Euthymia at domain levels 2 and higher.",
 		"items": ["Mudra of the Malefic General", "Tears of the Calamitous God", "The Meaning of Aeons"]
 	},
 	"Puppet": {
 		"priority": 6,
 		"craftUp": false,
 		"convertType": "intra",
+		"source": "Dropped in Joururi Workshop at domain levels 2 and higher.",
 		"items": ["Puppet Strings", "Mirror of Mushin", "Daka's Bell"]
 	},
 	"Apep": {
 		"priority": 7,
 		"craftUp": false,
 		"convertType": "intra",
+		"source": "Dropped in The Realm of Beginnings at domain levels 2 and higher.",
 		"items": ["Worldspan Fern", "Primordial Greenbloom", "Everamber"]
 	}
 }
@@ -1455,5 +1547,6 @@ const itemGroupDB = {
 for (var groupItem in itemGroupDB) {
 	for (var i = 0; i < itemGroupDB[groupItem].items.length; i++) {
 		itemDB[itemGroupDB[groupItem].items[i]].group = groupItem;
+		itemDB[itemGroupDB[groupItem].items[i]].source = itemGroupDB[groupItem].source;
 	}
 }

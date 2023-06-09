@@ -1,26 +1,40 @@
 // Inventory stuff
+var fixInv = () => {
+	if(getLSItem("inv") != null) {
+		setLSItem("inv",decodeURIComponent(getLSItem("inv")));
+	}
+	setLSItem("invNotURIDecoded","true")
+}
 var saveInventory = () => {
 	var userInvInputs = getByClass("userInvInput");
 	var userItems = "";
 	var inv = loadInventory();
 	var tested = [];
 	for(var i = 0; i < userInvInputs.length; i++) {
-		if(inv == null) {inv = []}
+		if(inv == null) {inv = {}}
 		if(val(userInvInputs[i].id) == 0 && inv[underscoreToSpace(userInvInputs[i].id.slice(13))] == undefined) continue;
 		tested[tested.length] = underscoreToSpace(userInvInputs[i].id.slice(13));
+		if(val(userInvInputs[i].id) == 0) continue;
 		userItems += "\""+underscoreToSpace(userInvInputs[i].id.slice(13))+"\":"+val(userInvInputs[i].id)+",";
 	}
 	for(var i in inv) {
 		if(tested.indexOf(i) != -1) continue;
+		if(inv[i] == 0) {
+			delete inv[i];
+			continue;
+		}
 		userItems += "\""+i+"\":"+inv[i]+",";
 	}
 	userItems = "{"+userItems.slice(0,-1)+"}";
-	if(userItems == "{}") return;
-	setLSItem("inv",encodeURIComponent(userItems));
+	if(userItems == "{}") {
+		clearLSItem("inv");
+	} else {
+		setLSItem("inv",userItems);
+	}
 }
 var loadInventory = () => {
 	try {
-		var inv = JSON.parse(decodeURIComponent(getLSItem("inv")));
+		var inv = JSON.parse(getLSItem("inv"));
 	}
 	catch {
 		console.warn("Inventory was corrupted; returning empty string.")

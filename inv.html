@@ -11,14 +11,23 @@
 	<script type="text/javascript" src="scripts/inventory.js"></script>
 	<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	<body>
+		<div id="warning">
+			<strong>The way inventories are saved in localStorage have been altered and may have been wiped. Please check your inventory is working correctly. This warning will persist until the next update.</strong>
+		</div>
 		<div>
 			<a href="index.html">Home</a>
+			<!-- <a href="characters.html">Characters</a> -->
 		</div>
 		<div class="invBlock" id="inventory"></div>
 	</body>
 	<script>
 	'use strict';
 	window.addEventListener("load", () => {
+		if(getLSItem("invNotURIDecoded") == null) {
+			fixInv();
+		} else {
+			get("warning").style = "display:none"
+		}
 		var html = "<div class=\"boxName\">Inventory</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><br><div class=\"outputRequired\">";
 		var maxInputSize = 4;
 		var inv = loadInventory();
@@ -31,7 +40,7 @@
 		if(inv == null) inv = {};
 		for(var i in itemKeys) {
 			if(inv != null && inv[itemKeys[i]]) {value = inv[itemKeys[i]]} else {value = 0}
-			html+="<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(itemKeys[i])+"\">",-1,"mini")+"</div>";
+			html+="<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(itemKeys[i])+"\">",-1,"mini",true)+"</div>";
 		}
 		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveInventory()\">Save Inventory</button><button id=\"clearinvbutton\" onClick=\"clearInventory()\">Clear Inventory</button></div></div>";
 		get("inventory").innerHTML = html;

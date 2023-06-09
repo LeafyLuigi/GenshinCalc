@@ -1,6 +1,7 @@
 'use strict';
 // set vars
 var travelerType, neededItemsForAscTal, travelerAscensionDone = false;
+var showConvertsBool;
 
 // shorthands
 var get = (id) => {
@@ -9,8 +10,22 @@ var get = (id) => {
 var getByClass = (className) => {
 	return document.getElementsByClassName(className);
 }
+var getOnlyClass = (className = "") => {
+	if(className.indexOf(" ") != -1) {
+		console.error("getOnlyClass cannot be used with multiple classes.");
+	}
+	var allElementsWithClass = getByClass(className);
+	var elementsWithOnlyClass = [];
+	for (var i = 0; i < allElementsWithClass.length; i++) {
+		if(allElementsWithClass[i].className == className) elementsWithOnlyClass[elementsWithOnlyClass.length] = allElementsWithClass[i];
+	}
+	return elementsWithOnlyClass;
+}
 var getByName = (nameName) => {
 	return document.getElementsByName(nameName);
+}
+var toggleClass = (element, className) => {
+	element.classList.toggle(className);
 }
 var val = (id,noGet=false) => {
 	if(!noGet) {
@@ -38,17 +53,18 @@ var removeQuotes = (string) => {
 
 // Pick Character
 var pickChar = (choice,travType=null) => {
-	get("dropdownCharName").innerText = choice;
 	if(choice.indexOf("Traveler") != -1) {
 		choice = "Traveler";
-		travelerType = travType;
+		travelerType = chars["Traveler"].regions[travType].type;
+		get("dropdownCharName").value = travelerType+" "+choice;
 	} else {
 		travelerType = undefined;
+		get("dropdownCharName").value = choice;
 	}
 	get("dropdownCharIcon").setAttribute("src","images/char/"+spaceToUnderscore(choice)+".png");
 }
 var pickWeapon = (choice, rarity) => {
-	get("dropdownWeaponName").innerText = choice;
+	get("dropdownWeaponName").value = choice;
 	choice = removeQuotes(choice);
 	get("dropdownWeaponName").setAttribute("rarity",rarity);
 	get("dropdownWeaponIcon").setAttribute("src","images/weapon/"+spaceToUnderscore(choice)+".png");
@@ -100,26 +116,25 @@ var mergeItems = (firstList,secondList,deleteZeroOrLess=false) => {
 	return mergedList;
 }
 // Items can also be manually sorted in the itemdb.js file
-const typeOrder = ["charExp","local","common","elite","gem","books","weaponAsc","boss","weeklyBoss","other"];
+const typeOrder = ["local","charExp","common","elite","gem","books","weaponAsc","boss","weeklyBoss","other"];
 const intraTypeOrder = ["group","rarity","count"]; // "Group" is arbitrary and until multiple inputs are added, will be skipped.
 var orderItems = (items) => {
 	// var index = items.map(i => i.name);
 	items.sort((a,b) => {
-		if(a == "Mora") return -1; // "Mora" is placed first
+		if(a == "Mora") return -1;
 		if(b == "Mora") return 1;
-		if(a == "Crown of Insight") return 1; // Crowns are last
-		if(b == "Crown of Insight") return -1;
+		// "Mora" is placed first
 		var aItem = itemDB[a];
 		var bItem = itemDB[b];
 		var aType = typeOrder.indexOf(aItem.type);
 		var bType = typeOrder.indexOf(bItem.type);
-		if(aType - bType != 0) return aType - bType;
+		if(aType != bType) return aType - bType;
 		// arbitrary group stuff here~
 		if(aItem.group != undefined && bItem.group != undefined) {
 			if(itemGroupDB[aItem.group].priority - itemGroupDB[bItem.group].priority != 0) return itemGroupDB[aItem.group].priority - itemGroupDB[bItem.group].priority;
 		}
 		//
-		if(aItem.rarity - bItem.rarity != 0) return bItem.rarity - aItem.rarity;
+		if(aItem.rarity != bItem.rarity) return bItem.rarity - aItem.rarity;
 		// if(a.count - b.count != 0) return a.count - b.count;
 
 		return 0;
@@ -128,7 +143,7 @@ var orderItems = (items) => {
 
 // Quick and dirty icon creator for items
 // mainly used for adding to $element.innerHTML
-var makeItemIcon = (item,count=1,rarity=-1,size="mini") => {
+var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceType=null) => {
 	var fallback = item;
 	var validSizes = ["micro","tiny","mini","small","normal","big"];
 	var pixels = [36, 56, 72, 96, 112, 256];
@@ -144,19 +159,28 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini") => {
 		img = item;
 		rarity = 1;
 	} else {
-		type = itemDB[item].type;
+		if(forceType == null) {
+			type = itemDB[item].type;
+		} else {
+			type = forceType;
+		}
 		img = spaceToUnderscore(item);
 		if(rarity == -1) rarity = itemDB[item].rarity;
 	}
 	html = "<div class=\"itemIcon ";
 	if(size == "micro" || size == "tiny" || size == "mini" || size == "small" || size == "normal") html+=size+" ";
-	html +="rarity-"+rarity+"\"><img ";
-	if(fallback != item) html+="fallback=\""+fallback+"\" ";
+	html +="rarity-"+rarity+"\">";
+	if(showSource && itemDB[item].source != undefined) {
+		html += "<img onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>"
+	}
+	html +="<img ";
+	if(fallback != item) {html+="fallback=\""+fallback+"\" "; console.warn("[MakeItemIcon] Fallback doesn't match item.")}
 	html +="class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">"+count+"</div>";
 	return html;
 }
 
 var test = () => {
+	if(ids.length == 0) return;
 	resetItemLists();
 	for (var perID in ids) {
 		var html = "";
@@ -165,16 +189,18 @@ var test = () => {
 		if(boxType == "char") {
 			var selectedCharacter = "";
 			selectedCharacter = get(id).children[0].children[0].innerText;
+			var charName = selectedCharacter;
 			var travelerType = undefined
 			if(get(id).hasAttribute("travtype")) {
 				selectedCharacter = "Traveler";
 				travelerType = get(id).getAttribute("travtype")
 			}
-			/* FIX TRAVELER!! */
 			var charStats = [val(id+"-asc"), val(id+"-tal1"), val(id+"-tal2"), val(id+"-tal3")];
 			var targets = [val(id+"-targetAsc"),val(id+"-targetTal1"),val(id+"-targetTal2"),val(id+"-targetTal3")];
-			if(JSON.stringify(charStats) == JSON.stringify(targets)) return;
-			
+			if(JSON.stringify(charStats) == JSON.stringify(targets)) {
+				get(id+"-charOutput").innerHTML = "<div class=\"boxTitle\">You don't need anything for "+selectedCharacter+".</div>"
+				continue;
+			}
 			const order = [ascValues,talValues,talValues,talValues];
 			var charData, charSet = false;
 			var charItems = {};
@@ -237,7 +263,7 @@ var test = () => {
 				html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItemsForAscTal,"tiny") + "</div>";
 				if(selectedCharacter == "Traveler" && i == 0) travelerAscensionDone = true;
 			}
-			html += "<br><div class=\"boxTitle\">The total for "+selectedCharacter+" is:</div>";
+			html += "<br><div class=\"boxTitle\">The total for "+charName+" is:</div>";
 			// orderItems(charItems);
 			html += "<div class=\"outputRequired\">" + getItemsNeeded(charItems,"mini") + "</div>";
 			get(id+"-charOutput").innerHTML = html;
@@ -272,7 +298,7 @@ var test = () => {
 
 	}
 	getByClass("invBlock")[0].classList.remove("empty");
-	get("totalOutput").innerHTML = "<div class=\"boxTitle\">These are the items you need.</div><div class=\"outputRequired\">"+getItemsNeeded(items,"mini")+"</div>";
+	get("totalOutput").innerHTML = "<div class=\"boxTitle\">These are the items you need.</div><div class=\"outputRequired\">"+getItemsNeeded(items,"mini",false,true)+"</div>";
 	get("whatDoYouHave").innerHTML = askUserForItems(items);
 }
 
@@ -297,7 +323,7 @@ var resetItemLists = () => {
 }
 
 // loop MakeItemIcon (above) with defaults (sans size) for needed items
-var getItemsNeeded = (items,size="mini",hideBelowZero=true) => {
+var getItemsNeeded = (items,size="mini",hideBelowZero=true,showSource=false) => {
 	var html = "";
 	var itemKeys = [];
 	for (var i in items) {
@@ -307,7 +333,7 @@ var getItemsNeeded = (items,size="mini",hideBelowZero=true) => {
 	for (var i in itemKeys) {
 		if(items[itemKeys[i]] == undefined) continue;
 		if(hideBelowZero && items[itemKeys[i]] < 1) continue;
-		html+=makeItemIcon(itemKeys[i],items[itemKeys[i]],-1,size);
+		html+=makeItemIcon(itemKeys[i],items[itemKeys[i]],-1,size,showSource);
 	}
 	return html;
 }
@@ -319,7 +345,7 @@ var askUserForItems = (items) => {
 	var groups = [];
 	var groupItems = [];
 	for (var i in items) {
-		if(itemDB[i].group!=undefined && groups.indexOf(itemDB[i].group)==-1) groups[groups.length] = itemDB[i].group;
+		if(itemDB[i].group!=undefined && itemDB[i].type != "weeklyBoss" && groups.indexOf(itemDB[i].group)==-1) groups[groups.length] = itemDB[i].group;
 	}
 	for (var i in groups) {
 		for (var j in itemGroupDB[groups[i]].items) {
@@ -334,22 +360,97 @@ var askUserForItems = (items) => {
 	orderItems(itemKeys);
 	var inv = loadInventory();
 	var value = 0;
-	html += "<div class=\"boxTitle\">How many items do you have?</div><div class=\"outputRequired\">";
+	// html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div><button id=\"toggleConverts\" class=\"removeButton\" onclick=\"toggleConverts()\">Show Converts?</button></div><div class=\"outputRequired\">";
+	html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div></div><div class=\"outputRequired\">";
 	for (var i = 0; i < itemKeys.length; i++) {
 		if(inv != null && inv[itemKeys[i]] != undefined) {value = inv[itemKeys[i]]} else {value = 0}
-		html += "<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+itemKeys[i]+"\">",-1,"mini")+"</div>";
+		html += "<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+itemKeys[i]+"\">",-1,"mini",true)+"</div>";
 	}
-	html += "</div><br><button onclick=\"getItemsRemaining()\">Submit</button>";
+	html += "</div><div id=\"converts\"></div><br><button onclick=\"getItemsRemaining()\">Submit</button>";
+	showConvertsBool = false;
 	return html;
 }
-
+var toggleConverts = () => {
+	if(!showConvertsBool) {
+		get("toggleConverts").innerText = "Hide Converts?";
+		showConvertsBool = true;
+		var html = "<br><div class=\"outputRequired\">";
+		var inv = loadInventory();
+		var groups = [];
+		var intraGroups = [];
+		var gems = false;
+		for(var i in items) {
+			if(itemDB[i].group != undefined) {
+				var groupName = itemDB[i].group
+				if(groups.indexOf(groupName) != -1) continue;
+				groups[groups.length] = groupName;
+				if(itemGroupDB[groupName].convertType != undefined) {
+					if(itemGroupDB[groupName].convertType == "intra") {
+						intraGroups[intraGroups.length] = groupName;
+					} else {
+						gems = true;
+					}
+				}
+			}
+		}
+		if(gems) {
+			var itemDBGems = [];
+			for (var i in itemDB) {
+				if(itemDB[i].group != undefined) {
+					if(itemDB[i].type == "gem" && itemGroupDB[itemDB[i].group].canConvertTo != false) {
+						if(itemDBGems.indexOf(itemDB[i].group) != -1) continue;
+						itemDBGems[itemDBGems.length] = itemDB[i].group;
+					}
+				}
+			}
+			for(var i in groups) {
+				if(itemDBGems.indexOf(groups[i]) != -1) itemDBGems.splice(itemDBGems.indexOf(groups[i]),1)
+			}
+		}
+		var itemKeys = [];
+		var value;
+		for(var group in intraGroups) {
+			for(var i in itemGroupDB[intraGroups[group]].items) {
+				itemKeys[itemKeys.length] = itemGroupDB[intraGroups[group]].items[i];
+			}
+		}
+		itemKeys[itemKeys.length] = "Dream Solvent";
+		orderItems(itemKeys)
+		for(var i = 0; i < itemKeys.length; i++) {
+			if(items[itemKeys[i]]){continue} // skip items already in list
+			if(inv != null && inv[itemKeys[i]] != undefined) {value = inv[itemKeys[i]]} else {value = 0}
+			html += "<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput userConvertInput convertIntra\" type=\"number\" size=\"3\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+itemKeys[i]+"\">",-1,"tiny")+"</div>";
+		}
+		// console.log(html)
+		html+="</div><br><div class=\"outputRequired\">"
+		itemKeys = [];
+		for(var group in itemDBGems) {
+			for(var i in itemGroupDB[itemDBGems[group]].items) {
+				itemKeys[itemKeys.length] = itemGroupDB[itemDBGems[group]].items[i];
+			}
+		}
+		itemKeys[itemKeys.length] = "Dust of Azoth";
+		orderItems(itemKeys)
+		for(var i = 0; i < itemKeys.length; i++) {
+			if(items[itemKeys[i]]){continue} // skip items already in list
+			if(inv != null && inv[itemKeys[i]] != undefined) {value = inv[itemKeys[i]]} else {value = 0}
+			html += "<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput userConvertInput convertInter\" type=\"number\" size=\"3\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+itemKeys[i]+"\">",-1,"tiny")+"</div>";
+		}
+		html += "</div>"
+		get("converts").innerHTML = html;
+	} else {
+		showConvertsBool = false;
+		get("toggleConverts").innerText = "Show Converts?";
+		get("converts").innerHTML = "";
+	}
+}
 // calc what's needed minus has
 var getItemsRemaining = () => {
 	get("whatToObtain").innerHTML = "";
 	get("textOutput").innerText = "";
 	var userItemsLeft = {};
 	saveInventory();
-	var userInvInputs = getByClass("userInvInput");
+	var userInvInputs = getOnlyClass("userInvInput");
 	var html = "";
 	for (var i = 0; i < userInvInputs.length; i++) {
 		var itemName = underscoreToSpace(userInvInputs[i].id.slice(13));
@@ -365,10 +466,10 @@ var getItemsRemaining = () => {
 		userItemsLeftKeys[userItemsLeftKeys.length] = i;
 	}
 	if(userItemsLeftKeys.length != 0) {
-		html += "<div class=\"boxTitle\">You need to obtain the following:</div><div class=\"outputRequired\">";
+		html += "<div class=\"boxTitle\">You need to obtain the following:</div><div><em></em></div><div class=\"outputRequired\">";
 		for(var i in userItemsLeft) {
 			if(userItemsLeft[i] < 1) continue;
-			html += makeItemIcon(i,userItemsLeft[i],-1,"small");
+			html += makeItemIcon(i,userItemsLeft[i],-1,"small",true);
 		}
 		html += "</div>";
 	}
@@ -427,9 +528,35 @@ var getItemsRemaining = () => {
 		html += "<div class=\"boxTitle\">You need to further obtain the following items to craft or match the above items:</div><div><em>This assumes no crafting bonuses.</em></div><div class=\"outputRequired\">";
 		for(var i in userItemsLeftKeys) {
 			if(userItemsLeft[userItemsLeftKeys[i]] < 1) continue;
-			html += makeItemIcon(userItemsLeftKeys[i],userItemsLeft[userItemsLeftKeys[i]],-1,"small");
+			html += makeItemIcon(userItemsLeftKeys[i],userItemsLeft[userItemsLeftKeys[i]],-1,"small",true);
 		}
 		html +="</div>";
+		// if(showConvertsBool) {
+		// 	var convertInputs = getByClass("userConvertInput");
+		// 	var convertItemsByType = [0,0,0,0];
+		// 	var types = ["Sliver", "Fragment", "Chunk", "Gemstone"];
+		// 	for(var i = 0; i < convertInputs.length; i++) {
+		// 		var itemName = convertInputs[i].id.slice(13)
+		// 		var value = val(convertInputs[i],true)
+		// 		for (var j = 0; j < types.length; j++) {
+		// 			if(itemName.indexOf(types[j]) != -1) convertItemsByType[j] += value;
+		// 		}
+		// 	}
+		// 	// console.log(convertItemsByType);
+		// 	if(JSON.stringify(convertItemsByType) != "[0,0,0,0]") {
+		// 		html += "<div id=\"whatToConvert\"><div><em>You could also convert the following:</em></div><div class=\"outputRequired\">";
+		// 		var neededTypes = [0,0,0,0];
+		// 		for(var i = 0; i < userItemsLeftKeys.length; i++) {
+		// 			for(var j = 0; j < types.length; j++) {
+		// 				if(userItemsLeftKeys[i].indexOf(types[j]) != -1) {
+		// 					neededTypes[j] += userItemsLeft[userItemsLeftKeys[i]]
+		// 				}
+		// 			}
+		// 		}
+		// 		console.log(neededTypes)
+		// 		html += "</div></div>"
+		// 	}
+		// }
 		var textOutput = "You need to obtain the following lowest-tier equivalents:";
 		for (var i in userItemsLeftKeys) {
 			if(userItemsLeft[userItemsLeftKeys[i]] < 1) continue;

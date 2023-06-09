@@ -13,8 +13,16 @@
 	<body>
 		<!-- TODO:save options? -->
 		<!-- Options would include char/weap default target values (6/9/9/9 and 6 respectively). Not sure what else yet. -->
+		<!-- TODO: char levels (for char exp mats), add weapon exp mats?, add local sources. CONFIRM ORDER OF THUNDERCLAP FRUITCORE AND MAJ. HOOKED BEAKS -->
+		<!-- TODO: add converting as an option. "using [all your|the maximum needed] dust of azoth, you can use x 'wildcard' gems" and "using [all|max] dream solvents, you can use x 'wildcard' weeklyBoss drops" -->
+		<!-- TODO: add item names -->
+		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
+		<div id="warning">
+			<strong>The way inventories are saved in localStorage have been altered and may have been wiped. Please check your inventory is working correctly. This warning will persist until the next update.</strong>
+		</div>
 		<div>
 			<a href="inv.html">Inventory</a>
+			<!-- <a href="characters.html">Characters</a> -->
 		</div>
 		<div class="vertFlex">
 			<div>
@@ -33,28 +41,20 @@
 			<div class="charDropdown">
 				<button>
 					<img id="dropdownCharIcon" class="dropdownCharImg" src="images/char/Unknown.png">
-					<span id="dropdownCharName">Character</span>
+					<input id="dropdownCharName" size="13" placeholder="Character" type="text" onfocusout="dropdownLoseFocus('charDropdown')" onfocusin="dropdownFocus('charDropdown')" oninput="searchDropdown(this.value,'charDropdownButton')">
 				</button>
-				<div class="dropdownContent" id="dropdownCharContent">
-					<button onclick="pickChar(this.name)" name="Unknown">
-						<img src="images/char/Unknown.png"><span>Unknown</span>
-					</button>
-				</div>
+				<div class="dropdownContent" id="dropdownCharContent"></div>
 			</div>
-			<button onclick="addCharacter(get('dropdownCharName').innerText)">Add Character</button>
+			<button onclick="addCharacter(get('dropdownCharName').value);searchDropdown('','charDropdownButton')">Add Character</button>
 			
 			<div class="weaponDropdown">
 				<button>
 					<img id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
-					<span id="dropdownWeaponName" rarity="0">Weapon</span>
+					<input id="dropdownWeaponName" size="13" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="searchDropdown(this.value,'weaponDropdownButton')">
 				</button>
-				<div class="dropdownContent" id="dropdownWeaponContent">
-					<button onclick="pickWeapon(this.name,this.getAttribute('rarity'))" rarity="1" name="Unknown">
-						<img src="images/weapon/Unknown.png"><span>Unknown</span>
-					</button>
-				</div>
+				<div class="dropdownContent" id="dropdownWeaponContent"></div>
 			</div>
-			<button onclick="addWeapon(get('dropdownWeaponName').innerText)">Add Weapon</button>
+			<button onclick="addWeapon(get('dropdownWeaponName').value);searchDropdown('','weaponDropdownButton')">Add Weapon</button>
 			
 		</div>
 		<div class="notes">Do note that only the first Traveler's Ascension gets counted</div>
@@ -76,17 +76,23 @@
 	<script>
 	'use strict';
 	window.addEventListener("load", () => {
+		if (getLSItem("invNotURIDecoded") == null) {
+			fixInv();
+		} else {
+			get("warning").style = "display:none"
+		}
 		// Generate Dropdown HTML
+		// TODO? - Add rarity stars?
 		var html = "";
 		for (var i in chars) {
 			var charName = i;
 			var img = spaceToUnderscore(charName);
 			if (charName != "Traveler") {
-				html += "<button onclick=\"pickChar(this.name)\" name=\"" + charName + "\"><img class=\"dropdownCharImg\" src=\"images/char/" + img + ".png\"><span>" + charName + "</span></button>";
+				html += "<button class=\"charDropdownButton\" onclick=\"pickChar(this.name)\" name=\"" + charName + "\"><img class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/" + img + ".png\"><span>" + charName + "</span></button>";
 			} else {
 				for (var j = 0; j < chars[i].regions.length; j++) {
 					var travVariant = chars[i].regions[j];
-					html += "<button onclick=\"pickChar(this.name,this.getAttribute(&quot;num&quot;))\" name=\"" + charName + "\" num=\"" + j + "\"><img class=\"dropdownCharImg\" src=\"images/char/" + img + ".png\"><span>" + travVariant.type + " " + charName + "</span></button>";
+					html += "<button class=\"charDropdownButton\" onclick=\"pickChar(this.name,this.getAttribute(&quot;num&quot;))\" name=\"" + travVariant.type + " " + charName + "\" num=\"" + j + "\"><img class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/" + img + ".png\"><span>" + travVariant.type + " " + charName + "</span></button>";
 				}
 			}
 		}
@@ -97,18 +103,10 @@
 			var rarity = weapDB[i].rarity;
 			var img = spaceToUnderscore(weapName);
 			if (weapDB[i].title != undefined) title = weapDB[i].title;
-			html += "<button onclick=\"pickWeapon(this.name,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><img class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></button>";
+			html += "<button class=\"weaponDropdownButton\" onclick=\"pickWeapon(this.children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><img class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></button>";
 		}
 		get("dropdownWeaponContent").innerHTML = html; html = "";
-
-		// try {
-		// 	selectedChars = JSON.parse(getLSItem("selectedChars"))
-		// }
-		// catch {
-		// }
 		selectedChars = getSelectedChars();
-		
-		// console.log(selectedChars)
 		if(selectedChars != null) {
 			for(var i = 0; i < selectedChars.length; i++) {
 				selectedCharsIndex = selectedChars.map(i => i.id);
@@ -122,5 +120,28 @@
 			selectedChars = [];
 		}
 	});
+	var searchDropdown = (string,className) => {
+		// TODO? - Sort by closest match? ie searching "zh" should bring Zhongli first then Baizhu.
+		var buttons = getByClass(className);
+		if(string != "") {
+				for(var i = 0; i < buttons.length; i++) {
+				if(buttons[i].name.toLowerCase().indexOf(string.toLowerCase()) == -1) {
+					buttons[i].style = "display:none";
+				} else {
+					buttons[i].removeAttribute("style");
+				}
+			}
+		} else {
+			for(var i = 0; i < buttons.length; i++) {
+				buttons[i].removeAttribute("style");
+			}
+		}
+	}
+	var dropdownFocus = (parentClass) => {
+		getByClass(parentClass)[0].classList.add("active");
+	}
+	var dropdownLoseFocus = (parentClass) => {
+		getByClass(parentClass)[0].classList.remove("active");
+	}
 	</script>
 </html>
