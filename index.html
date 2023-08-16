@@ -10,25 +10,13 @@
 	<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
 	<script type="text/javascript" src="scripts/inventory.js"></script>
 	<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
-	<body class="hideLimited">
+	<body>
 		<!-- TODO:save options? -->
-		<!-- Options: not sure what else that hasn't been added yet would be. -->
-		<!-- TODO: char levels (for char exp mats), add weapon exp mats? -->
-		<!-- TODO: add converting as an option. "using [all your|the maximum needed] dust of azoth, you can use x 'wildcard' gems" and "using [all|max] dream solvents, you can use x 'wildcard' weeklyBoss drops". -->
+		<!-- Options would include char/weap default target values (6/9/9/9 and 6 respectively). Not sure what else yet. -->
+		<!-- TODO: char levels (for char exp mats), add weapon exp mats?, add local sources. CONFIRM ORDER OF THUNDERCLAP FRUITCORE AND MAJ. HOOKED BEAKS -->
+		<!-- TODO: add converting as an option. "using [all your|the maximum needed] dust of azoth, you can use x 'wildcard' gems" and "using [all|max] dream solvents, you can use x 'wildcard' weeklyBoss drops" -->
+		<!-- TODO: add item names -->
 		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
-		<!-- 
-			The following images need updating or downloading:
-			Lumidouce Bell, Rainbow Rose, Beryl Conch, Romaritime Flower
-			Teachings / Guide / Philos... of Order (size differences), Justice, Equity (check these just in case)
-			Fontemer... Drops
-			Breacher Primuses drops
-			Tainted hydro... drops
-			All Fontaine Weapon Mats
-			All Fontaine Elite drops
-			New Weapon icons
-			All Fontaine visions - Inazuma's Electro is also slightly too big?
-			Lynette and Lyney may have slight issues with their icons
-		-->
 		<div id="warning">
 			<strong>The way inventories are saved in localStorage have been altered and may have been wiped. Please check your inventory is working correctly. This warning will persist until the next update.</strong>
 		</div>
@@ -36,42 +24,37 @@
 			<a href="inv.html">Inventory</a>
 			<!-- <a href="characters.html">Characters</a> -->
 		</div>
-		<div class="vertFlex inputs">
+		<div class="vertFlex">
 			<div>
-				<span>Default <strong>target</strong> values for <label for="defaultTargetCharLvl">Character Level</label>, <label for="defaultTargetAsc">Character Ascension</label>, <label for="defaultTargetTal1">Normal Attack</label>, <label for="defaultTargetTal2">Skill</label> and <label for="defaultTargetTal3">Burst</label>:</span>
-				<input type="number" class="defaultInput" id="defaultTargetCharLvl" size="3" max="90" min="1" value="90">
-				<input type="number" class="defaultInput" id="defaultTargetAsc" size="3" max="6" min="0" value="6">
-				<input type="number" class="defaultInput" id="defaultTargetTal1" size="3" max="10" min="1" value="9">
-				<input type="number" class="defaultInput" id="defaultTargetTal2" size="3" max="10" min="1" value="9">
-				<input type="number" class="defaultInput" id="defaultTargetTal3" size="3" max="10" min="1" value="9">
+				<label>Default <strong>target</strong> values for Character Ascension, Normal Attack, Skill and Burst:</label>
+				<input type="number" id="defaultTargetAsc" size="3" max="6" min="0" value="6">
+				<input type="number" id="defaultTargetTal1" size="3" max="10" min="1" value="9">
+				<input type="number" id="defaultTargetTal2" size="3" max="10" min="1" value="9">
+				<input type="number" id="defaultTargetTal3" size="3" max="10" min="1" value="9">
 			</div>
 			<div>
-				<span>Default <strong>target</strong> value for <label for="defaultWeaponAsc">Weapon Ascension</label></span>
-				<input type="number" class="defaultInput" id="defaultWeaponAsc" size="3" max="6" min="0" value="6">
-				<span> | </span>
-				<input type="checkbox" class="defaultInput" onclick="toggleLimitedItems()" id="toggleLimited" name="toggleLimited" checked title="Limited-Timed items include Aloy and Flagship Event Weapons."><label for="toggleLimited" title="Limited-Timed items include Aloy and Flagship Event Weapons.">Hide Limited-Timed Items</label>
-				<span> | </span>
-				<input type="checkbox" class="defaultInput" onclick="toggleExtraIcons()" id="toggleExtraIcons" name="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars."><label for="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars.">Hide Extra Icons</label>
+				<label>Default <strong>target</strong> value for Weapon Ascension</label>
+				<input type="number" id="defaultWeaponAsc" size="3" max="6" min="0" value="6">
 			</div>
 		</div>
 		<div class="addButtons">
 			<div class="charDropdown">
-				<div class="fauxButton">
-					<img loading="lazy" id="dropdownCharIcon" class="dropdownCharImg" src="images/char/Unknown.png">
-					<input id="dropdownCharName" placeholder="Character" type="text" onfocusout="dropdownLoseFocus('charDropdown')" onfocusin="dropdownFocus('charDropdown')" oninput="searchDropdown(this.value,'charDropdownButton')">
-				</div>
+				<button>
+					<img id="dropdownCharIcon" class="dropdownCharImg" src="images/char/Unknown.png">
+					<input id="dropdownCharName" size="13" placeholder="Character" type="text" onfocusout="dropdownLoseFocus('charDropdown')" onfocusin="dropdownFocus('charDropdown')" oninput="searchDropdown(this.value,'charDropdownButton')">
+				</button>
 				<div class="dropdownContent" id="dropdownCharContent"></div>
 			</div>
-			<div class="fauxButton" onclick="addCharacter(get('dropdownCharName').value);searchDropdown('','charDropdownButton')">Add Character</div>
+			<button onclick="addCharacter(get('dropdownCharName').value);searchDropdown('','charDropdownButton')">Add Character</button>
 			
 			<div class="weaponDropdown">
-				<div class="fauxButton">
-					<img loading="lazy" id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
-					<input id="dropdownWeaponName" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="searchDropdown(this.value,'weaponDropdownButton')">
-				</div>
+				<button>
+					<img id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
+					<input id="dropdownWeaponName" size="13" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="searchDropdown(this.value,'weaponDropdownButton')">
+				</button>
 				<div class="dropdownContent" id="dropdownWeaponContent"></div>
 			</div>
-			<div class="fauxButton" onclick="addWeapon(get('dropdownWeaponName').value);searchDropdown('','weaponDropdownButton')">Add Weapon</div>
+			<button onclick="addWeapon(get('dropdownWeaponName').value);searchDropdown('','weaponDropdownButton')">Add Weapon</button>
 			
 		</div>
 		<div class="notes">Do note that only the first Traveler's Ascension gets counted</div>
@@ -86,7 +69,7 @@
 		</div>
 		<div class="fakeTextbox" id="textOutput"></div>
 		<footer style="font-size:12px;overflow-x:auto;">
-			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site, the interactive map and from the game itself. This site <strong>does not</strong> use Cookies and is completely open source. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
+			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site. This site <strong>does not</strong> use Cookies but it does use Local Storage. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
 		</footer>
 	</body>
 	
@@ -104,33 +87,12 @@
 		for (var i in chars) {
 			var charName = i;
 			var img = spaceToUnderscore(charName);
-			var rarity = chars[i].rarity;
 			if (charName != "Traveler") {
-				if(chars[charName].include === false) continue;
-				html += "<div class=\"charDropdownButton fauxButton rarity-"+rarity;
-				if(charName == "Aloy") html += " limited";
-				html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;))\" name=\""+charName+"\">";
-				html += "<span>";
-				html += "<img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+charName+"</span>";
-				html += "<span class=\"iconsGroup\">";
-				// html += "<img loading="lazy" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/elements/"+chars[charName].type+".svg\">";
-				if(chars[charName].region != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].region+"_"+chars[charName].type+".png\">";
-				if(chars[charName].vision != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].vision+".png\">";
-				if(chars[charName].weapon != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars[charName].weapon+".png\">";
-				html += "</span>";
-				html += "</div>";
+				html += "<button class=\"charDropdownButton\" onclick=\"pickChar(this.name)\" name=\"" + charName + "\"><img class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/" + img + ".png\"><span>" + charName + "</span></button>";
 			} else {
 				for (var j = 0; j < chars[i].regions.length; j++) {
-					if (chars[i].regions[j].include === false) continue;
 					var travVariant = chars[i].regions[j];
-					html += "<div class=\"charDropdownButton fauxButton rarity-"+rarity;
-					if(travVariant.type == "Unaligned") html+=" limited";
-					html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;),this.getAttribute(&quot;num&quot;))\" name=\""+travVariant.type+" "+charName+"\" num=\""+j+"\"><span><img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+travVariant.type+" "+charName+"</span>";
-					html += "<span class=\"iconsGroup\">"
-					html+="<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/Traveler_"+travVariant.type+".png\">";
-					html+="<img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars["Traveler"].weapon+".png\">";
-					html += "</span>";
-					html += "</div>";
+					html += "<button class=\"charDropdownButton\" onclick=\"pickChar(this.name,this.getAttribute(&quot;num&quot;))\" name=\"" + travVariant.type + " " + charName + "\" num=\"" + j + "\"><img class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/" + img + ".png\"><span>" + travVariant.type + " " + charName + "</span></button>";
 				}
 			}
 		}
@@ -141,9 +103,7 @@
 			var rarity = weapDB[i].rarity;
 			var img = spaceToUnderscore(weapName);
 			if (weapDB[i].title != undefined) title = weapDB[i].title;
-			html += "<div class=\"weaponDropdownButton fauxButton rarity-"+rarity;
-			if(weapDB[i].source != undefined && weapDB[i].source == "event") html+=" limited";
-			html += "\" onclick=\"pickWeapon(this.children[0].children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><span><img loading=\"lazy\" class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></span><img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/" + weapDB[weapName].type +".png\"></div>";
+			html += "<button class=\"weaponDropdownButton\" onclick=\"pickWeapon(this.children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><img class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></button>";
 		}
 		get("dropdownWeaponContent").innerHTML = html; html = "";
 		selectedChars = getSelectedChars();
@@ -159,21 +119,13 @@
 		} else {
 			selectedChars = [];
 		}
-		var prefs = JSON.parse(getLSItem("prefs"));
-		for(var i = 0; i < defaultInputs.length; i++) {
-			if(prefs != null) setVal(defaultInputs[i],prefs[i],true)
-			defaultInputs[i].setAttribute("onChange","forceValue(this.id,this.value,this.min,this.max);updateDefaultTargetPrefs();");
-		}
-		if(!val("toggleLimited")) document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
-		if(val("toggleExtraIcons")) document.getElementsByTagName("body")[0].classList.toggle("hideExtraIcons");
 	});
-	const defaultInputs = getByClass("defaultInput");
 	var searchDropdown = (string,className) => {
 		// TODO? - Sort by closest match? ie searching "zh" should bring Zhongli first then Baizhu.
 		var buttons = getByClass(className);
 		if(string != "") {
 				for(var i = 0; i < buttons.length; i++) {
-				if(buttons[i].getAttribute("name").toLowerCase().indexOf(string.toLowerCase()) == -1) {
+				if(buttons[i].name.toLowerCase().indexOf(string.toLowerCase()) == -1) {
 					buttons[i].style = "display:none";
 				} else {
 					buttons[i].removeAttribute("style");
@@ -190,18 +142,6 @@
 	}
 	var dropdownLoseFocus = (parentClass) => {
 		getByClass(parentClass)[0].classList.remove("active");
-	}
-	var updateDefaultTargetPrefs = () => {
-		var prefs = [];
-		for(var i = 0; i < defaultInputs.length; i++) {
-			prefs[i] = val(defaultInputs[i],true);
-		}
-
-		if(JSON.stringify(prefs) === "[90,6,9,9,9,6,true,false]" ) {
-			clearLSItem("prefs");
-		} else {
-			setLSItem("prefs",JSON.stringify(prefs));
-		}
 	}
 	</script>
 </html>

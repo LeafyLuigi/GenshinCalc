@@ -1,10 +1,5 @@
 body {
   line-height: 1.6;
-  font-family: sans-serif;
-}
-
-.hideLimited .limited {
-  display: none !important;
 }
 
 .fakeTextbox {
@@ -47,15 +42,6 @@ body {
   margin-bottom: 8px;
 }
 
-.charWeapInputs input:invalid {
-  outline: 2px solid #ff0000;
-  outline-offset: 1px;
-}
-
-.charBlock input {
-  margin-inline: 2px;
-}
-
 .boxName {
   font-size: 24px;
   font-weight: 600;
@@ -63,7 +49,7 @@ body {
   display: flex;
   align-items: center;
 }
-.boxName > img:not([src*=icons]) {
+.boxName > img {
   width: 64px;
 }
 
@@ -90,18 +76,15 @@ body {
   max-width: 200px;
   min-width: 200px;
 }
-:is(.charDropdown, .weaponDropdown) > .fauxButton {
+:is(.charDropdown, .weaponDropdown) > button {
   min-height: 48px;
   min-width: inherit;
   display: flex;
   align-items: center;
   max-width: inherit;
 }
-:is(.charDropdown, .weaponDropdown) > .fauxButton > img {
+:is(.charDropdown, .weaponDropdown) > button > img {
   margin-right: 8px;
-}
-:is(.charDropdown, .weaponDropdown) input {
-  max-width: 136px;
 }
 :is(.charDropdown, .weaponDropdown):hover .dropdownContent, :is(.charDropdown, .weaponDropdown).active .dropdownContent {
   display: block;
@@ -116,29 +99,21 @@ body {
   min-width: inherit;
   scrollbar-width: thin;
 }
-.dropdownContent > .fauxButton {
+.dropdownContent > button {
   display: flex;
-  justify-content: space-between;
+  align-items: center;
   min-width: inherit;
   max-width: inherit;
 }
-.dropdownContent > .fauxButton > span:not([class]) {
-  display: flex;
-  align-items: center;
-}
-.dropdownContent > .fauxButton > span:not([class]) > img:not([src*=icons]) {
+.dropdownContent > button > img {
   margin-right: 8px;
 }
-.dropdownContent > .fauxButton[disabled], .dropdownContent > .fauxButton:disabled {
+.dropdownContent > button[disabled], .dropdownContent > button:disabled {
   display: none;
 }
 
 .dropdownWeaponImg, .dropdownCharImg {
   width: 32px;
-}
-
-.dropdownType {
-  float: right;
 }
 
 .testButton {
@@ -147,16 +122,8 @@ body {
   margin-right: 4px;
 }
 
-.itemIconContainer {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  --size: 256px;
-  --rarity-size: 55px;
-}
-
 .itemIcon {
-  transform: rotate(0deg);
+  --size: 256px;
   display: flex;
   flex-flow: column nowrap;
   align-items: center;
@@ -168,54 +135,53 @@ body {
   font-size: calc(var(--size) * 0.2142857143);
   border-radius: calc(var(--size) / 10);
   background: top/cover no-repeat;
+  transform: rotate(0deg);
 }
-
-.normal {
+.itemIcon input {
+  border-width: 0;
+  padding: 0;
+  margin: 0;
+  background-color: transparent;
+  color: #495366;
+  max-height: calc(var(--size) * 0.2142857143);
+  line-height: 1;
+}
+.itemIcon.normal {
   --size: 112px;
-  --rarity-size: 24px;
 }
-
-.small {
+.itemIcon.small {
   --size: 96px;
-  --rarity-size: 20px;
 }
-
-.mini {
+.itemIcon.mini {
   --size: 72px;
-  --rarity-size: 15px;
 }
-
-.tiny {
+.itemIcon.tiny {
   --size: 56px;
-  --rarity-size: 12px;
 }
-
-.micro {
+.itemIcon.micro {
   --size: 36px;
-  --rarity-size: 8px;
 }
-
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon {
+.itemIcon:is(.micro, .tiny, .mini, .small, .normal) {
   background-color: #a2a2a2;
   background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-1.png);
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-2 {
+.itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-2 {
   background-color: #6cad8d;
   background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-2.png);
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-3 {
+.itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-3 {
   background-color: #6eaace;
   background-image: linear-gradient(to bottom, #667896 0%, #6eaace 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-3.png);
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-4 {
+.itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-4 {
   background-color: #9674c5;
   background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-4.png);
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-5 {
+.itemIcon:is(.micro, .tiny, .mini, .small, .normal).rarity-5 {
   background-color: #e09552;
   background-image: linear-gradient(to bottom, #946a43 0%, #e09552 82.35%, 82.36%, #e9e5dc 100%);
   background-image: url(images/rarity/mini-5.png);
@@ -226,43 +192,10 @@ body {
   width: var(--size);
 }
 
-.itemName {
-  color: #495366;
-  line-height: 1;
-  font-size: calc(var(--size) * 0.2142857143);
-  text-align: center;
-  overflow-wrap: normal;
-  min-width: 100%;
-  max-width: 100%;
-  width: -moz-min-content;
-  width: min-content;
-}
-
-.userInvInput {
-  border: 0;
-  margin: 0;
-  background-color: transparent;
-  color: #495366;
-  max-height: calc(var(--size) * 0.2142857143);
-  line-height: 1;
-  max-width: var(--size);
-  box-sizing: border-box;
-  padding-block: 0;
-  padding-inline: 2px;
-}
-
-:is(.inputs, .charWeapInputs) input[type=number] {
-  padding-inline: 2px;
-  padding-block: 2px;
-  border: 1px solid #495366;
-  border-radius: 4px;
-  background-color: transparent;
-}
-
 .outputRequired {
   display: flex;
   flex-wrap: wrap;
-  gap: 4px;
+  gap: 8px;
 }
 
 .itemSource {
@@ -289,7 +222,6 @@ body {
   -webkit-user-select: none;
      -moz-user-select: none;
           user-select: none;
-  font-size: 14px;
 }
 .itemSource:hover + .itemSourceTooltip, .active + .itemSourceTooltip {
   visibility: visible;
@@ -300,62 +232,4 @@ body {
 }
 .showConvert .convert {
   display: block;
-}
-
-.fauxButton {
-  border: 2px outset #8f8f9d;
-  background-color: #e9e9ed;
-  padding-block: 1px;
-  padding-inline: 4px;
-  cursor: default;
-  box-sizing: border-box;
-  border-radius: 8px;
-}
-.fauxButton:hover {
-  border-color: #676774;
-  background-color: #d0d0d7;
-}
-
-:is(.charDropdownButton, .weaponDropdownButton) {
-  font-size: 14px;
-}
-:is(.charDropdownButton, .weaponDropdownButton):is(.rarity-0, .rarity-1) {
-  background-image: linear-gradient(to right, #707275 0%, #a2a2a2 20%, transparent 44px);
-}
-:is(.charDropdownButton, .weaponDropdownButton).rarity-2 {
-  background-image: linear-gradient(to right, #5c7670 0%, #6cad8d 20%, transparent 44px);
-}
-:is(.charDropdownButton, .weaponDropdownButton).rarity-3 {
-  background-image: linear-gradient(to right, #667896 0%, #6eaace 20%, transparent 44px);
-}
-:is(.charDropdownButton, .weaponDropdownButton).rarity-4 {
-  background-image: linear-gradient(to right, #65608c 0%, #9674c5 20%, transparent 44px);
-}
-:is(.charDropdownButton, .weaponDropdownButton).rarity-5 {
-  background-image: linear-gradient(to right, #946a43 0%, #e09552 20%, transparent 44px);
-}
-
-.rarityIcon {
-  position: absolute;
-  height: var(--rarity-size);
-  top: calc(var(--size) - var(--rarity-size));
-}
-
-.hideExtraIcons .extraIcon {
-  display: none;
-}
-
-.iconsGroup {
-  display: flex;
-  max-height: 32px;
-  align-items: center;
-  align-self: center;
-}
-.iconsGroup:empty {
-  display: none;
-}
-
-.vision {
-  filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
-  pointer-events: none;
 }
