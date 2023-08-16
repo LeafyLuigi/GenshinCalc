@@ -101,14 +101,14 @@ const itemDB = {
 		"source": "Dropped by Ruin Serpent.",
 		"type": "boss"
 	},
-	"Thunderclap Fruitcore": {
-		"rarity": 4,
-		"source": "Dropped by Electro Regisvine.",
-		"type": "boss"
-	},
 	"Majestic Hooked Beak": {
 		"rarity": 4,
 		"source": "Dropped by Jadeplume Terrorshroom.",
+		"type": "boss"
+	},
+	"Thunderclap Fruitcore": {
+		"rarity": 4,
+		"source": "Dropped by Electro Regisvine.",
 		"type": "boss"
 	},
 	"Perpetual Caliber": {
@@ -134,6 +134,16 @@ const itemDB = {
 	"Evergloom Ring": {
 		"rarity": 4,
 		"source": "Dropped by Iniquitous Baptist.",
+		"type": "boss"
+	},
+	"Artificed Spare Clockwork Component - Coppelia": {
+		"rarity": 4,
+		"source": "Dropped by Icewind Suite.",
+		"type": "boss"
+	},
+	"Emperor's Resolution": {
+		"rarity": 4,
+		"source": "Dropped by Emperor of Fire and Iron.",
 		"type": "boss"
 	},
 
@@ -282,7 +292,31 @@ const itemDB = {
 		"rarity": 1,
 		"type": "common"
 	},
-
+	"Meshing Gear": {
+		"rarity": 1,
+		"type": "common"
+	},
+	"Mechanical Spur Gear": {
+		"rarity": 2,
+		"type": "common"
+	},
+	"Artificed Dynamic Gear": {
+		"rarity": 3,
+		"type": "common"
+	},
+	"Transoceanic Pearl": {
+		"rarity": 1,
+		"type": "common"
+	},
+	"Transoceanic Chunk": {
+		"rarity": 2,
+		"type": "common"
+	},
+	"Xenochromatic Crystal": {
+		"rarity": 3,
+		"type": "common"
+	},
+	
 	"A Flower Yet to Bloom": {
 		"rarity": 2,
 		"type": "elite"
@@ -460,6 +494,30 @@ const itemDB = {
 		"type": "elite"
 	},
 	"Wanderer's Blooming Flower": {
+		"rarity": 4,
+		"type": "elite"
+	},
+	"Rift Core": {
+		"rarity": 2,
+		"type": "elite"
+	},
+	"Foreign Synapse": {
+		"rarity": 3,
+		"type": "elite"
+	},
+	"Alien Life Core": {
+		"rarity": 4,
+		"type": "elite"
+	},
+	"Drop of Tainted Water": {
+		"rarity": 2,
+		"type": "elite"
+	},
+	"Scoop of Tainted Water": {
+		"rarity": 3,
+		"type": "elite"
+	},
+	"Newborn Tainted Hydro Phantasm": {
 		"rarity": 4,
 		"type": "elite"
 	},
@@ -737,142 +795,232 @@ const itemDB = {
 		"rarity": 2,
 		"type": "books"
 	},
+	"Teachings of Equity": {
+		"rarity": 2,
+		"type": "books"
+	},
+	"Guide to Equity": {
+		"rarity": 3,
+		"type": "books"
+	},
+	"Philosophies of Equity": {
+		"rarity": 4,
+		"type": "books"
+	},
+	"Teachings of Justice": {
+		"rarity": 2,
+		"type": "books"
+	},
+	"Guide to Justice": {
+		"rarity": 3,
+		"type": "books"
+	},
+	"Philosophies of Justice": {
+		"rarity": 4,
+		"type": "books"
+	},
+	"Teachings of Order": {
+		"rarity": 2,
+		"type": "books"
+	},
+	"Guide to Order": {
+		"rarity": 3,
+		"type": "books"
+	},
+	"Philosophies of Order": {
+		"rarity": 4,
+		"type": "books"
+	},
 
 	"Wolfhook": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Found in Wolvendom headed towards Lupus Boreas."
 	},
 	"Valberry": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Found around Stormbearer Mountains and Stormbearer Point."
 	},
 	"Cecilia": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Found in the higher regions of Starsnatch Cliff."
 	},
 	"Windwheel Aster": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Found around Stormterror's Lair and the Statues of the Seven in Mondstadt."
 	},
 	"Philanemo Mushroom": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Found on the sides of buildings in the City of Mondstadt, Springvale and around Dawn Winery."
 	},
 	"Small Lamp Grass": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Found in small clumps around Mondstadt but best found in Whispering Woods and Wolvendom's lower areas."
 	},
 	"Calla Lily": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Found near lakes in Mondstadt."
 	},
 	"Dandelion Seed": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Mondstadt",
+		"source": "Scattered all over Mondstadt but is best found outside the City of Mondstadt and on the cliff across from Dawn Winery."
 	},
 	"Jueyun Chili": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Found around Qingce Village, the cliffs above Stone Gate and around (but not on) Qingyun Peak."
 	},
 	"Noctilucous Jade": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Scattered all over Liyue but is best found around Mingyun Village and/or Qiongji Estuary."
 	},
 	"Silk Flower": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Found in Liyue Harbour and around Wangshu Inn."
 	},
 	"Glaze Lily": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Found in Liyue Harbour and Qingce Village."
 	},
 	"Qingxin": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Scattered in the mountainous regions of Liyue. Wuwang Hill, Qingyun Peak and The Chasm have a bulk of these."
 	},
 	"Starconch": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Found along the beaches in Liyue's central east."
 	},
 	"Violetgrass": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Scattered in the mountainous regions of Liyue along cliff faces. The Chasm, the area around Dunyu Ruins and around Huaguang Stone Forest have large groups."
 	},
 	"Cor Lapis": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Liyue",
+		"source": "Found all throughout Liyue's more interior and mountainous regions. Best found in The Chasm, Cuijue Slope and Mt. Hulao."
 	},
 	"Onikabuto": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Found primarially in north-eastern Narukami Island and on Tatarasuna with smaller amounts on Yashiori and south-western Seirai."
 	},
 	"Sakura Bloom": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Found all over Narukami Island. Use Electro to obtain."
 	},
 	"Crystal Marrow": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Primarially found on Yashiori Island with a smaller bit in western Tatarasuna."
 	},
 	"Dendrobium": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Found primarially on Nazuchi Beach and less around the boss arenas for Pyro Hypostasis and Maguu Kenki."
 	},
 	"Naku Weed": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Large amounts are on Tatarasuna and Seirai Island with smaller amounts on Yashiori Island and Narukami Island."
 	},
 	"Sea Ganoderma": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Found on the shorelines of Inazuma."
 	},
 	"Sango Pearl": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Found on Watatsumi Island."
 	},
 	"Amakumo Fruit": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Found on Seirai Island."
 	},
 	"Fluorescent Fungus": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Inazuma",
+		"source": "Found on Tsurumi Island."
 	},
 	"Rukkhashava Mushrooms": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Best found in Mawtiyima Forest and Apam Woods with smaller groups around rainforest Sumaru."
 	},
 	"Padisarah": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Best found in Vanarana and around built-up areas in northern rainforest Sumaru."
 	},
 	"Nilotpala Lotus": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Found in water bodies in the rainforest areas of Sumaru, mostly north-east."
 	},
 	"Kalpalata Lotus": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Found in small but dense groups all over rainforest Sumaru."
 	},
 	"Henna Berry": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Found all over the Great Red Sand, growing on cacti."
 	},
 	"Sand Grease Pupa": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Best found in the cave system containing Setekh Wenut but can be found all over the Desert of Hadramaveth."
 	},
 	"Mourning Flower": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Found in the Girdle of the Sands, primarially along the rivers there."
 	},
 	"Trishiraite": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Found in the Girdle of the Sands, mostly in Gavireh Lajavard."
 	},
 	"Scarab": {
-		"rarity": 1,
-		"type": "local"
+		"type": "local",
+		"region": "Sumaru",
+		"source": "Primarially found around the Mausoleum of King Deshret."
+	},
+	"Beryl Conch": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "No clue yet."
+	},
+	"Romaritime Flower": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "No clue yet."
+	},
+	"Lumidouce Bell": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "No clue yet."
+	},
+	"Rainbow Rose": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "No clue yet."
 	},
 
 	"Bit of Aerosiderite": {
@@ -1067,6 +1215,54 @@ const itemDB = {
 		"rarity": 2,
 		"type": "weaponAsc"
 	},
+	"Broken Goblet of the Pristine Sea": {
+		"rarity": 2,
+		"type": "weaponAsc"
+	},
+	"Wine Goblet of the Pristine Sea": {
+		"rarity": 3,
+		"type": "weaponAsc"
+	},
+	"Silver Goblet of the Pristine Sea": {
+		"rarity": 4,
+		"type": "weaponAsc"
+	},
+	"Golden Goblet of the Pristine Sea": {
+		"rarity": 5,
+		"type": "weaponAsc"
+	},
+	"Dross of Pure Sacred Dewdrop": {
+		"rarity": 2,
+		"type": "weaponAsc"
+	},
+	"Sublimation of Pure Sacred Dewdrop": {
+		"rarity": 3,
+		"type": "weaponAsc"
+	},
+	"Spring of Pure Sacred Dewdrop": {
+		"rarity": 4,
+		"type": "weaponAsc"
+	},
+	"Essence of Pure Sacred Dewdrop": {
+		"rarity": 5,
+		"type": "weaponAsc"
+	},
+	"Fragment of an Anchient Chord": {
+		"rarity": 2,
+		"type": "weaponAsc"
+	},
+	"Chapter of an Anchient Chord": {
+		"rarity": 3,
+		"type": "weaponAsc"
+	},
+	"Movement of an Anchient Chord": {
+		"rarity": 4,
+		"type": "weaponAsc"
+	},
+	"Echo of an Anchient Chord": {
+		"rarity": 5,
+		"type": "weaponAsc"
+	},
 
 	"Dvalin's Plume": {
 		"rarity": 5,
@@ -1225,6 +1421,16 @@ const itemGroupDB = {
 		"source": "Dropped by Emerites.",
 		"items":["Faded Red Satin", "Trimmed Red Silk", "Rich Red Brocade"]
 	},
+	"clockworkMeka": {
+		"priority": 11,
+		"source": "Dropped by Clockwork Mekas.",
+		"items":["Meshing Gear","Mechanical Spur Gear","Artificed Dynamic Gear"]
+	},
+	"fontemerAberrants": {
+		"priority": 12,
+		"source": "Dropped by Fontemer Aberrants.",
+		"items": ["Transoceanic Pearl","Transoceanic Chunk","Xenochromatic Crystal"]
+	},
 
 	// elite mats
 	"mitachurl": {
@@ -1302,6 +1508,16 @@ const itemGroupDB = {
 		"source": "Dropped by Hilichurl Rogues.",
 		"items":["A Flower Yet to Bloom", "Treasured Flower", "Wanderer's Blooming Flower"]
 	},
+	"breacherPrimuses": {
+		"priority": 15,
+		"source": "Dropped by Breacher Primuses.",
+		"items": ["Rift Core","Foreign Synapse","Alien Life Core"]
+	},
+	"taintedHydroPhantasm": {
+		"priority": 16,
+		"source": "Dropped by Tainted Hydro Phantasms.",
+		"items": ["Drop of Tainted Water","Scoop of Tainted Water","Newborn Tainted Hydro Phantasm"]
+	},
 	
 	// weapon asc mats
 	"decarabianTiles": {
@@ -1364,7 +1580,22 @@ const itemGroupDB = {
 		"source": "Can be obtained from Tower of Abject Pride in Sumeru on Wednesday, Saturday and Sunday.",
 		"items":["Echo of Scorching Might","Remnant Glow of Scorching Might","Dream of Scorching Might","Olden Days of Scorching Might"]
 	},
-
+	"ancientChord": {
+		"priority": 12,
+		"source": "Can be obtained from Echoes of the Deep Tides in Fontaine on Monday, Thursday and Sunday.",
+		"items":["Fragment of an Anchient Chord","Chapter of an Anchient Chord","Movement of an Anchient Chord","Echo of an Anchient Chord"]
+	},
+	"pureSacredDewdrop": {
+		"priority": 13,
+		"source": "Can be obtained from Echoes of the Deep Tides in Fontaine on Tuesday, Friday and Sunday.",
+		"items":["Dross of Pure Sacred Dewdrop","Sublimation of Pure Sacred Dewdrop","Spring of Pure Sacred Dewdrop","Essence of Pure Sacred Dewdrop"]
+	},
+	"pristineSeaGoblet": {
+		"priority": 14,
+		"source": "Can be obtained from Echoes of the Deep Tides in Fontaine on Wednesday, Saturday and Sunday.",
+		"items":["Broken Goblet of the Pristine Sea","Wine Goblet of the Pristine Sea","Silver Goblet of the Pristine Sea","Golden Goblet of the Pristine Sea"]
+	},
+	
 	// gem groups - sorted here by element in loading screen bar
 	"Brilliant Diamond": {
 		"priority": 0,
@@ -1483,6 +1714,21 @@ const itemGroupDB = {
 		"priority": 11,
 		"source": "Can be obtained from Steeple of Ignorance in Sumeru on Wednesday, Saturday and Sunday.",
 		"items": ["Teachings of Praxis", "Guide to Praxis", "Philosophies of Praxis"]
+	},
+	"Equity": {
+		"priority": 12,
+		"source": "Can be obtained from Pale Forgotten Glory in Fontaine on Monday, Thursday and Sunday.",
+		"items": ["Teachings of Equity", "Guide to Equity", "Philosophies of Equity"]
+	},
+	"Justice": {
+		"priority": 13,
+		"source": "Can be obtained from Pale Forgotten Glory in Fontaine on Tuesday, Friday and Sunday.",
+		"items": ["Teachings of Justice", "Guide to Justice", "Philosophies of Justice"]
+	},
+	"Order": {
+		"priority": 14,
+		"source": "Can be obtained from Pale Forgotten Glory in Fontaine on Wednesday, Saturday and Sunday.",
+		"items": ["Teachings of Order", "Guide to Order", "Philosophies of Order"]
 	},
 
 	// Weekly Boss Drops

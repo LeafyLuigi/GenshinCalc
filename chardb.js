@@ -2,6 +2,8 @@
 const chars = {
 	"Albedo": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Mondstadt",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
 		"boss": "Basalt Pillar",
@@ -12,6 +14,8 @@ const chars = {
 	},
 	"Alhaitham": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Sumeru",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Pseudo-Stamens",
@@ -22,6 +26,9 @@ const chars = {
 	},
 	"Aloy": {
 		"rarity": 5,
+		"vision": "Aloy",
+		"weapon": "Bow",
+		"region": null,
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Crystalline Bloom",
@@ -32,6 +39,8 @@ const chars = {
 	},
 	"Amber": {
 		"rarity": 4,
+		"weapon": "Bow",
+		"region": "Mondstadt",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Everflame Seed",
@@ -42,6 +51,8 @@ const chars = {
 	},
 	"Arataki Itto": {
 		"rarity": 5,
+		"weapon": "Claymore",
+		"region": "Inazuma",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
 		"boss": "Riftborn Regalia",
@@ -52,6 +63,8 @@ const chars = {
 	},
 	"Baizhu": {
 		"rarity": 5,
+		"weapon": "Catalyst",
+		"region": "Liyue",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Evergloom Ring",
@@ -62,6 +75,8 @@ const chars = {
 	},
 	"Barbara": {
 		"rarity": 4,
+		"weapon": "Catalyst",
+		"region": "Mondstadt",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Cleansing Heart",
@@ -72,6 +87,8 @@ const chars = {
 	},
 	"Beidou": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Liyue",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Lightning Prism",
@@ -82,6 +99,8 @@ const chars = {
 	},
 	"Bennett": {
 		"rarity": 4,
+		"weapon": "Sword",
+		"region": "Mondstadt",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Everflame Seed",
@@ -92,6 +111,8 @@ const chars = {
 	},
 	"Candace": {
 		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Sumeru",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Light Guiding Tetrahedron",
@@ -100,8 +121,23 @@ const chars = {
 		"books": "Admonition",
 		"weeklyBoss": "Tears of the Calamitous God"
 	},
+	"Charlotte": {
+		"include": false,
+		"rarity": 4,
+		"weapon": "Catalyst",
+		"region": "Fontaine",
+		"type": "Cryo",
+		"gem": "Shivada Jade",
+		"boss": "Unknown",
+		"local": "Unknown",
+		"common": "Unknown",
+		"books": "Unknown",
+		"weeklyBoss": "Unknown"
+	},
 	"Chongyun": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Liyue",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Hoarfrost Core",
@@ -112,6 +148,8 @@ const chars = {
 	},
 	"Collei": {
 		"rarity": 4,
+		"weapon": "Bow",
+		"region": "Sumeru",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Majestic Hooked Beak",
@@ -122,6 +160,8 @@ const chars = {
 	},
 	"Cyno": {
 		"rarity": 5,
+		"weapon": "Polearm",
+		"region": "Sumeru",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Thunderclap Fruitcore",
@@ -132,6 +172,8 @@ const chars = {
 	},
 	"Dehya": {
 		"rarity": 5,
+		"weapon": "Claymore",
+		"region": "Sumeru",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Light Guiding Tetrahedron",
@@ -142,6 +184,8 @@ const chars = {
 	},
 	"Diluc": {
 		"rarity": 5,
+		"weapon": "Claymore",
+		"region": "Mondstadt",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Everflame Seed",
@@ -152,6 +196,8 @@ const chars = {
 	},
 	"Diona": {
 		"rarity": 4,
+		"weapon": "Bow",
+		"region": "Mondstadt",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Hoarfrost Core",
@@ -162,6 +208,8 @@ const chars = {
 	},
 	"Dori": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Sumeru",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Thunderclap Fruitcore",
@@ -172,6 +220,8 @@ const chars = {
 	},
 	"Eula": {
 		"rarity": 5,
+		"weapon": "Claymore",
+		"region": "Mondstadt",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Crystalline Bloom",
@@ -182,6 +232,8 @@ const chars = {
 	},
 	"Faruzan": {
 		"rarity": 4,
+		"weapon": "Bow",
+		"region": "Sumeru",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Light Guiding Tetrahedron",
@@ -192,6 +244,8 @@ const chars = {
 	},
 	"Fischl": {
 		"rarity": 4,
+		"weapon": "Bow",
+		"region": "Mondstadt",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Lightning Prism",
@@ -200,8 +254,23 @@ const chars = {
 		"books": "Ballad",
 		"weeklyBoss": "Spirit Locket of Boreas"
 	},
+	"Freminet": {
+		"include": false,
+		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Fontaine",
+		"type": "Cryo",
+		"gem": "Shivada Jade",
+		"boss": "Unknown",
+		"local": "Unknown",
+		"common": "Unknown",
+		"books": "Unknown",
+		"weeklyBoss": "Unknown"		
+	},
 	"Ganyu": {
 		"rarity": 5,
+		"weapon": "Bow",
+		"region": "Liyue",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Hoarfrost Core",
@@ -212,6 +281,8 @@ const chars = {
 	},
 	"Gorou": {
 		"rarity": 4,
+		"weapon": "Bow",
+		"region": "Inazuma",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
 		"boss": "Perpetual Heart",
@@ -222,6 +293,8 @@ const chars = {
 	},
 	"Hu Tao": {
 		"rarity": 5,
+		"weapon": "Polearm",
+		"region": "Liyue",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Juvenile Jade",
@@ -232,6 +305,8 @@ const chars = {
 	},
 	"Jean": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Mondstadt",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Hurricane Seed",
@@ -242,6 +317,8 @@ const chars = {
 	},
 	"Kaedehara Kazuha": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Inazuma",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Marionette Core",
@@ -252,6 +329,8 @@ const chars = {
 	},
 	"Kaeya": {
 		"rarity": 4,
+		"weapon": "Sword",
+		"region": "Mondstadt",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Hoarfrost Core",
@@ -262,6 +341,8 @@ const chars = {
 	},
 	"Kamisato Ayaka": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Inazuma",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Perpetual Heart",
@@ -272,6 +353,8 @@ const chars = {
 	},
 	"Kamisato Ayato": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Inazuma",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Dew of Repudiation",
@@ -282,6 +365,8 @@ const chars = {
 	},
 	"Kaveh": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Sumeru",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Quelled Creeper",
@@ -292,6 +377,8 @@ const chars = {
 	},
 	"Keqing": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Liyue",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Lightning Prism",
@@ -302,6 +389,8 @@ const chars = {
 	},
 	"Kirara": {
 		"rarity": 4,
+		"weapon": "Sword",
+		"region": "Inazuma",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Evergloom Ring",
@@ -312,6 +401,8 @@ const chars = {
 	},
 	"Klee": {
 		"rarity": 5,
+		"weapon": "Catalyst",
+		"region": "Mondstadt",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Everflame Seed",
@@ -322,6 +413,8 @@ const chars = {
 	},
 	"Kujou Sara": {
 		"rarity": 4,
+		"weapon": "Bow",
+		"region": "Inazuma",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Storm Beads",
@@ -332,6 +425,8 @@ const chars = {
 	},
 	"Kuki Shinobu": {
 		"rarity": 4,
+		"weapon": "Sword",
+		"region": "Inazuma",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Runic Fang",
@@ -342,6 +437,8 @@ const chars = {
 	},
 	"Layla": {
 		"rarity": 4,
+		"weapon": "Sword",
+		"region": "Sumeru",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Perpetual Caliber",
@@ -352,6 +449,8 @@ const chars = {
 	},
 	"Lisa": {
 		"rarity": 4,
+		"weapon": "Catalyst",
+		"region": "Mondstadt",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Lightning Prism",
@@ -360,8 +459,32 @@ const chars = {
 		"books": "Ballad",
 		"weeklyBoss": "Dvalin's Claw"
 	},
+	"Lynette": {
+		"rarity": 4,
+		"weapon": "Sword",
+		"region": "Fontaine",
+		"type": "Anemo",
+		"gem": "Vayuda Turquoise",
+		"local": "Lumidouce Bell",
+		"common": "clockworkMeka",
+		"books": "Order",
+		"weeklyBoss": "Everamber"
+	},
+	"Lyney": {
+		"rarity": 5,
+		"weapon": "Bow",
+		"region": "Fontaine",
+		"type": "Pyro",
+		"gem": "Agnidus Agate",
+		"local": "Rainbow Rose",
+		"common": "fatuiSkirmisher",
+		"books": "Equity",
+		"weeklyBoss": "Primordial Greenbloom"
+	},
 	"Mika": {
 		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Mondstadt",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Pseudo-Stamens",
@@ -372,6 +495,8 @@ const chars = {
 	},
 	"Mona": {
 		"rarity": 5,
+		"weapon": "Catalyst",
+		"region": "Mondstadt",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Cleansing Heart",
@@ -382,6 +507,8 @@ const chars = {
 	},
 	"Nahida": {
 		"rarity": 5,
+		"weapon": "Catalyst",
+		"region": "Sumeru",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Quelled Creeper",
@@ -392,6 +519,8 @@ const chars = {
 	},
 	"Nilou": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Sumeru",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Perpetual Caliber",
@@ -402,6 +531,8 @@ const chars = {
 	},
 	"Ningguang": {
 		"rarity": 4,
+		"weapon": "Catalyst",
+		"region": "Liyue",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
 		"boss": "Basalt Pillar",
@@ -412,6 +543,8 @@ const chars = {
 	},
 	"Noelle": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Mondstadt",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
 		"boss": "Basalt Pillar",
@@ -422,6 +555,8 @@ const chars = {
 	},
 	"Qiqi": {
 		"rarity": 5,
+		"weapon": "Sword",
+		"region": "Liyue",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Hoarfrost Core",
@@ -432,6 +567,8 @@ const chars = {
 	},
 	"Raiden Shogun": {
 		"rarity": 5,
+		"weapon": "Polearm",
+		"region": "Inazuma",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Storm Beads",
@@ -442,6 +579,8 @@ const chars = {
 	},
 	"Razor": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Mondstadt",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Lightning Prism",
@@ -452,6 +591,8 @@ const chars = {
 	},
 	"Rosaria": {
 		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Mondstadt",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Hoarfrost Core",
@@ -462,6 +603,8 @@ const chars = {
 	},
 	"Sangonomiya Kokomi": {
 		"rarity": 5,
+		"weapon": "Catalyst",
+		"region": "Inazuma",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Dew of Repudiation",
@@ -472,6 +615,8 @@ const chars = {
 	},
 	"Sayu": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Inazuma",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Marionette Core",
@@ -482,6 +627,8 @@ const chars = {
 	},
 	"Shenhe": {
 		"rarity": 5,
+		"weapon": "Polearm",
+		"region": "Liyue",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
 		"boss": "Dragonheir's False Fin",
@@ -492,6 +639,8 @@ const chars = {
 	},
 	"Shikanoin Heizou": {
 		"rarity": 4,
+		"weapon": "Catalyst",
+		"region": "Inazuma",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Runic Fang",
@@ -502,6 +651,8 @@ const chars = {
 	},
 	"Sucrose": {
 		"rarity": 4,
+		"weapon": "Catalyst",
+		"region": "Mondstadt",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Hurricane Seed",
@@ -512,6 +663,8 @@ const chars = {
 	},
 	"Tartaglia": {
 		"rarity": 5,
+		"weapon": "Bow",
+		"region": "Snezhnaya",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Cleansing Heart",
@@ -522,6 +675,8 @@ const chars = {
 	},
 	"Thoma": {
 		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Inazuma",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Smoldering Pearl",
@@ -532,6 +687,8 @@ const chars = {
 	},
 	"Tighnari": {
 		"rarity": 5,
+		"weapon": "Bow",
+		"region": "Sumeru",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Majestic Hooked Beak",
@@ -542,6 +699,8 @@ const chars = {
 	},
 	"Venti": {
 		"rarity": 5,
+		"weapon": "Bow",
+		"region": "Mondstadt",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Hurricane Seed",
@@ -552,6 +711,8 @@ const chars = {
 	},
 	"Wanderer": {
 		"rarity": 5,
+		"weapon": "Catalyst",
+		"region": "Sumeru",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Perpetual Caliber",
@@ -562,6 +723,8 @@ const chars = {
 	},
 	"Xiangling": {
 		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Liyue",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Everflame Seed",
@@ -572,6 +735,8 @@ const chars = {
 	},
 	"Xiao": {
 		"rarity": 5,
+		"weapon": "Polearm",
+		"region": "Liyue",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
 		"boss": "Juvenile Jade",
@@ -582,6 +747,8 @@ const chars = {
 	},
 	"Xingqiu": {
 		"rarity": 4,
+		"weapon": "Sword",
+		"region": "Liyue",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Cleansing Heart",
@@ -592,6 +759,8 @@ const chars = {
 	},
 	"Xinyan": {
 		"rarity": 4,
+		"weapon": "Claymore",
+		"region": "Liyue",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Everflame Seed",
@@ -602,6 +771,8 @@ const chars = {
 	},
 	"Yae Miko": {
 		"rarity": 5,
+		"weapon": "Catalyst",
+		"region": "Inazuma",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
 		"boss": "Dragonheir's False Fin",
@@ -612,6 +783,8 @@ const chars = {
 	},
 	"Yanfei": {
 		"rarity": 4,
+		"weapon": "Catalyst",
+		"region": "Liyue",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Juvenile Jade",
@@ -622,6 +795,8 @@ const chars = {
 	},
 	"Yaoyao": {
 		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Liyue",
 		"type": "Dendro",
 		"gem": "Nagadus Emerald",
 		"boss": "Quelled Creeper",
@@ -632,6 +807,8 @@ const chars = {
 	},
 	"Yelan": {
 		"rarity": 5,
+		"weapon": "Bow",
+		"region": "Liyue",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Runic Fang",
@@ -642,6 +819,8 @@ const chars = {
 	},
 	"Yoimiya": {
 		"rarity": 5,
+		"weapon": "Bow",
+		"region": "Inazuma",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
 		"boss": "Smoldering Pearl",
@@ -652,6 +831,8 @@ const chars = {
 	},
 	"Yun Jin": {
 		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Liyue",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
 		"boss": "Riftborn Regalia",
@@ -662,6 +843,8 @@ const chars = {
 	},
 	"Zhongli": {
 		"rarity": 5,
+		"weapon": "Polearm",
+		"region": "Liyue",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
 		"boss": "Basalt Pillar",
@@ -672,6 +855,7 @@ const chars = {
 	},
 	"Traveler": {
 		"rarity": 5,
+		"weapon": "Sword",
 		"gem": "Brilliant Diamond",
 		"boss": null,
 		"local": "Windwheel Aster",
@@ -701,6 +885,13 @@ const chars = {
 				"books": ["Admonition", "Ingenuity", "Praxis"],
 				"weeklyBoss": "Mudra of the Malefic General",
 				"common": "fungus"
+			},{
+				"include": false,
+				"region": "Fontaine",
+				"type": "Hydro",
+				"books": ["Unknown", "Unknown", "Unknown"],
+				"weeklyBoss": "Unknown",
+				"common": "Unknown"
 			},{
 				"region": null,
 				"type": "Unaligned",
