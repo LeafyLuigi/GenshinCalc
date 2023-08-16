@@ -53,6 +53,7 @@ var getSelectedChars = () => {
 		}
 
 		setLSItem("selectedCharVersion",JSON.stringify(selectedCharVersion));
+		setLSItem("selectedChars",JSON.stringify(selectedChars))
 	}
 	return selectedChars;
 
