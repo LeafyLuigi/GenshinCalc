@@ -44,14 +44,10 @@ var getSelectedChars = () => {
 
 		// Convert old characters from asc/NA/S/B to lvl/asc/NA/S/B
 		for (var i = 0; i < selectedChars.length; i++) {
-			if(!Array.isArray(selectedChars[i].current)) {
-				continue;
-			} else if(selectedChars[i].current.length == 4) {
+			if(Array.isArray(selectedChars[i].current) && selectedChars[i].current.length == 4) {
 				selectedChars[i].current.unshift(1);				
 			}
-			if(!Array.isArray(selectedChars[i].target)) {
-				continue;
-			} else if(selectedChars[i].target.length == 4) {
+			if(Array.isArray(selectedChars[i].target) && selectedChars[i].target.length == 4) {
 				selectedChars[i].target.unshift(val("defaultTargetCharLvl"));
 			}
 		}
