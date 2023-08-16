@@ -138,7 +138,12 @@ const itemDB = {
 	},
 	"Artificed Spare Clockwork Component - Coppelia": {
 		"rarity": 4,
-		"source": "Dropped by Icewind Suite.",
+		"source": "Dropped by Icewind Suite's \"Dirge of Corppelia\".",
+		"type": "boss"
+	},
+	"Artificed Spare Clockwork Component - Corppelius": {
+		"rarity": 4,
+		"source": "Dropped by Icewind Suite's \"Nemesis of Coppelius\"",
 		"type": "boss"
 	},
 	"Emperor's Resolution": {
