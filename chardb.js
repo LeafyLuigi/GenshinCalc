@@ -146,6 +146,19 @@ const chars = {
 		"books": "Diligence",
 		"weeklyBoss": "Dvalin's Sigh"
 	},
+	"Clorinde": {
+		"include": false,
+		"rarity": 4,
+		"weapon": "Unknown",
+		"region": "Fontaine",
+		"type": "Electro",
+		"gem": "Vajrada Amethyst",
+		"boss": "Unknown",
+		"local": "Unknown",
+		"common": "Unknown",
+		"books": "Unknown",
+		"weeklyBoss": "Unknown"
+	},
 	"Collei": {
 		"rarity": 4,
 		"weapon": "Bow",
@@ -266,6 +279,19 @@ const chars = {
 		"common": "Unknown",
 		"books": "Unknown",
 		"weeklyBoss": "Unknown"		
+	},
+	"Furina": {
+		"include": false,
+		"rarity": 5,
+		"weapon": "Unknown",
+		"region": "Fontaine",
+		"type": "Hydro",
+		"gem": "Varunada Lazurite",
+		"boss": "Unknown",
+		"local": "Unknown",
+		"common": "Unknown",
+		"books": "Unknown",
+		"weeklyBoss": "Unknown"
 	},
 	"Ganyu": {
 		"rarity": 5,
@@ -517,6 +543,32 @@ const chars = {
 		"books": "Ingenuity",
 		"weeklyBoss": "Puppet Strings"
 	},
+	"Navia": {
+		"include": false,
+		"rarity": 4,
+		"weapon": "Unknown",
+		"region": "Fontaine",
+		"type": "Geo",
+		"gem": "Prithiva Topaz",
+		"boss": "Unknown",
+		"local": "Unknown",
+		"common": "Unknown",
+		"books": "Unknown",
+		"weeklyBoss": "Unknown"
+	},
+	"Neuvillette": {
+		"include": false,
+		"rarity": 4,
+		"weapon": "Unknown",
+		"region": "Fontaine",
+		"type": "Hydro",
+		"gem": "Varunada Lazurite",
+		"boss": "Unknown",
+		"local": "Unknown",
+		"common": "Unknown",
+		"books": "Unknown",
+		"weeklyBoss": "Unknown"
+	},
 	"Nilou": {
 		"rarity": 5,
 		"weapon": "Sword",
@@ -721,6 +773,19 @@ const chars = {
 		"books": "Praxis",
 		"weeklyBoss": "Daka's Bell"
 	},
+	"Wriothesley": {
+		"include": false,
+		"rarity": 5,
+		"weapon": "Unknown",
+		"region": "Fontaine",
+		"type": "Cryo",
+		"gem": "Shivada Jade",
+		"boss": "Unknown",
+		"local": "Unknown",
+		"common": "Unknown",
+		"books": "Unknown",
+		"weeklyBoss": "Unknown"
+	},
 	"Xiangling": {
 		"rarity": 4,
 		"weapon": "Polearm",
@@ -889,9 +954,9 @@ const chars = {
 				"include": false,
 				"region": "Fontaine",
 				"type": "Hydro",
-				"books": ["Unknown", "Unknown", "Unknown"],
+				"books": ["Equity", "Unknown", "Unknown"],
 				"weeklyBoss": "Unknown",
-				"common": "Unknown"
+				"common": "fontemerAberrants"
 			},{
 				"region": null,
 				"type": "Unaligned",

@@ -38,10 +38,11 @@ var getAllByAttribute = (attribute) => {
 var toggleClass = (element, className) => {
 	element.classList.toggle(className);
 }
-var val = (id,fallback,noGet=false) => {
+var val = (id,noGet=false,fallback=null) => {
 	if(!noGet) {
 		id = get(id);
 		if (id == null) {
+			// it'll return null by default as a fallback
 			return fallback;
 		}
 	}
@@ -507,7 +508,7 @@ var getItemsRemaining = () => {
 	var html = "";
 	for (var i = 0; i < userInvInputs.length; i++) {
 		var itemName = underscoreToSpace(userInvInputs[i].id.slice(13));
-		var count = -1 * val(userInvInputs[i],noGet=true);
+		var count = -1 * val(userInvInputs[i],true);
 		if (items[itemName] != undefined) {
 			count += items[itemName];
 		}
@@ -590,7 +591,7 @@ var getItemsRemaining = () => {
 		// 	var types = ["Sliver", "Fragment", "Chunk", "Gemstone"];
 		// 	for(var i = 0; i < convertInputs.length; i++) {
 		// 		var itemName = convertInputs[i].id.slice(13)
-		// 		var value = val(convertInputs[i],noGet=true)
+		// 		var value = val(convertInputs[i],true)
 		// 		for (var j = 0; j < types.length; j++) {
 		// 			if(itemName.indexOf(types[j]) != -1) convertItemsByType[j] += value;
 		// 		}

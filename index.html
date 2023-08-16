@@ -18,7 +18,6 @@
 		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
 		<!-- 
 			The following images need updating or downloading:
-			Lumidouce Bell, Rainbow Rose, Beryl Conch, Romaritime Flower
 			Teachings / Guide / Philos... of Order (size differences), Justice, Equity (check these just in case)
 			Fontemer... Drops
 			Breacher Primuses drops
@@ -193,7 +192,7 @@
 	var updateDefaultTargetPrefs = () => {
 		var prefs = [];
 		for(var i = 0; i < defaultInputs.length; i++) {
-			prefs[i] = val(defaultInputs[i],noGet=true);
+			prefs[i] = val(defaultInputs[i],true);
 		}
 
 		if(JSON.stringify(prefs) === "[90,6,9,9,9,6,true,false]" ) {
