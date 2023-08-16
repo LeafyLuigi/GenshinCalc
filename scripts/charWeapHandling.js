@@ -36,8 +36,27 @@ var getSelectedChars = () => {
 		var selectedChars = JSON.parse(getLSItem("selectedChars"));
 	}
 	catch {
-		console.warn("Selected Characters was corrupted; returning empty array.")
+		console.warn("Selected Characters was corrupted; returning empty array. This may cause issues.")
 		return [];
+	}
+	if (getLSItem("selectedCharVersion") == undefined || getLSItem("selectedCharVersion") != selectedCharVersion) {
+		console.warn("Saved character list version may not be fully compatible with the current version. It will attempt to be updated.");
+
+		// Convert old characters from asc/NA/S/B to lvl/asc/NA/S/B
+		for (var i = 0; i < selectedChars.length; i++) {
+			if(!Array.isArray(selectedChars[i].current)) {
+				continue;
+			} else if(selectedChars[i].current.length == 4) {
+				selectedChars[i].current.unshift(1);				
+			}
+			if(!Array.isArray(selectedChars[i].target)) {
+				continue;
+			} else if(selectedChars[i].target.length == 4) {
+				selectedChars[i].target.unshift(val("defaultTargetCharLvl"));
+			}
+		}
+
+		setLSItem("selectedCharVersion",JSON.stringify(selectedCharVersion));
 	}
 	return selectedChars;
 
@@ -238,7 +257,7 @@ var loadCharacters = () => {
 		var char = JSON.parse(decodeURIComponent(getLSItem("char")));
 	}
 	catch {
-		console.error("Character list was corrupted; returning empty string.")
+		console.error("Character list was corrupted; returning empty string. This WILL cause issues.")
 		return "";
 	}
 	if(char.version == undefined || char.version != selectedCharVersion) {

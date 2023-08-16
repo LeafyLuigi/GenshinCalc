@@ -99,7 +99,6 @@
 			get("warning").style = "display:none"
 		}
 		// Generate Dropdown HTML
-		// TODO? - Add rarity stars?
 		var html = "";
 		for (var i in chars) {
 			var charName = i;
@@ -194,7 +193,7 @@
 	var updateDefaultTargetPrefs = () => {
 		var prefs = [];
 		for(var i = 0; i < defaultInputs.length; i++) {
-			prefs[i] = val(defaultInputs[i],true);
+			prefs[i] = val(defaultInputs[i],noGet=true);
 		}
 
 		if(JSON.stringify(prefs) === "[90,6,9,9,9,6,true,false]" ) {

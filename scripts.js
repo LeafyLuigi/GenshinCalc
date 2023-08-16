@@ -38,9 +38,12 @@ var getAllByAttribute = (attribute) => {
 var toggleClass = (element, className) => {
 	element.classList.toggle(className);
 }
-var val = (id,noGet=false) => {
+var val = (id,fallback,noGet=false) => {
 	if(!noGet) {
 		id = get(id);
+		if (id == null) {
+			return fallback;
+		}
 	}
 	if(id.getAttribute("type") == "number") {
 		var value = id.value;
@@ -53,6 +56,10 @@ var val = (id,noGet=false) => {
 var setVal = (id,val,noGet=false) => {
 	if(!noGet) {
 		id = get(id);
+		if(id==null) {
+			console.error("id error.");
+			return;
+		}
 	}
 	if(id.getAttribute("type") == "number") {
 		var value = val;
@@ -500,7 +507,7 @@ var getItemsRemaining = () => {
 	var html = "";
 	for (var i = 0; i < userInvInputs.length; i++) {
 		var itemName = underscoreToSpace(userInvInputs[i].id.slice(13));
-		var count = -1 * val(userInvInputs[i],true);
+		var count = -1 * val(userInvInputs[i],noGet=true);
 		if (items[itemName] != undefined) {
 			count += items[itemName];
 		}
@@ -583,7 +590,7 @@ var getItemsRemaining = () => {
 		// 	var types = ["Sliver", "Fragment", "Chunk", "Gemstone"];
 		// 	for(var i = 0; i < convertInputs.length; i++) {
 		// 		var itemName = convertInputs[i].id.slice(13)
-		// 		var value = val(convertInputs[i],true)
+		// 		var value = val(convertInputs[i],noGet=true)
 		// 		for (var j = 0; j < types.length; j++) {
 		// 			if(itemName.indexOf(types[j]) != -1) convertItemsByType[j] += value;
 		// 		}
