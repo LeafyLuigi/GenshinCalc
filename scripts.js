@@ -3,6 +3,14 @@
 var travelerType, neededItemsForAscTal, travelerAscensionDone = false;
 var showConvertsBool;
 
+// stuff on main and inv pages
+var toggleLimitedItems = () => {
+	document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
+}
+var toggleExtraIcons = () => {
+	document.getElementsByTagName("body")[0].classList.toggle("hideExtraIcons");
+}
+
 // shorthands
 var get = (id) => {
 	return document.getElementById(id);
@@ -24,6 +32,9 @@ var getOnlyClass = (className = "") => {
 var getByName = (nameName) => {
 	return document.getElementsByName(nameName);
 }
+var getAllByAttribute = (attribute) => {
+	return document.querySelectorAll("["+attribute+"]");
+}
 var toggleClass = (element, className) => {
 	element.classList.toggle(className);
 }
@@ -38,6 +49,22 @@ var val = (id,noGet=false) => {
 		return Math.floor(value);
 	}
 	if(id.getAttribute("type") == "checkbox") return id.checked;
+}
+var setVal = (id,val,noGet=false) => {
+	if(!noGet) {
+		id = get(id);
+	}
+	if(id.getAttribute("type") == "number") {
+		var value = val;
+		if(id.max != "" && value > Math.floor(id.max)) value = id.max;
+		if(id.min != "" && value < Math.floor(id.min)) value = id.min;
+		id.value = value;
+		return;
+	}
+	if(id.getAttribute("type") == "checkbox" && (val === true || val === false)) {
+		id.checked = val;
+		return;
+	}
 }
 
 // regex stuff
@@ -147,6 +174,7 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 	var fallback = item;
 	var validSizes = ["micro","tiny","mini","small","normal","big"];
 	var pixels = [36, 56, 72, 96, 112, 256];
+	var raritySizes = [8, 12, 15, 20, 24, 55];
 	if (validSizes.indexOf(size) == -1) {
 		console.warn("Invalid size used. Using default (\"mini\"). Valid sizes: "+validSizes)
 		size = "mini";
@@ -167,15 +195,20 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 		img = spaceToUnderscore(item);
 		if(rarity == -1) rarity = itemDB[item].rarity;
 	}
-	html = "<div class=\"itemIcon ";
-	if(size == "micro" || size == "tiny" || size == "mini" || size == "small" || size == "normal") html+=size+" ";
-	html +="rarity-"+rarity+"\">";
+	html = "<div class=\"itemIconContainer "
+	if(size == "micro" || size == "tiny" || size == "mini" || size == "small" || size == "normal") html+=size;
+	html += "\"><div class=\"itemIcon"
+	if(rarity != undefined && rarity != 0) html+= " rarity-"+rarity;
+	html += "\">";
 	if(showSource && itemDB[item].source != undefined) {
-		html += "<img onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>"
+		html += "<img loading='lazy' onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/icons/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>"
 	}
-	html +="<img ";
+	html +="<img loading='lazy'";
 	if(fallback != item) {html+="fallback=\""+fallback+"\" "; console.warn("[MakeItemIcon] Fallback doesn't match item.")}
-	html +="class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">"+count+"</div>";
+	html +="class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">";
+	if(rarity != undefined && rarity != 0) html += "<img loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">"; // height is set in css
+	html +="<span class=\"itemCount\">"+count+"</span></div>";
+	html +="<div class=\"itemName\">"+item+"</div></div>";
 	return html;
 }
 
@@ -195,24 +228,25 @@ var test = () => {
 				selectedCharacter = "Traveler";
 				travelerType = get(id).getAttribute("travtype")
 			}
-			var charStats = [val(id+"-asc"), val(id+"-tal1"), val(id+"-tal2"), val(id+"-tal3")];
-			var targets = [val(id+"-targetAsc"),val(id+"-targetTal1"),val(id+"-targetTal2"),val(id+"-targetTal3")];
+			var charStats = [val(id+"-charLvl"),val(id+"-asc"), val(id+"-tal1"), val(id+"-tal2"), val(id+"-tal3")];
+			var targets = [val(id+"-targetCharLvl"),val(id+"-targetAsc"),val(id+"-targetTal1"),val(id+"-targetTal2"),val(id+"-targetTal3")];
 			if(JSON.stringify(charStats) == JSON.stringify(targets)) {
 				get(id+"-charOutput").innerHTML = "<div class=\"boxTitle\">You don't need anything for "+selectedCharacter+".</div>"
 				continue;
 			}
-			const order = [ascValues,talValues,talValues,talValues];
+			const order = [charLevelValues,ascValues,talValues,talValues,talValues];
 			var charData, charSet = false;
 			var charItems = {};
 			var offset = 0;
+			var extraExpNeeded = [];
 
-			const valueNames = ["ascension", "normal attack", "skill", "burst"];
+			const valueNames = ["","ascension", "normal attack", "skill", "burst"];
 			const gemSuffix = [" Sliver", " Fragment", " Chunk", " Gemstone"];
 			const booksPrefix = ["Teachings of ", "Guide to ", "Philosophies of "];
 
 			
-			for (var i = 0; i < 4; i++) {
-				if(i == 0 && travelerAscensionDone && selectedCharacter == "Traveler") continue;
+			for (var i = 0; i < 5; i++) {
+				if(i == 1 && travelerAscensionDone && selectedCharacter == "Traveler") continue;
 				if(charStats[i] >= targets[i]) continue;
 				if(!charSet) {
 					if(i == 0 || selectedCharacter != "Traveler") {
@@ -223,8 +257,21 @@ var test = () => {
 						charSet = true;
 					}
 				}
-				if(i != 0) {offset = 1} else {offset = 0}
+				if(i == 1) {offset = 1} else {offset = 0}
 				neededItemsForAscTal = {};
+				if(i == 0) {
+				// 	var expHave = 0;
+				// 	var totalExpNeeded = 0;
+				// 	var level = 0;
+				// 	for(var j = 0; j < charStats[i] - 1; j++) {
+				// 		expHave += charLevelValues[j];
+				// 	}
+				// 	for(var j = charStats[i] - 1; j < targets[i] - 1; j++) {
+				// 		totalExpNeeded += charLevelValues[j];
+				// 	}
+				// 	console.log([expHave,totalExpNeeded, (totalExpNeeded / charExpItems[0])])
+					continue;
+				}
 				for(var j = charStats[i] - offset;j < targets[i] - offset;j++) {
 					for(var k in order[i][j]) {
 						if(k == "cost") {
@@ -261,7 +308,7 @@ var test = () => {
 				html += " from " + charStats[i] + " to " + targets[i] + " are:";
 				// orderItems(neededItemsForAscTal);
 				html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItemsForAscTal,"tiny") + "</div>";
-				if(selectedCharacter == "Traveler" && i == 0) travelerAscensionDone = true;
+				if(selectedCharacter == "Traveler" && i == 1) travelerAscensionDone = true;
 			}
 			html += "<br><div class=\"boxTitle\">The total for "+charName+" is:</div>";
 			// orderItems(charItems);
@@ -341,7 +388,6 @@ var getItemsNeeded = (items,size="mini",hideBelowZero=true,showSource=false) => 
 // ask what user has
 var askUserForItems = (items) => {
 	var html = "";
-	var maxInputSize = 4;
 	var groups = [];
 	var groupItems = [];
 	for (var i in items) {
@@ -364,7 +410,7 @@ var askUserForItems = (items) => {
 	html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div></div><div class=\"outputRequired\">";
 	for (var i = 0; i < itemKeys.length; i++) {
 		if(inv != null && inv[itemKeys[i]] != undefined) {value = inv[itemKeys[i]]} else {value = 0}
-		html += "<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+itemKeys[i]+"\">",-1,"mini",true)+"</div>";
+		html += "<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+itemKeys[i]+"\">",-1,"mini",true)+"</div>";
 	}
 	html += "</div><div id=\"converts\"></div><br><button onclick=\"getItemsRemaining()\">Submit</button>";
 	showConvertsBool = false;
