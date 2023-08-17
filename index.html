@@ -18,13 +18,10 @@
 		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
 		<!-- 
 			The following images need updating or downloading:
-			Teachings / Guide / Philos... of Order (size differences), Justice, Equity (check these just in case)
-			Fontemer... Drops
+			Teachings / Guide / Philos... of Order (size differences)
 			Breacher Primuses drops
-			Tainted hydro... drops
-			All Fontaine Weapon Mats
+			All Fontaine Weapon Mats: Ancient Chord, Pristine Sea Goblet, Pure Sacred Dewdrop
 			All Fontaine Elite drops
-			New Weapon icons
 			All Fontaine visions - Inazuma's Electro is also slightly too big?
 			Lynette and Lyney may have slight issues with their icons
 		-->
@@ -135,6 +132,7 @@
 		get("dropdownCharContent").innerHTML = html; html = "";
 		for (var i in weapDB) {
 			var weapName = i;
+			if(weapDB[weapName].include === false) continue;
 			var title = weapName;
 			var rarity = weapDB[i].rarity;
 			var img = spaceToUnderscore(weapName);

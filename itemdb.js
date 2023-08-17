@@ -141,7 +141,7 @@ const itemDB = {
 		"source": "Dropped by Icewind Suite's \"Dirge of Corppelia\".",
 		"type": "boss"
 	},
-	"Artificed Spare Clockwork Component - Corppelius": {
+	"Artificed Spare Clockwork Component - Coppelius": {
 		"rarity": 4,
 		"source": "Dropped by Icewind Suite's \"Nemesis of Coppelius\"",
 		"type": "boss"
@@ -1252,19 +1252,19 @@ const itemDB = {
 		"rarity": 5,
 		"type": "weaponAsc"
 	},
-	"Fragment of an Anchient Chord": {
+	"Fragment of an Ancient Chord": {
 		"rarity": 2,
 		"type": "weaponAsc"
 	},
-	"Chapter of an Anchient Chord": {
+	"Chapter of an Ancient Chord": {
 		"rarity": 3,
 		"type": "weaponAsc"
 	},
-	"Movement of an Anchient Chord": {
+	"Movement of an Ancient Chord": {
 		"rarity": 4,
 		"type": "weaponAsc"
 	},
-	"Echo of an Anchient Chord": {
+	"Echo of an Ancient Chord": {
 		"rarity": 5,
 		"type": "weaponAsc"
 	},
@@ -1431,7 +1431,7 @@ const itemGroupDB = {
 		"source": "Dropped by Clockwork Mekas.",
 		"items":["Meshing Gear","Mechanical Spur Gear","Artificed Dynamic Gear"]
 	},
-	"fontemerAberrants": {
+	"transoceanic": {
 		"priority": 12,
 		"source": "Dropped by Fontemer Aberrants.",
 		"items": ["Transoceanic Pearl","Transoceanic Chunk","Xenochromatic Crystal"]
@@ -1518,7 +1518,7 @@ const itemGroupDB = {
 		"source": "Dropped by Breacher Primuses.",
 		"items": ["Rift Core","Foreign Synapse","Alien Life Core"]
 	},
-	"taintedHydroPhantasm": {
+	"taintedWater": {
 		"priority": 16,
 		"source": "Dropped by Tainted Hydro Phantasms.",
 		"items": ["Drop of Tainted Water","Scoop of Tainted Water","Newborn Tainted Hydro Phantasm"]
@@ -1588,7 +1588,7 @@ const itemGroupDB = {
 	"ancientChord": {
 		"priority": 12,
 		"source": "Can be obtained from Echoes of the Deep Tides in Fontaine on Monday, Thursday and Sunday.",
-		"items":["Fragment of an Anchient Chord","Chapter of an Anchient Chord","Movement of an Anchient Chord","Echo of an Anchient Chord"]
+		"items":["Fragment of an Ancient Chord","Chapter of an Ancient Chord","Movement of an Ancient Chord","Echo of an Ancient Chord"]
 	},
 	"pureSacredDewdrop": {
 		"priority": 13,

@@ -276,6 +276,13 @@ const weapDB = {
 		"elite": "ruinSentinel",
 		"common": "nobushi"
 	},
+	"Ballad of the Fjords": {
+		"rarity": 4,
+		"type": "Polearm",
+		"weapon": "pristineSeaGoblet",
+		"elite": "hilichurlRogue",
+		"common": "whopperflower"
+	},
 	"Blackcliff Agate": {
 		"rarity": 4,
 		"type": "Catalyst",
@@ -428,6 +435,27 @@ const weapDB = {
 		"weapon": "gladiatorShackles",
 		"elite": "mitachurl",
 		"common": "fatuiSkirmisher"
+	},
+	"Finale of the Deep": {
+		"rarity": 4,
+		"type": "Sword",
+		"weapon": "pureSacredDewdrop",
+		"elite": "taintedWater",
+		"common": "nobushi"
+	},
+	"Fleuve Cendre Ferryman": {
+		"rarity": 4,
+		"type": "Sword",
+		"weapon": "ancientChord",
+		"elite": "taintedWater",
+		"common": "transoceanic"
+	},
+	"Flowing Purity": {
+		"rarity": 4,
+		"type": "Catalyst",
+		"weapon": "pureSacredDewdrop",
+		"elite": "taintedWater",
+		"common": "transoceanic"
 	},
 	"Forest Regalia": {
 		"rarity": 4,
@@ -592,6 +620,13 @@ const weapDB = {
 		"elite": "mirrorMaiden",
 		"common": "specter"
 	},
+	"Talking Stick": {
+		"rarity": 4,
+		"type": "Claymore",
+		"weapon": "oasisGardens",
+		"elite": "consecratedBeast",
+		"common": "slime"
+	},
 	"Oathsworn Eye": {
 		"rarity": 4,
 		"type": "Catalyst",
@@ -649,6 +684,13 @@ const weapDB = {
 		"weapon": "elixirs",
 		"elite": "fatuiCicinMage",
 		"common": "samachurl"
+	},
+	"Rightful Reward": {
+		"rarity": 4,
+		"type": "Polearm",
+		"weapon": "pristineSeaGoblet",
+		"elite": "breacherPrimuses",
+		"common": "clockworkMeka"
 	},
 	"Royal Bow": {
 		"rarity": 4,
@@ -713,6 +755,13 @@ const weapDB = {
 		"elite": "abyssMage",
 		"common": "hilichurlShooter"
 	},
+	"Sacrificial Jade": {
+		"rarity": 4,
+		"type": "Catalyst",
+		"weapon": "guyunPillars",
+		"elite": "fatuiCicinMage",
+		"common": "samachurl"
+	},
 	"Sacrificial Sword": {
 		"rarity": 4,
 		"type": "Sword",
@@ -726,6 +775,13 @@ const weapDB = {
 		"weapon": "forestDewTalismans",
 		"elite": "ruinDrake",
 		"common": "eremites"
+	},
+	"Scion of the Blazing Sun": {
+		"rarity": 4,
+		"type": "Bow",
+		"weapon": "scorchingMights",
+		"elite": "hilichurlRogue",
+		"common": "fungus"
 	},
 	"Serpent Spine": {
 		"rarity": 4,
@@ -747,6 +803,13 @@ const weapDB = {
 		"weapon": "guyunPillars",
 		"elite": "fatuiPyroAgent",
 		"common": "whopperflower"
+	},
+	"Song of Stillness": {
+		"rarity": 4,
+		"type": "Bow",
+		"weapon": "ancientChord",
+		"elite": "taintedWater",
+		"common": "hilichurlShooter"
 	},
 	"Sword of Descension": {
 		"rarity": 4,
@@ -805,6 +868,13 @@ const weapDB = {
 		"elite": "abyssMage",
 		"common": "hilichurl"
 	},
+	"Tidal Shadow": {
+		"rarity": 4,
+		"type": "Claymore",
+		"weapon": "pristineSeaGoblet",
+		"elite": "breacherPrimuses",
+		"common": "clockworkMeka"
+	},
 	"Toukabou Shigure": {
 		"rarity": 4,
 		"type": "Sword",
@@ -850,6 +920,13 @@ const weapDB = {
 		"elite": "abyssMage",
 		"common": "treasureHoarder"
 	},
+	"Wolf-Fang": {
+		"rarity": 4,
+		"type": "Sword",
+		"weapon": "decarabianTiles",
+		"elite": "ruinHumainoid",
+		"common": "hilichurl"
+	},
 	"Xiphos Moonlight": {
 		"rarity": 4,
 		"type": "Sword",
@@ -877,14 +954,14 @@ const weapDB = {
 		"rarity": 5,
 		"type": "Bow",
 		"weapon": "guyunPillars",
-		"elite": "mitachurl",
+		"elite": "blackSerpents",
 		"common": "specter"
 	},
 	"Aquila Favonia": {
 		"rarity": 5,
 		"type": "Sword",
 		"weapon": "decarabianTiles",
-		"elite": "blackSerpents",
+		"elite": "mitachurl",
 		"common": "hilichurlShooter"
 	},
 	"Beacon of the Reed Sea": {
@@ -1085,6 +1162,13 @@ const weapDB = {
 		"weapon": "guyunPillars",
 		"elite": "fatuiPyroAgent",
 		"common": "hilichurl"
+	},
+	"The First Great Magic": {
+		"rarity": 5,
+		"type": "Bow",
+		"weapon": "ancientChord",
+		"elite": "taintedWater",
+		"common": "transoceanic"
 	},
 	"The Unforged": {
 		"rarity": 5,

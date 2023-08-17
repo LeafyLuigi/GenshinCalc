@@ -951,12 +951,11 @@ const chars = {
 				"weeklyBoss": "Mudra of the Malefic General",
 				"common": "fungus"
 			},{
-				"include": false,
 				"region": "Fontaine",
 				"type": "Hydro",
-				"books": ["Equity", "Unknown", "Unknown"],
-				"weeklyBoss": "Unknown",
-				"common": "fontemerAberrants"
+				"books": ["Equity", "Justice", "Order"],
+				"weeklyBoss": "Worldspan Fern",
+				"common": "taintedWater"
 			},{
 				"region": null,
 				"type": "Unaligned",

@@ -182,7 +182,7 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 	var fallback = item;
 	var validSizes = ["micro","tiny","mini","small","normal","big"];
 	var pixels = [36, 56, 72, 96, 112, 256];
-	var raritySizes = [8, 12, 15, 20, 24, 55];
+	// var raritySizes = [8, 12, 15, 20, 24, 55];
 	if (validSizes.indexOf(size) == -1) {
 		console.warn("Invalid size used. Using default (\"mini\"). Valid sizes: "+validSizes)
 		size = "mini";
@@ -191,9 +191,8 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 	if(itemDB[item] == undefined) {
 		console.warn("\""+item+"\" not found in itemsdb.js; using fallback.");
 		item = "Unknown";
-		type = "char";
-		img = item;
-		rarity = 1;
+		type = "icons";
+		img = "itemFallback";
 	} else {
 		if(forceType == null) {
 			type = itemDB[item].type;
@@ -244,6 +243,7 @@ var test = () => {
 			}
 			const order = [charLevelValues,ascValues,talValues,talValues,talValues];
 			var charData, charSet = false;
+			var skip;
 			var charItems = {};
 			var offset = 0;
 			var extraExpNeeded = [];
@@ -254,19 +254,22 @@ var test = () => {
 
 			
 			for (var i = 0; i < 5; i++) {
+				skip = false;
 				if(i == 1 && travelerAscensionDone && selectedCharacter == "Traveler") continue;
 				if(charStats[i] >= targets[i]) continue;
+				if(i > 2 && charStats[i] == charStats[i-1] && targets[i] == targets[i-1]) skip = true;
 				if(!charSet) {
 					if(i == 0 || selectedCharacter != "Traveler") {
 						charData = chars[selectedCharacter];
 						if(selectedCharacter != "Traveler") charSet = true;
 					} else {
 						charData = chars[selectedCharacter].regions[travelerType];
+						charData["gem"] = chars[selectedCharacter].gem; // something was throwing errors :)
 						charSet = true;
 					}
 				}
 				if(i == 1) {offset = 1} else {offset = 0}
-				neededItemsForAscTal = {};
+				if(!skip) neededItemsForAscTal = {};
 				if(i == 0) {
 				// 	var expHave = 0;
 				// 	var totalExpNeeded = 0;
@@ -281,6 +284,7 @@ var test = () => {
 					continue;
 				}
 				for(var j = charStats[i] - offset;j < targets[i] - offset;j++) {
+					if (skip) continue; // don't need to recalculate if it's the exact same
 					for(var k in order[i][j]) {
 						if(k == "cost") {
 							neededItemsForAscTal = addItem("Mora",order[i][j][k],neededItemsForAscTal);
