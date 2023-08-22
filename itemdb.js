@@ -18,7 +18,7 @@ const itemDB = {
 	"Crown of Insight": {
 		"rarity": 5,
 		"source": "Purchased from Limited-Time Flagship Event shops or Offerings.",
-		"type": "other"
+		"type": "crown"
 	},
 	
 	"Hurricane Seed": {
@@ -1010,22 +1010,22 @@ const itemDB = {
 	"Beryl Conch": {
 		"type": "local",
 		"region": "Fontaine",
-		"source": "No clue yet."
+		"source": "Underwater in Fontaine."
 	},
 	"Romaritime Flower": {
 		"type": "local",
 		"region": "Fontaine",
-		"source": "No clue yet."
+		"source": "Primarially underwater in Fontaine with on-land areas needing to be hit with Hydro first."
 	},
 	"Lumidouce Bell": {
 		"type": "local",
 		"region": "Fontaine",
-		"source": "No clue yet."
+		"source": "Scattered around Fontaine's above water areas with the best group in the north of the Court of Fontaine Region, close to the Shrine of Depths."
 	},
 	"Rainbow Rose": {
 		"type": "local",
 		"region": "Fontaine",
-		"source": "No clue yet."
+		"source": "Best found in the west of the Court of Fontaine Region and around the Fountain of Lucine."
 	},
 
 	"Bit of Aerosiderite": {
@@ -1370,7 +1370,7 @@ const itemDB = {
 const itemGroupDB = {
 	// NOTE: LOCALS AND BOSS DROPS LACK GROUPS. THEY ARE SORTED MANUALLY IN THE LIST ABOVE.
 
-	// common mats
+	// common and elite mats
 	"slime": {
 		"priority": 0,
 		"source": "Dropped by Slimes of all kinds.",
@@ -1391,137 +1391,135 @@ const itemGroupDB = {
 		"source": "Dropped by Hilichurl Shooters.",
 		"items":["Firm Arrowhead", "Sharp Arrowhead", "Weathered Arrowhead"]
 	},
-	"fatuiSkirmisher": {
-		"priority": 4,
-		"source": "Dropped by Fatui Skirmishers.",
-		"items":["Recruit's Insignia", "Sergeant's Insignia", "Lieutenant's Insignia"]
-	},
-	"treasureHoarder": {
-		"priority": 5,
-		"source": "Dropped by Treasure Hoarders.",
-		"items":["Treasure Hoarder Insignia", "Silver Raven Insignia", "Golden Raven Insignia"]
-	},
-	"whopperflower": {
-		"priority": 6,
-		"source": "Dropped by Whopperflowers.",
-		"items":["Whopperflower Nectar", "Shimmering Nectar", "Energy Nectar"]
-	},
-	"nobushi": {
-		"priority": 7,
-		"source": "Dropped by Nobushi and Kairagi.",
-		"items":["Old Handguard", "Kageuchi Handguard", "Famed Handguard"]
-	},
-	"specter": {
-		"priority": 8,
-		"source": "Dropped by Specters.",
-		"items":["Spectral Husk", "Spectral Heart", "Spectral Nucleus"]
-	},
-	"fungus": {
-		"priority": 9,
-		"source": "Dropped by Fungi.",
-		"items":["Fungal Spores", "Luminescent Pollen", "Crystalline Cyst Dust"]
-	},
-	"eremites": {
-		"priority": 10,
-		"source": "Dropped by Emerites.",
-		"items":["Faded Red Satin", "Trimmed Red Silk", "Rich Red Brocade"]
-	},
-	"clockworkMeka": {
-		"priority": 11,
-		"source": "Dropped by Clockwork Mekas.",
-		"items":["Meshing Gear","Mechanical Spur Gear","Artificed Dynamic Gear"]
-	},
-	"transoceanic": {
-		"priority": 12,
-		"source": "Dropped by Fontemer Aberrants.",
-		"items": ["Transoceanic Pearl","Transoceanic Chunk","Xenochromatic Crystal"]
-	},
-
-	// elite mats
 	"mitachurl": {
-		"priority": 0,
+		"priority": 4,
 		"source": "Dropped by Mitachurls.",
 		"items":["Heavy Horn", "Black Bronze Horn", "Black Crystal Horn"]
 	},
 	"abyssMage": {
-		"priority": 1,
+		"priority": 5,
 		"source": "Dropped by Abyss Mages and Abyss Heralds.",
 		"items":["Dead Ley Line Branch", "Dead Ley Line Leaves", "Ley Line Sprout"]
 	},
 	"ruinHumainoid": {
-		"priority": 2,
+		"priority": 6,
 		"source": "Dropped by Ruin Guards, Ruin Hunters and Ruin Graders.",
 		"items":["Chaos Device", "Chaos Circuit", "Chaos Core"]
 	},
 	"fatuiCicinMage": {
-		"priority": 3,
+		"priority": 7,
 		"source": "Dropped by Fatui Cincin Mages.",
 		"items":["Mist Grass Pollen", "Mist Grass", "Mist Grass Wick"]
 	},
 	"fatuiPyroAgent": {
-		"priority": 4,
+		"priority": 8,
 		"source": "Dropped by Fatui Pyro Agents.",
 		"items":["Hunter's Sacrificial Knife", "Agent's Sacrificial Knife", "Inspector's Sacrificial Knife"]
 	},
+	"fatuiSkirmisher": {
+		"priority": 9,
+		"source": "Dropped by Fatui Skirmishers.",
+		"items":["Recruit's Insignia", "Sergeant's Insignia", "Lieutenant's Insignia"]
+	},
+	"treasureHoarder": {
+		"priority": 10,
+		"source": "Dropped by Treasure Hoarders.",
+		"items":["Treasure Hoarder Insignia", "Silver Raven Insignia", "Golden Raven Insignia"]
+	},
+	"whopperflower": {
+		"priority": 11,
+		"source": "Dropped by Whopperflowers.",
+		"items":["Whopperflower Nectar", "Shimmering Nectar", "Energy Nectar"]
+	},
 	"vishap": {
-		"priority": 5,
+		"priority": 12,
 		"source": "Dropped by Geovishaps and Bathysmal Vishaps.",
 		"items":["Fragile Bone Shard", "Sturdy Bone Shard", "Fossilized Bone Shard"]
 	},
+	"nobushi": {
+		"priority": 13,
+		"source": "Dropped by Nobushi and Kairagi.",
+		"items":["Old Handguard", "Kageuchi Handguard", "Famed Handguard"]
+	},
 	"ruinSentinel": {
-		"priority": 6,
+		"priority": 14,
 		"source": "Dropped by Droped by Ruin Cruisers, Ruin Destroyers, Ruin Defenders and Ruin Scouts.",
 		"items":["Chaos Gear", "Chaos Axis", "Chaos Oculus"]
 	},
 	"mirrorMaiden": {
-		"priority": 7,
+		"priority": 15,
 		"source": "Dropped by Mirror Maidens.",
 		"items":["Dismal Prism", "Crystal Prism", "Polarizing Prism"]
 	},
+	"specter": {
+		"priority": 16,
+		"source": "Dropped by Specters.",
+		"items":["Spectral Husk", "Spectral Heart", "Spectral Nucleus"]
+	},
 	"riftwolf": {
-		"priority": 8,
+		"priority": 17,
 		"source": "Dropped by Rifthounds.",
 		"items":["Concealed Claw", "Concealed Unguis", "Concealed Talon"]
 	},
 	"blackSerpents": {
-		"priority": 9,
+		"priority": 18,
 		"source": "Dropped by Black Serpents and Abyss Lectors.",
 		"items":["Gloomy Statuette", "Dark Statuette", "Deathly Statuette"]
 	},
+	"fungus": {
+		"priority": 19,
+		"source": "Dropped by Fungi.",
+		"items":["Fungal Spores", "Luminescent Pollen", "Crystalline Cyst Dust"]
+	},
 	"fungusStateShifted": {
-		"priority": 10,
+		"priority": 20,
 		"source": "Dropped by State-Shifted Fungi.",
 		"items":["Inactivated Fungal Nucleus", "Dormant Fungal Nucleus", "Robust Fungal Nucleus"]
 	},
+	"eremites": {
+		"priority": 21,
+		"source": "Dropped by Emerites.",
+		"items":["Faded Red Satin", "Trimmed Red Silk", "Rich Red Brocade"]
+	},
 	"ruinDrake": {
-		"priority": 11,
+		"priority": 22,
 		"source": "Dropped by Ruin Drakes.",
 		"items":["Chaos Storage", "Chaos Module", "Chaos Bolt"]
 	},
 	"primalConstruct": {
-		"priority": 12,
+		"priority": 23,
 		"source": "Dropped by Primordial Contructs.",
 		"items":["Damaged Prism", "Turbid Prism", "Radiant Prism"]
 	},
 	"consecratedBeast": {
-		"priority": 13,
+		"priority": 24,
 		"source": "Dropped by Consecrated Beasts.",
 		"items":["Desiccated Shell", "Sturdy Shell", "Marked Shell"]
 	},
 	"hilichurlRogue": {
-		"priority": 14,
+		"priority": 25,
 		"source": "Dropped by Hilichurl Rogues.",
 		"items":["A Flower Yet to Bloom", "Treasured Flower", "Wanderer's Blooming Flower"]
 	},
-	"breacherPrimuses": {
-		"priority": 15,
-		"source": "Dropped by Breacher Primuses.",
-		"items": ["Rift Core","Foreign Synapse","Alien Life Core"]
+	"transoceanic": {
+		"priority": 26,
+		"source": "Dropped by Fontemer Aberrants.",
+		"items": ["Transoceanic Pearl","Transoceanic Chunk","Xenochromatic Crystal"]
+	},
+	"clockworkMeka": {
+		"priority": 27,
+		"source": "Dropped by Clockwork Mekas.",
+		"items":["Meshing Gear","Mechanical Spur Gear","Artificed Dynamic Gear"]
 	},
 	"taintedWater": {
-		"priority": 16,
+		"priority": 28,
 		"source": "Dropped by Tainted Hydro Phantasms.",
 		"items": ["Drop of Tainted Water","Scoop of Tainted Water","Newborn Tainted Hydro Phantasm"]
+	},
+	"breacherPrimuses": {
+		"priority": 29,
+		"source": "Dropped by Breacher Primuses.",
+		"items": ["Rift Core","Foreign Synapse","Alien Life Core"]
 	},
 	
 	// weapon asc mats

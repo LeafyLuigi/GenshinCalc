@@ -151,18 +151,27 @@ var mergeItems = (firstList,secondList,deleteZeroOrLess=false) => {
 	return mergedList;
 }
 // Items can also be manually sorted in the itemdb.js file
-const typeOrder = ["local","charExp","common","elite","gem","books","weaponAsc","boss","weeklyBoss","other"];
+const typeOrder = ["local","charExp","commonElite","weeklyBoss","boss","gem","books","crown","weaponAsc","other"];
 const intraTypeOrder = ["group","rarity","count"]; // "Group" is arbitrary and until multiple inputs are added, will be skipped.
 var orderItems = (items) => {
 	// var index = items.map(i => i.name);
 	items.sort((a,b) => {
+		var aType, bType;
 		if(a == "Mora") return -1;
 		if(b == "Mora") return 1;
 		// "Mora" is placed first
 		var aItem = itemDB[a];
 		var bItem = itemDB[b];
-		var aType = typeOrder.indexOf(aItem.type);
-		var bType = typeOrder.indexOf(bItem.type);
+		if(aItem.type == "common" || aItem.type == "elite") {
+			aType = typeOrder.indexOf("commonElite");
+		} else {
+			aType = typeOrder.indexOf(aItem.type);
+		}
+		if(bItem.type == "common" || bItem.type == "elite") {
+			bType = typeOrder.indexOf("commonElite");
+		} else {
+			bType = typeOrder.indexOf(bItem.type);
+		}
 		if(aType != bType) return aType - bType;
 		// arbitrary group stuff here~
 		if(aItem.group != undefined && bItem.group != undefined) {
