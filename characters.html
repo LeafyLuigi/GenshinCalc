@@ -54,12 +54,12 @@
 		}
 		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveCharacters()\">Save Characters</button><!--<button id=\"clearcharactersbutton\" onClick=\"clearInventory()\">Clear Inventory</button>--></div></div>";
 		get("characters").innerHTML = html;
-		var j = ["asc","tal1","tal2","tal3"]
+		var j = ["asc","tal1","tal2","tal3"];
 		for(var i in charsDone) {
 			for(var k in j) {
-				get(i+"-"+j[k]).setAttribute("onchange","forceValue(this.id,this.value)")
+				get(i+"-"+j[k]).setAttribute("onchange","forceValue(this.id,this.value)");
 			}
-			get(i+"-owned").setAttribute("onchange","updateCharList(this.id,this.checked)")
+			get(i+"-owned").setAttribute("onchange","updateCharList(this.id,this.checked)");
 		}
 	});
 	var updateCharList = (id,isChecked) => {

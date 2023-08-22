@@ -32,7 +32,7 @@
 		if(getLSItem("invNotURIDecoded") == null) {
 			fixInv();
 		} else {
-			get("warning").style = "display:none"
+			get("warning").style = "display:none";
 		}
 		var html = "<div class=\"boxName\">Inventory</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><br><div class=\"outputRequired\">";
 		var maxInputSize = 4;
@@ -45,7 +45,7 @@
 		orderItems(itemKeys);
 		if(inv == null) inv = {};
 		for(var i in itemKeys) {
-			if(inv != null && inv[itemKeys[i]]) {value = inv[itemKeys[i]]} else {value = 0}
+			if(inv != null && inv[itemKeys[i]]) {value = inv[itemKeys[i]];} else {value = 0;}
 			html+="<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(itemKeys[i])+"\">",-1,"mini",true)+"</div>";
 		}
 		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveInventory()\">Save Inventory</button><button id=\"clearinvbutton\" onClick=\"clearInventory()\">Clear Inventory</button></div></div>";

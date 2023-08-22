@@ -184,7 +184,7 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 	var pixels = [36, 56, 72, 96, 112, 256];
 	// var raritySizes = [8, 12, 15, 20, 24, 55];
 	if (validSizes.indexOf(size) == -1) {
-		console.warn("Invalid size used. Using default (\"mini\"). Valid sizes: "+validSizes)
+		console.warn("Invalid size used. Using default (\"mini\"). Valid sizes: "+validSizes);
 		size = "mini";
 	}
 	var type, img, html="";
@@ -202,17 +202,20 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 		img = spaceToUnderscore(item);
 		if(rarity == -1) rarity = itemDB[item].rarity;
 	}
-	html = "<div class=\"itemIconContainer "
+	html = "<div class=\"itemIconContainer ";
 	if(size == "micro" || size == "tiny" || size == "mini" || size == "small" || size == "normal") html+=size;
-	html += "\"><div class=\"itemIcon"
+	html += "\"><div class=\"itemIcon";
 	if(rarity != undefined && rarity != 0) html+= " rarity-"+rarity;
 	html += "\">";
 	if(showSource && itemDB[item].source != undefined) {
-		html += "<img loading='lazy' onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/icons/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>"
+		html += "<img loading='lazy' onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/icons/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>";
 	}
 	html +="<img loading='lazy'";
-	if(fallback != item) {html+="fallback=\""+fallback+"\" "; console.warn("[MakeItemIcon] Fallback doesn't match item.")}
-	html +="class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">";
+	if(fallback != item) {
+		html+=" fallback=\""+fallback+"\"";
+		console.warn("[MakeItemIcon] Fallback doesn't match item.")
+	}
+	html +=" class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">";
 	if(rarity != undefined && rarity != 0) html += "<img loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">"; // height is set in css
 	html +="<span class=\"itemCount\">"+count+"</span></div>";
 	html +="<div class=\"itemName\">"+item+"</div></div>";
@@ -248,14 +251,14 @@ var test = () => {
 			var offset = 0;
 			var extraExpNeeded = [];
 
-			const valueNames = ["","ascension", "normal attack", "skill", "burst"];
+			const valueNames = ["character exp","ascension", "normal attack", "skill", "burst"];
 			const gemSuffix = [" Sliver", " Fragment", " Chunk", " Gemstone"];
 			const booksPrefix = ["Teachings of ", "Guide to ", "Philosophies of "];
 
 			
 			for (var i = 0; i < 5; i++) {
 				skip = false;
-				if(i == 1 && travelerAscensionDone && selectedCharacter == "Traveler") continue;
+				if(i < 2 && travelerAscensionDone && selectedCharacter == "Traveler") continue;
 				if(charStats[i] >= targets[i]) continue;
 				if(i > 2 && charStats[i] == charStats[i-1] && targets[i] == targets[i-1]) skip = true;
 				if(!charSet) {
@@ -268,19 +271,19 @@ var test = () => {
 						charSet = true;
 					}
 				}
-				if(i == 1) {offset = 1} else {offset = 0}
+				if(i != 1) {offset = 1} else {offset = 0}
 				if(!skip) neededItemsForAscTal = {};
 				if(i == 0) {
-				// 	var expHave = 0;
-				// 	var totalExpNeeded = 0;
-				// 	var level = 0;
-				// 	for(var j = 0; j < charStats[i] - 1; j++) {
-				// 		expHave += charLevelValues[j];
-				// 	}
-				// 	for(var j = charStats[i] - 1; j < targets[i] - 1; j++) {
-				// 		totalExpNeeded += charLevelValues[j];
-				// 	}
-				// 	console.log([expHave,totalExpNeeded, (totalExpNeeded / charExpItems[0])])
+					// var expHave = 0;
+					// var totalExpNeeded = 0;
+					// var level = 0;
+					// for(var j = 0; j < charStats[i] - 1; j++) {
+					// 	expHave += charLevelValues[j];
+					// }
+					// for(var j = charStats[i] - 1; j < targets[i] - 1; j++) {
+					// 	totalExpNeeded += charLevelValues[j];
+					// }
+					// console.log([expHave,totalExpNeeded, (totalExpNeeded / charExpItems[0])])
 					continue;
 				}
 				for(var j = charStats[i] - offset;j < targets[i] - offset;j++) {

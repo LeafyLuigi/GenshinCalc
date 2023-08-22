@@ -17,13 +17,7 @@
 		<!-- TODO: add converting as an option. "using [all your|the maximum needed] dust of azoth, you can use x 'wildcard' gems" and "using [all|max] dream solvents, you can use x 'wildcard' weeklyBoss drops". -->
 		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
 		<!-- 
-			The following images need updating or downloading:
-			Teachings / Guide / Philos... of Order (size differences)
-			Breacher Primuses drops
-			All Fontaine Weapon Mats: Ancient Chord, Pristine Sea Goblet, Pure Sacred Dewdrop
-			All Fontaine Elite drops
-			All Fontaine visions - Inazuma's Electro is also slightly too big?
-			Lynette and Lyney may have slight issues with their icons
+			No images currently need updating afaik
 		-->
 		<div id="warning">
 			<strong>The way inventories are saved in localStorage have been altered and may have been wiped. Please check your inventory is working correctly. This warning will persist until the next update.</strong>
@@ -92,7 +86,7 @@
 		if (getLSItem("invNotURIDecoded") == null) {
 			fixInv();
 		} else {
-			get("warning").style = "display:none"
+			get("warning").style = "display:none";
 		}
 		// Generate Dropdown HTML
 		var html = "";
@@ -102,6 +96,7 @@
 			var rarity = chars[i].rarity;
 			if (charName != "Traveler") {
 				if(chars[charName].include === false) continue;
+				if(chars[charName].visionType != null) vision += "_"+chars[charName].visionType;
 				html += "<div class=\"charDropdownButton fauxButton rarity-"+rarity;
 				if(charName == "Aloy") html += " limited";
 				html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;))\" name=\""+charName+"\">";
@@ -109,7 +104,11 @@
 				html += "<img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+charName+"</span>";
 				html += "<span class=\"iconsGroup\">";
 				// html += "<img loading="lazy" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/elements/"+chars[charName].type+".svg\">";
-				if(chars[charName].region != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].region+"_"+chars[charName].type+".png\">";
+				if(chars[charName].region != undefined) {
+					var vision = chars[charName].region+"_"+chars[charName].type;
+					if(chars[charName].visionType != undefined && chars[charName].visionType != "") vision = vision+"_"+chars[charName].visionType;
+					html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+vision+".png\">";
+				}
 				if(chars[charName].vision != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].vision+".png\">";
 				if(chars[charName].weapon != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars[charName].weapon+".png\">";
 				html += "</span>";
@@ -122,14 +121,15 @@
 					if(travVariant.type == "Unaligned") html+=" limited";
 					html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;),this.getAttribute(&quot;num&quot;))\" name=\""+travVariant.type+" "+charName+"\" num=\""+j+"\"><span><img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+travVariant.type+" "+charName+"</span>";
 					html += "<span class=\"iconsGroup\">"
-					html+="<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/Traveler_"+travVariant.type+".png\">";
-					html+="<img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars["Traveler"].weapon+".png\">";
+					html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/Traveler_"+travVariant.type+".png\">";
+					html += "<img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars["Traveler"].weapon+".png\">";
 					html += "</span>";
 					html += "</div>";
 				}
 			}
 		}
-		get("dropdownCharContent").innerHTML = html; html = "";
+		get("dropdownCharContent").innerHTML = html;
+		html = "";
 		for (var i in weapDB) {
 			var weapName = i;
 			if(weapDB[weapName].include === false) continue;
@@ -141,7 +141,8 @@
 			if(weapDB[i].source != undefined && weapDB[i].source == "event") html+=" limited";
 			html += "\" onclick=\"pickWeapon(this.children[0].children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><span><img loading=\"lazy\" class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></span><img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/" + weapDB[weapName].type +".png\"></div>";
 		}
-		get("dropdownWeaponContent").innerHTML = html; html = "";
+		get("dropdownWeaponContent").innerHTML = html;
+		html = "";
 		selectedChars = getSelectedChars();
 		if(selectedChars != null) {
 			for(var i = 0; i < selectedChars.length; i++) {
@@ -157,7 +158,7 @@
 		}
 		var prefs = JSON.parse(getLSItem("prefs"));
 		for(var i = 0; i < defaultInputs.length; i++) {
-			if(prefs != null) setVal(defaultInputs[i],prefs[i],true)
+			if(prefs != null) setVal(defaultInputs[i],prefs[i],true);
 			defaultInputs[i].setAttribute("onChange","forceValue(this.id,this.value,this.min,this.max);updateDefaultTargetPrefs();");
 		}
 		if(!val("toggleLimited")) document.getElementsByTagName("body")[0].classList.toggle("hideLimited");

@@ -149,8 +149,12 @@ var addCharacter = (char="Lynette",fromInit=false,forcedId=null,charPage=false,i
 	}
 	html += "><div class='topFlex'><div class='boxName'><img loading='lazy' width='64' height='64' src='images/char/"+img+".png'>"+charName;
 	if(img != "Traveler") {
-		if(region != undefined) html+="<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+region+"_"+type+".png'>";
-		if(chars[charName].vision !== undefined) html+= "<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+chars[charName].vision+".png'>";
+		var vision = region+"_"+type;
+		if(chars[charName].visionType != undefined && chars[charName].visionType != "") vision = vision+"_"+chars[charName].visionType;
+		if(region != undefined) html+="<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+vision+".png'>";
+		if(chars[charName].vision !== undefined) {
+			html+= "<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+chars[charName].vision+".png'>";
+		}
 	} else {
 		html+= "<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/Traveler_"+type+".png'>";
 	}
