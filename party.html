@@ -1,0 +1,526 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Genshin Party Saver</title>
+		<link rel="stylesheet" href="style.css">
+		<script type="text/javascript" src="chardb.js"></script>
+		<script type="text/javascript" src="itemdb.js"></script>
+		<script type="text/javascript" src="weapdb.js"></script>
+		<script type="text/javascript" src="artifactdb.js"></script>
+		<script type="text/javascript" src="scripts.js"></script>
+		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
+	</head>
+	<!--
+	TODO:
+	- MAKE PARTY GROUPS
+	- 
+	- ALLOW VISUALISATION OF TYPE COMBOS IN FULL PARTY
+	- OPTIONAL VISIBILITY OF ARTIFACTS AND WEAPONS
+	- PARTY PROPERTIES INCLUDE:
+		- NAME OF PARTY (won't save yet)
+		- CHARACTER(S) HELD WITHIN PARTY INCLUDING ORDER OF CHARACTERS (reordering works)
+		- CHARACTERS WITHIN PARTY HAVE THE FOLLOWING ADDITIONAL PROPERTIES:
+			- (maybe) VISIBLE TO USER; THE LEVEL, ASC, SKILL, BURST AND CON OF THE CHARACTER.
+			- CHOSEN WEAPON, AS AN ICON (changing does not work)
+			- CHOSEN ARTIFACTS, AS ONE OR MORE ICONS - THIS WILL NOT SHOW SET BONUSES (changing does not work)
+		
+		- INTRA-PARTY RESTRICTIONS:
+			- 4 CHARACTERS MAXIMUM (this should work)
+			- NO CHARACTER, INCLUDING ANY OF THE TRAVELER TYPES CAN BE USED MORE THAN ONCE
+			- CHARACTERS MUST BE ABLE TO BE REORDERED WITHIN THE PARTY (this works)
+			- COMBOS ONLY APPLY AT 4 CHARACTERS (combos not yet implemented)
+			- CANNOT REMOVE LAST CHARACTER FROM PARTY, IT WILL ASK IF DELETION IS WANTED INSTEAD (not yet implemented)
+
+	WHAT WILL NOT BE ADDED:
+	- ANY SORT OF REFINEMENT/LEVEL OR HP/DEF/ATK/CRIT/HEALING BONUS/$TYPE DMG/ER/EM STATS. NONE OF THEM. SOURCE OF WEAPON/ARTIFACT IS LIKELY FINE THOUGH
+	- NON-SOURCE RELATED WEAPON OR ARTIFACT DESCRIPTION. THESE WOULD TAKE UP TOO MUCH TIME AND BE UTTERLY POINTLESS. A LINK TO A GOOD WIKI MAYBE?
+
+	NEEDED ICONS:
+	ALL ARTIFACTS. YES, ALL OF THEM.
+	EMPTY ARTIFACT ICONS - use the name "fallback.png" in each of the folders
+	A BIIIIIG PLUS FOR ADDING A NEW CHARACTER
+
+	----
+
+	parties to be stored something like
+	[
+		{
+			id: "asdfgh",
+			name: "Party Name",
+			notes: "Party Notes",
+			chars: [
+				{
+					"name": "Ganyu",
+					"weapon": "Amos' Bow",
+					"artifacts": [
+						{"set": "Blizzard Strayer"},
+						{},
+						{},
+						{},
+						{}
+						],
+					(optional rarity)
+					"rarity": 5,
+					"customNotes": ""
+				},
+				{
+					(Only traveler contains the following but all others apply.)
+					type: "Hydro"
+				},
+				...
+				(max 4)
+			]
+		},
+		...
+	]
+	-->
+	<body>
+		<div>
+			<a href="index.html">Home</a>
+			<a href="inv.html">Inventory</a>
+			<!-- <a href="characters.html">Characters</a> -->
+		</div>
+
+<pre>hey so currently this is a proof of concept. Paste the next line into your console for a quick test run. nothing will save though.
+newParty(false,"asdfghj",`{"chars":[{"name":"Ganyu","weapon":"Dull Blade"},{"name":"Traveler","type":"Dendro","rarity":2,"weapon":"Song of Stillness"},{"name":"Shenhe","type":"Hydro","rarity":3}]}`)
+</pre>
+		<div class="topFlex">
+			<div class="notes">You can change Traveler's element, artifacts and held weapon by clicking on their respective icon. The same party restrictions that apply in-game also apply here.</div>
+			<button class="newPartyButton" onclick="newParty(true)" disabled>Add New Party</button>
+		</div>
+
+		<div id="partyGroups">
+			<!-- Example Party -->
+			<!-- <div id="0123456" class="party">
+				<div class="partyMeta topFlex">
+					<div class="partyName">New Party</div>
+					<div class="partyCombos">Image(s) of elemental resonance</div>
+					(float right)
+					<div class="partyDelete">Delete button with confirmation</div>
+				</div>
+				<div class="partyChars">
+					<div class="partyChar">Keqing | (stats if any) | &lt; [x] &gt;</div>
+					<div class="partyChar">Ganyu</div>
+					<div class="partyChar">Collei</div>
+					<div class="partyChar">Sangonomiya Kokomi</div>
+					<div class="partyAddChar partyFull">(+)</div>
+				</div>
+			</div> -->
+
+			<!-- Example Party -->
+			<!-- <div id="7890123" class="party">
+				<div class="partyMeta topFlex">
+					<div class="partyName">Just Ganyu</div>
+					<div class="partyCombos">None, party not full</div>
+					(float right)
+					<div class="partyDelete">Delete button with confirmation</div>
+				</div>
+				<div class="partyChars">
+					<div class="partyChar">Ganyu</div>
+					<div class="partyAddChar">(+)</div>
+				</div>
+			</div> -->
+
+		</div>
+		<!-- <div id="artis" style="display:flex;flex-wrap: wrap;"></div> -->
+
+		<footer style="font-size:12px;overflow-x:auto;">
+			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site, the interactive map and from the game itself. This site <strong>does not</strong> use Cookies and is completely open source. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
+		</footer>
+	</body>
+	<script>
+	'use strict';
+	var foundParties, foundPartiesIndex;
+	window.addEventListener("load", () => {
+		// check if preexisting parties are found and add them to html tree
+		if(getLSItem("parties") != undefined) {
+			try {
+				foundParties = JSON.parse(getLSItem("parties"));
+			}
+			catch {
+				console.error("Previously saved party data was corrupted. Not resetting it lol");
+				foundParties = [];
+			}
+			if(JSON.stringify(foundParties) != JSON.stringify([])) {
+				for(var i in foundParties) {
+					console.log(foundParties[i])
+					if(foundParties[i].name == undefined) foundParties[i].name=undefined;
+					if(foundParties[i].notes == undefined) foundParties[i].notes=undefined;
+					newParty(false,foundParties[i].id,foundParties[i].chars,foundParties[i].name,foundParties[i].notes);
+				}
+			}
+		} else {
+			newParty(true);
+		}
+
+		// test add new party
+		// newParty(true,"asdfghj",`{"chars":[{"name":"Ganyu","weapon":"Dull Blade"},{"name":"Traveler","type":"Dendro","rarity":2,"weapon":"Song of Stillness"},{"name":"Shenhe","type":"Hydro","rarity":3}]}`)
+
+		// dump all artifacts for testing
+		// var html = "";
+		// for (var i in artifactDB) {
+		// 	for (var j in artifactTypes) {
+		// 		console.log(i,j)
+		// 		if(artifactDB[i][artifactTypes[j]] == undefined) continue;
+		// 		html+="<img height=\"16\" width=\"16\" src=\"images/artifacts/"+artifactTypes[j]+"/"+removeQuotes(spaceToUnderscore(artifactDB[i][artifactTypes[j]]))+".png\">";
+		// 	}
+		// }
+		// get("artis").innerHTML = html;
+
+
+		if(foundParties!=undefined) foundPartiesIndex = foundParties.map(i => i.id);
+	});
+
+	const artifactTypes = ["flower","plume","sands","goblet","circlet"];
+	var newParty = (saveParty=false,forcedID="",forcedChars="",forcedName="",forcedNotes="") => {
+		// forced chars needs to be in the format of: [{"name":"char1","type":"Hydro","weapon":"Dull Blade","artifacts":[{},{},{},{},{}]},{},{},{}]
+		var partyID = "";
+		var partyData = "";
+		var partyCount = 0, partyCharsCount = 0;
+		var contents = {};
+		var isLSPartyDataEmpty = true;
+		var partyName = "", partyNotes = "";
+		if(forcedName != undefined && forcedName != "") {
+			partyName = forcedName;
+		}
+		if(forcedNotes != undefined && forcedNotes != "") {
+			partyNotes = forcedNotes;
+		}
+		if (getLSItem("parties") != null) {
+			try {
+				partyCount = Object.keys(JSON.parse(getLSItem("parties"))).length;
+				isLSPartyDataEmpty = false;
+				if(saveParty && JSON.stringify(JSON.parse(getLSItem("parties"))[partyCount - 1].chars) == "[]") {
+					return;
+				}
+			}
+			catch {
+				console.error("Parties were corrupted. Below is the raw JSON.");
+				console.log(getLSItem("parties"));
+				partyCount = 0;
+			}
+		}
+		if (forcedChars != "" && typeof(forcedChars) == "string") {
+			try {
+				contents = JSON.parse(forcedChars);
+				partyCharsCount = contents.chars.length;
+				if(partyCharsCount > 3) {
+					console.error("forced contents contains more than 4 characters. An empty party will be used instead.");
+					contents = {};
+					partyCharsCount = 0;
+				}
+			}
+			catch {
+				console.log("forcedChars not jsonifyable fml");
+				contents = {};
+				partyCharsCount = 0;
+			}
+		} else {
+			contents.chars = forcedChars;
+			partyCharsCount = contents.chars.length;
+		}
+		if (forcedID != "") {
+			saveParty = false;
+			partyID = forcedID;
+		} else {
+			partyID = createId("party");
+		}
+		if(saveParty)partyData += "{\"id\":\"" + partyID + "\",";
+		// party init
+		var html = "<div class=\"party\" id=\""+partyID+"\">";
+
+		// party meta; includes name, element combos and the delete button
+		html += "<div class=\"partyMeta topFlex\">";
+		// name + combo group
+		html += "<div>";
+		// name
+		html += "<div><label for=\""+partyID+"-name\">Party Name: </label>";
+		html += "<input class=\"partyName\" type=\"text\" id=\""+partyID+"-name\" name=\""+partyID+"-name\" maxlength=\"50\" value=\"Party "+partyCount+"\" placeholder=\"Party Name\"></div>";
+		if(saveParty)partyData+="\"name\":\"Party "+partyCount+"\",";
+		// element combos if applicable - js would be needed for updating this.
+		html += "<div id=\""+partyID+"-combos\"></div>";
+		// close name+combo group
+		html += "</div>";
+		// delete button
+		html += "<button id=\""+partyID+"-remove\" class=\"removeButton\" onclick=\"removeParty(&quot;"+partyID+"&quot;)\">Remove</button>";
+		// close meta tag
+		html += "</div>";
+
+		// party chars start
+		html += "<div id=\""+partyID+"-party\" class=\"partyChars\">";
+		
+		if(saveParty)partyData += "\"chars\":[,"; // open character list
+		for(var i = 0; i < partyCharsCount; i++) {
+			var char = contents.chars[i].name;
+			var rarity, type, artifacts, weapon;
+			if(saveParty)partyData = partyData.splice(0,-1)+"{\"name\":\""+char+"\","; // open character
+			if(contents.chars[i].artifacts != undefined) {
+				artifacts = contents.chars[i].artifacts;
+				if(saveParty)partyData += "\"artifacts\":\""+artifacts+"\",";
+			} else {
+				artifacts = "[{},{},{},{},{}]";
+			}
+			if(contents.chars[i].weapon != undefined) {
+				weapon = contents.chars[i].weapon;
+				if(saveParty)partyData += "\"weapon\":\""+weapon+"\",";
+			} else {
+				weapon = defaultWeapons[chars[char].weapon];
+			}
+			if(contents.chars[i].type == undefined) {
+				if(char == "Traveler") {
+					type = "Anemo";
+				} else {
+					type = chars[char].type;
+				}
+			} else {
+				type = contents.chars[i].type;
+				if(char == "Traveler"&&saveParty) partyData += "\"type\": \""+type+"\",";
+			}
+			if(contents.chars[i].rarity == undefined) {
+				rarity = chars[char].rarity;
+			} else {
+				rarity = contents.chars[i].rarity;
+				if(saveParty)partyData += "\"rarity\":\""+rarity+"\",";
+			}
+			if(saveParty)partyData = partyData.slice(0,-1)+"},"; // close character
+
+			html += partyAddChar(partyID,char,type,rarity,weapon,artifacts);
+		}
+		if(saveParty)partyData = partyData.slice(0,-1)+"],"; // close character list
+		
+		// "add character" button that'll bring up a modal of sorts to add a character. any added characters should allow weapon + artifact editing and removal.
+		html += "<div id=\""+partyID+"-addChar\" class=\"partyAddChar";
+		if(partyCharsCount >= 4) {
+			html += " partyFull";
+		}
+		html += "\" onclick=\"partyAddCharStart(&quot;"+partyID+"&quot;,this.parentNode)\"></div>";
+		// close chars tag
+		html += "</div>";
+
+		// close outermost tag
+		html+="</div>"
+
+		if(saveParty){
+			partyData = partyData.slice(0,-1)+"}"; // remove ending comma and close party
+			console.log(partyData,isLSPartyDataEmpty)
+			if(!isLSPartyDataEmpty) {
+				setLSItem("parties",getLSItem("parties").slice(0,-1)+","+partyData+"]");
+			} else {
+				setLSItem("parties","["+partyData+"]");
+			}
+			foundParties.push(partyData);
+			savePartyData();
+		}
+		get("partyGroups").innerHTML += html;
+	};
+
+	var clearPartyDoConfirm = "", wasPartyCleared = false;
+	var removeParty = (partyID="") => {
+		if(clearPartyDoConfirm == "") {
+			get((partyID+"-remove")).innerText = "Confirm?";
+			clearPartyDoConfirm = true;
+			window.setTimeout(function(){if(!wasPartyCleared){console.log("Any errors relating to \"Uncaught TypeError: get(...) is null\" within the next few seconds can be safely ignored.");get((partyID+"-remove")).innerText = "Remove";clearPartyDoConfirm = partyID}},5000);
+		} else {
+			wasPartyCleared = true;
+			clearPartyDoConfirm = "";
+			foundParties.splice(foundPartiesIndex.indexOf(partyID),1);
+			savePartyData();
+			get(partyID).outerHTML = "";
+			ids.splice(idNameIndex.indexOf(partyID),1);
+			idNameIndex = ids.map(i => i.id);
+			window.setTimeout(function(){wasPartyCleared = false},5000);
+		}
+	}
+
+	var partyAddChar = (partyID="",char="Ganyu",type="Anemo",rarity="1",weapon="Dull Sword",artifacts="[{},{},{},{},{}]") => {
+		if(partyID == "") {
+			console.warn("No Party ID was included. This may not work fully.");
+		}
+		var html = "";
+		try {
+			artifacts = JSON.parse(artifacts);
+		}
+		catch {
+			console.error(char+" has corrupted artifacts. They'll be reset to blank. Below is the previous artifacts as a string.");
+			console.log(artifacts);
+			artifacts = [{},{},{},{},{}];
+		}
+		// start character
+		html += "<div class=\"partyChar normal\">";
+
+		// get char type icon, image, rarity and throw them into a nice box
+		html += "<div class=\"partyCharIcon rarity-"+rarity+"\">";
+		html += "<img loading=\"lazy\" class=\"partyCharImage\" height=\"112\" width=\"112\" src=\"images/char/"+spaceToUnderscore(char)+".png\">";
+
+		// type
+		html += "<img loading=\"lazy\" class=\"partyCharType";
+		if(char == "Traveler") html += " partyTravType\" id=\""+partyID+"-travType\" onclick=\"changeTravType(this);";
+		html += "\" height=\"32\" width=\"32\" src=\"images/icons/elements/"+type+".svg\">";
+
+		html += "<img loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">";
+		// close icon group
+		html += "</div>";
+
+		// add optional weapon+artifact stuff
+		html += "<div class=\"partyOptional\">";
+
+		// notes are useful
+		html += "<input class=\"partyCharNote\" type=\"text\" maxlength=\"50\" placeholder=\"Add note...\" pattern=\"[^\\`]\">";
+		
+		// group weapons and artis
+		html += "<div class=\"partyWeaponArtiGroup\">";
+		// this should probably be a dropdown
+		html += "<div class=\"partyWeapon\">";
+		
+		// NOTE: THIS NEEDS AN ONCLICK APPLIED TO IT FOR SWAPPING WEAPONS.
+		html += "<img class=\"partyWeaponImg\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/weapon/"+spaceToUnderscore(weapon)+".png\">";
+		
+		html += "</div>";
+
+		// start artifacts group
+		html += "<div class=\"partyArtifacts\">";
+		for (var j = 0; j < artifacts.length; j++) {
+			var artifact = artifacts[j];
+			var artifactIcon = undefined;
+			html += "<div class=\"partyArtifact\">";
+			if(artifact.type != undefined) {
+				artifactIcon = artifactDB[artifact.type][artifactTypes[j]];
+			} else if(typeof(artifact) == "string") {
+				artifactIcon = artifact;
+			} else {
+				if(artifact.type == undefined) {
+					console.info("Artifact type was undefined, assuming empty and returning fallback.");
+				} else {
+					console.error("Artifact data corrupted somehow. Below's the data. Using fallback.");
+					console.log(artifact);
+				}
+				artifactIcon = "fallback";
+			}
+			// NOTE: THIS NEEDS AN ONCLICK APPLIED TO IT FOR SWAPPING ARTIFACTS.
+			html += "<img class=\"partyArtifactImage\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/artifacts/"+artifactTypes[j]+"/"+artifactIcon+".png\">";
+			html += "</div>";
+		}
+		// close artifact group
+		html += "</div>";
+		// close partyWeaponArtiGroup
+		html += "</div>";
+
+		// close optional weapon+artifact stuff
+		html += "</div>";
+		// add buttons to move or remove character here
+		html += "<div class=\"partyCharControls\">";
+		// move left, remove and move right button
+		html += "<button class=\"partyMoveCharButton\" onclick=\"moveCharLeft(getCharElement(this));\">&lt;</button>";
+		html += "<button class=\"partyRemoveCharButton\" onclick=\"removeChar(getCharElement(this));\">Remove</button>";
+		html += "<button class=\"partyMoveCharButton\" onclick=\"moveCharRight(getCharElement(this));\">&gt;</button>";
+		// close buttons
+		html += "</div>";
+		// close character
+		html += "</div>";
+		return html;
+	}
+
+	var makePopup = (data,title="") => {
+		// popup base. element is for the parent of the element the popup will attach to, data is an array of what'll be within the popup. title is an optional string for a title.
+		if(data == undefined) {
+			console.error("Do not call makePopup without a undefined data.");
+			return;
+		}
+		var html = "";
+
+	}
+
+	var savePartyData = () => {
+		// ran often to save the party data.
+		foundPartiesIndex = foundParties.map(i => i.id);
+		setLSItem("parties", JSON.stringify(foundParties));
+	}
+
+	// popup to add character
+	var partyAddCharStart = (partyID,element) => {
+		// have popup with a list of characters appear if character count is less than 4
+		// selectable characters will follow these rules:
+		// - no duplicate characters
+		// - seriously that's it
+		// this popup will disappear upon character selection
+
+		// search bar wanted, might reuse code from index.html
+	}
+
+	// change traveler type
+	var changeTravType = (element) => {
+		// have popup with (current) types as well as unaligned (likely hidden without show event only or something)
+		// only changes the source image. seriously, that's it.
+	}
+
+	// change weapon
+	var changeWeapon = (element) => {
+		// first it gets the character's name from the image then gets a list of valid weapons to choose from. also swaps alt text
+	}
+
+	// change artifact
+	var changeArtifact = (element) => {
+		// swap out an artifact image for another. also swaps alt text which can be used for ::after{content:attr(alt)} or something
+	}
+
+	// get char html element
+	var getCharElement = (element) => {
+		do {element = element.parentNode} while (element.classList.contains("partyChar") == false); return element;
+	}
+	var getPartyID = (element) => {
+		while (element.id == "" && (element.tagName != "HTML"||element.tagName == undefined)) {element = element.parentNode}
+		if(element.id != "") {
+			if(element.id.length == 7) {
+				return element.id;
+			} else {
+				// console.warn("The found ID may not be correct.")
+				return element.id.slice(0,7);
+			}
+		} else {
+			console.error("The tested element was not part of a party.");
+			return;
+		}
+	}
+	// move chars around
+	var moveCharLeft = (char) => {
+		if(char.previousElementSibling == null) return;
+		char.parentNode.insertBefore(char, char.previousElementSibling);
+		var partyID = getPartyID(char);
+		var i = 0;
+		while ( (char = char.previousElementSibling) != null ) {
+			i++;
+		}
+		var j = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		j.splice(i, 0, j.splice(i + 1, 1)[0]);
+		savePartyData();
+	}
+	var moveCharRight = (char) => {
+		if(char.nextElementSibling.nextElementSibling == null || char.nextElementSibling.classList.contains("partyAddChar")) return;
+		char.parentNode.insertBefore(char, char.nextElementSibling.nextElementSibling);
+		var partyID = getPartyID(char);
+		var i = char.parentNode.childElementCount - 1;
+		while ((char = char.nextElementSibling) != null) {
+			i--;
+		}
+		var j = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		j.splice(i, 0, j.splice(i - 1, 1)[0]);
+		savePartyData();
+	}
+	// remove character
+	// the remove could potentially be changed for a "swap character in place of this"?
+	var removeChar = (char) => {
+		if(char.parentNode.childElementCount == 5) get(char.parentNode.id.slice(0,7)+"-addChar").classList.remove("partyFull");
+		var partyID = getPartyID(char);
+		var parentChildNodes = char.parentNode.childNodes;
+		var i = 0;
+		for (i; i < parentChildNodes.length; i++) {
+			if(char === parentChildNodes[i]) break;
+		}
+		char.outerHTML = "";
+		var j = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		j.splice(i,1);
+		savePartyData();
+	}
+	</script>
+</html>

@@ -137,7 +137,7 @@ body {
 	--size: 256px;
 	--rarity-size: 55px;
 }
-.itemIcon {
+.itemIcon, .partyCharIcon {
 	transform: rotate(0deg);
 	display: flex;
 	flex-flow: column nowrap;
@@ -150,6 +150,9 @@ body {
 	font-size: calc(var(--size) * (3 / 14));
 	border-radius: calc(var(--size) / 10);
 	background: top/cover no-repeat;
+}
+.partyCharIcon {
+	height: var(--size);
 }
 .normal {
 	--size: 112px;
@@ -232,21 +235,31 @@ body {
 	border-radius: 4px;
 	background-color: transparent;
 }
-// .rarity-0,.rarity-1 {
-// 	background-image: url(images/rarity/1.png);
-// }
-// .rarity-2 {
-// 	background-image: url(images/rarity/2.png);
-// }
-// .rarity-3 {
-// 	background-image: url(images/rarity/3.png);
-// }
-// .rarity-4 {
-// 	background-image: url(images/rarity/4.png);
-// }
-// .rarity-5 {
-// 	background-image: url(images/rarity/5.png);
-// }
+.rarity-0,.rarity-1 {
+	background-color: #a2a2a2;
+	background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 100%);
+	background-image: url(images/rarity/1.png);
+}
+.rarity-2 {
+	background-color: #6cad8d;
+	background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 100%);
+	background-image: url(images/rarity/2.png);
+}
+.rarity-3 {
+	background-color: #6eaace;
+	background-image: linear-gradient(to bottom, #667896 0%, #6eaace 100%);
+	background-image: url(images/rarity/3.png);
+}
+.rarity-4 {
+	background-color: #9674c5;
+	background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 100%);
+	background-image: url(images/rarity/4.png);
+}
+.rarity-5 {
+	background-color: #e09552;
+	background-image: linear-gradient(to bottom, #946a43 0%, #e09552 100%);
+	background-image: url(images/rarity/5.png);
+}
 
 .outputRequired {
 	display: flex;
@@ -344,3 +357,30 @@ body {
 	filter: drop-shadow(0 0 2px #0006);
 	pointer-events: none;
 }
+.partyCharImage {
+	position: absolute;
+	top: 0;
+	border-radius: inherit;
+}
+.partyCharType {
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	filter: drop-shadow(0 0 3px #0006);
+}
+.partyTravType.unsetType {
+	display: none;
+}
+.partyChars {
+	display: flex;
+}
+.partyArtifacts {
+	display: flex;
+	flex-wrap: wrap;
+}
+.partyWeaponArtiGroup {
+	display: flex;
+}
+// .partyAddChar {
+// 	height: 
+// }

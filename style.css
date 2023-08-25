@@ -155,7 +155,7 @@ body {
   --rarity-size: 55px;
 }
 
-.itemIcon {
+.itemIcon, .partyCharIcon {
   transform: rotate(0deg);
   display: flex;
   flex-flow: column nowrap;
@@ -168,6 +168,10 @@ body {
   font-size: calc(var(--size) * 0.2142857143);
   border-radius: calc(var(--size) / 10);
   background: top/cover no-repeat;
+}
+
+.partyCharIcon {
+  height: var(--size);
 }
 
 .normal {
@@ -257,6 +261,36 @@ body {
   border: 1px solid #495366;
   border-radius: 4px;
   background-color: transparent;
+}
+
+.rarity-0, .rarity-1 {
+  background-color: #a2a2a2;
+  background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 100%);
+  background-image: url(images/rarity/1.png);
+}
+
+.rarity-2 {
+  background-color: #6cad8d;
+  background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 100%);
+  background-image: url(images/rarity/2.png);
+}
+
+.rarity-3 {
+  background-color: #6eaace;
+  background-image: linear-gradient(to bottom, #667896 0%, #6eaace 100%);
+  background-image: url(images/rarity/3.png);
+}
+
+.rarity-4 {
+  background-color: #9674c5;
+  background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 100%);
+  background-image: url(images/rarity/4.png);
+}
+
+.rarity-5 {
+  background-color: #e09552;
+  background-image: linear-gradient(to bottom, #946a43 0%, #e09552 100%);
+  background-image: url(images/rarity/5.png);
 }
 
 .outputRequired {
@@ -358,4 +392,34 @@ body {
 .vision {
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
   pointer-events: none;
+}
+
+.partyCharImage {
+  position: absolute;
+  top: 0;
+  border-radius: inherit;
+}
+
+.partyCharType {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  filter: drop-shadow(0 0 3px rgba(0, 0, 0, 0.4));
+}
+
+.partyTravType.unsetType {
+  display: none;
+}
+
+.partyChars {
+  display: flex;
+}
+
+.partyArtifacts {
+  display: flex;
+  flex-wrap: wrap;
+}
+
+.partyWeaponArtiGroup {
+  display: flex;
 }

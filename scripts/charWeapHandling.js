@@ -88,7 +88,7 @@ var createId = (type="char",char="",travType=null,length=7,forcedId=null) => {
 		idNameIndex = ids.map(i => i.id);
 		idCharNameIndex = ids.map(i => i.name);
 	} else {
-		if(forcedId!=null) console.warn("Duplicate ID when trying to force an ID. A new, random one will be generated.");
+		if(forcedId!=null) console.warn("Duplicate ID when trying to force an ID. A new id one will be generated.");
 		createId(type,char,travType,length,null);
 	}
 	return newId;

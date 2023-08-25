@@ -1,3 +1,10 @@
+const defaultWeapons = {
+	"Bow": "Hunters Bow",
+	"Catalyst": "Apprentices Notes",
+	"Claymore": "Waster Greatsword",
+	"Polearm": "Beginners Protector",
+	"Sword": "Dull Blade"
+};
 const weapDB = {
 	"Apprentices Notes": {
 		"rarity": 1,
@@ -1206,5 +1213,17 @@ const weapDB = {
 		"weapon": "gladiatorShackles",
 		"elite": "ruinHumainoid",
 		"common": "samachurl"
+	}
+}
+const allBows = [];
+const allCatalysts = [];
+const allClaymores = [];
+const allPolearms = [];
+const allSwords = [];
+var k = ["Bow","Catalyst","Claymore","Polearm","Sword"];
+var l = [allBows,allCatalysts,allClaymores,allPolearms,allSwords];
+for (var i in weapDB) {
+	for (var j in k) {
+		if(weapDB[i].type == k[j]){l[j].push(i)}
 	}
 }

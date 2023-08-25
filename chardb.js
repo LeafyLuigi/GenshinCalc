@@ -975,5 +975,7 @@ const chars = {
 				"common": "samachurl"
 			}
 		]
-	},
+	}
 }
+const allChars = [];
+for (var i in chars) {allChars.push(i)}
