@@ -603,5 +603,25 @@
 		getByClass("invBlock")[1].classList.remove("empty");
 		get("whatToObtain").innerHTML = html;
 	}
+
+	var resetItemLists = () => {
+		travelerAscensionDone = false;
+		items = {};
+		getByClass("invBlock")[0].classList.add("empty");
+		getByClass("invBlock")[1].classList.add("empty");
+		get("totalOutput").innerHTML = "";
+		get("whatDoYouHave").innerHTML = "";
+		get("whatToObtain").innerHTML = "";
+		get("textOutput").innerHTML = "";
+		for (var perID in ids) {
+			var id = ids[perID].id;
+			var boxType = ids[perID].type;
+			if (boxType == "char") {
+				get(id + "-charOutput").innerHTML = "";
+			} else {
+				get(id + "-weapOutput").innerHTML = "";
+			}
+		}
+	}
 	</script>
 </html>
