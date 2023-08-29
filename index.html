@@ -323,7 +323,7 @@
 				var weapItems = [];
 
 				neededItemsForAscTal = {};
-				for (var j = weapAsc; j < target; j++) {
+				for (var j = weapAsc - 1; j < target; j++) {
 					for (var k in weaponAscOfRarirty[j]) {
 						if (k == "cost") {
 							weapItems = addItem("Mora", weaponAscOfRarirty[j][k], weapItems);
