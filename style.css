@@ -356,22 +356,22 @@ body {
   background-color: #d0d0d7;
 }
 
-:is(.charDropdownButton, .weaponDropdownButton) {
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon) {
   font-size: 14px;
 }
-:is(.charDropdownButton, .weaponDropdownButton):is(.rarity-0, .rarity-1) {
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon):is(.rarity-0, .rarity-1) {
   background-image: linear-gradient(to right, #707275 0%, #a2a2a2 20%, transparent 44px);
 }
-:is(.charDropdownButton, .weaponDropdownButton).rarity-2 {
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-2 {
   background-image: linear-gradient(to right, #5c7670 0%, #6cad8d 20%, transparent 44px);
 }
-:is(.charDropdownButton, .weaponDropdownButton).rarity-3 {
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-3 {
   background-image: linear-gradient(to right, #667896 0%, #6eaace 20%, transparent 44px);
 }
-:is(.charDropdownButton, .weaponDropdownButton).rarity-4 {
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-4 {
   background-image: linear-gradient(to right, #65608c 0%, #9674c5 20%, transparent 44px);
 }
-:is(.charDropdownButton, .weaponDropdownButton).rarity-5 {
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-5 {
   background-image: linear-gradient(to right, #946a43 0%, #e09552 20%, transparent 44px);
 }
 
@@ -426,18 +426,31 @@ body {
 }
 
 .partyChars {
+  padding: 4px;
   display: flex;
+  gap: 4px;
+  height: 260px;
 }
 .partyChars .partyChar:is(.normal),
 .partyChars .partyAddChar {
   width: 220px;
-  height: 228px;
+  max-height: 260px;
+}
+.partyChars .partyAddChar {
+  height: 260px;
 }
 
 .partyChar {
   display: flex;
   flex-direction: column;
   align-items: center;
+}
+:is(.partyPopupContent, .partyChar) > div:not([class]) {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  min-height: calc(var(--size) + 2 * var(--rarity-size));
+  height: calc(var(--size) + 2 * var(--rarity-size));
 }
 
 .partyArtifacts {
@@ -467,4 +480,144 @@ body {
 
 .allowEvents {
   pointer-events: initial;
+}
+
+.partyCharName {
+  text-align: center;
+}
+
+.partyPopupTravelerType {
+  display: flex;
+  align-items: center;
+}
+.partyPopupTravelerType img {
+  margin-right: 8px;
+}
+
+.partyChar .partyPopup {
+  max-height: 260px;
+  position: absolute;
+  transform: translateX(90%);
+  z-index: 1;
+  background: #ebe4d6;
+  border: 2px solid #4a5366;
+  border-radius: 4px;
+}
+.partyChar .partyPopup .partyPopupContent {
+  max-height: 100px;
+}
+.partyAddChar .partyPopup {
+  position: absolute;
+  z-index: 1;
+  width: -moz-fit-content;
+  width: fit-content;
+  background: #ebe4d6;
+  border: 2px solid #4a5366;
+  border-radius: 4px;
+}
+.partyAddChar .partyPopup .partyPopupContent {
+  display: grid;
+  padding-bottom: 10px;
+  max-height: 70vh;
+  grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+}
+.partyPopup .partyPopupHeader {
+  display: flex;
+  justify-content: space-between;
+  padding: 0 8px;
+  color: #4a5366;
+  -webkit-user-select: none;
+     -moz-user-select: none;
+          user-select: none;
+  gap: 8px;
+}
+.partyPopup .partyPopupHeader .partyPopupClose {
+  cursor: pointer;
+}
+.partyArtifactImage + .partyPopup {
+  transform: none;
+}
+.partyArtifactImage + .partyPopup::before {
+  content: "";
+  position: absolute;
+  top: -17px;
+  left: 6px;
+  height: 0;
+  width: 0;
+  border: 8px solid transparent;
+  display: block;
+  border-bottom-color: #4a5366;
+}
+.partyPopup .partyPopupContent {
+  overflow-y: scroll;
+}
+.partyPopup .partyPopupContent div:not([class]) {
+  min-height: 120px;
+  max-height: 120px;
+  min-width: 105px;
+  max-width: 105px;
+  justify-content: end;
+}
+.partyPopup .partyPopupContent .rarityIcon {
+  display: none;
+}
+
+.partyIntractable {
+  cursor: pointer;
+}
+.party[popupdisabled] .partyIntractable {
+  cursor: auto;
+}
+
+.partyPopupWeapon, .partyPopupArtifact, .partyMeta > div {
+  display: flex;
+  align-items: center;
+}
+
+.partyCombos {
+  margin-left: 1em;
+  display: flex;
+}
+.partyCombos > span {
+  display: inline-flex;
+}
+
+.partyComboIcon {
+  margin: 0 0.25em;
+  display: flex;
+  line-height: 1;
+  background-color: black;
+  border: 1px solid var(--elementColor, transparent);
+  border-radius: 50px;
+  height: -moz-fit-content;
+  height: fit-content;
+  padding: 2px;
+  box-shadow: 0 0 4px inset var(--elementColor, transparent), 0 0 4px var(--elementColor, transparent);
+}
+.partyComboIcon + .partyComboIcon {
+  margin: 0 0.25em 0 0;
+}
+.partyComboIcon.elementTypePyro {
+  --elementColor: #ef7938;
+}
+.partyComboIcon.elementTypeHydro {
+  --elementColor: #4cc2f1;
+}
+.partyComboIcon.elementTypeElectro {
+  --elementColor: #af8ec1;
+}
+.partyComboIcon.elementTypeCryo {
+  --elementColor: #9fd6e3;
+}
+.partyComboIcon.elementTypeAnemo {
+  --elementColor: #74c2a8;
+}
+.partyComboIcon.elementTypeGeo {
+  --elementColor: #fab632;
+}
+.partyComboIcon.elementTypeDendro {
+  --elementColor: #a5c83b;
+}
+.partyComboIcon.elementTypeUnaligned {
+  --elementColor: #13131e;
 }

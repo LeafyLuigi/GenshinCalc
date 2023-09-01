@@ -1793,9 +1793,9 @@ const itemGroupDB = {
 	}
 }
 // adds the group to the item
-for (var groupItem in itemGroupDB) {
-	for (var i = 0; i < itemGroupDB[groupItem].items.length; i++) {
-		itemDB[itemGroupDB[groupItem].items[i]].group = groupItem;
-		itemDB[itemGroupDB[groupItem].items[i]].source = itemGroupDB[groupItem].source;
+for (let i in itemGroupDB) {
+	for (let j = 0; j < itemGroupDB[i].items.length; j++) {
+		itemDB[itemGroupDB[i].items[j]].group = i;
+		itemDB[itemGroupDB[i].items[j]].source = itemGroupDB[i].source;
 	}
 }

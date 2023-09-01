@@ -978,4 +978,4 @@ const chars = {
 	}
 }
 const allChars = [];
-for (var i in chars) {allChars.push(i)}
+for (let i in chars) {allChars.push(i)}

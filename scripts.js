@@ -51,8 +51,11 @@ var val = (id,noGet=false,fallback=null) => {
 		if(id.max != "" && value > Math.floor(id.max)) value = id.max;
 		if(id.min != "" && value < Math.floor(id.min)) value = id.min;
 		return Math.floor(value);
+	} else if(id.getAttribute("type") == "checkbox") {
+		return id.checked;
+	} else if(id.getAttribute("type") == "text") {
+		return id.value;
 	}
-	if(id.getAttribute("type") == "checkbox") return id.checked;
 }
 var setVal = (id,val,noGet=false) => {
 	if(!noGet) {

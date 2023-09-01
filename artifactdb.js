@@ -460,10 +460,11 @@ const allPlumes = [];
 const allSands = [];
 const allGoblets = [];
 const allCirclets = [];
-var k = ["flower","plume","sands","goblet","circlet"];
-var l = [allFlowers,allPlumes,allSands,allGoblets,allCirclets];
-for(var i in artifactDB) {
-	for(var j in k) {
-		l[j].push(artifactDB[i][k[j]]);
+const artifactTypes = ["flower","plume","sands","goblet","circlet"];
+const allArtifacts = [allFlowers,allPlumes,allSands,allGoblets,allCirclets];
+const allArtifactGroups = Object.keys(artifactDB);
+for(let i in artifactDB) {
+	for(let j in artifactTypes) {
+		if(artifactDB[i][artifactTypes[j]] != undefined) allArtifacts[j].push(artifactDB[i][artifactTypes[j]]);
 	}
 }

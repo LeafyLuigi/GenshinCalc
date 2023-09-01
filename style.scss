@@ -322,7 +322,7 @@ body {
 		background-color: #d0d0d7;
 	}
 }
-:is(.charDropdownButton, .weaponDropdownButton) {
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon) {
 	font-size: 14px;
 	&:is(.rarity-0,.rarity-1) {
 		background-image: linear-gradient(to right, #707275 0%, #a2a2a2 20%, transparent 44px);
@@ -386,17 +386,32 @@ body {
 	display: none;
 }
 .partyChars {
+	padding: 4px;
 	display: flex;
+	gap: 4px;
+	height: 260px;
 	.partyChar:is(.normal),
 	.partyAddChar {
 		width: 220px;
-		height: 228px;
+		max-height: 260px;
+	}
+	.partyAddChar {
+		height: 260px;
 	}
 }
 .partyChar {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
+	:is(.partyPopupContent, &) {
+		>div:not([class]) {
+			display: flex;
+			flex-direction: column;
+			align-items: center;
+			min-height: calc(var(--size) + (2 * var(--rarity-size)));
+			height: calc(var(--size) + (2 * var(--rarity-size)));
+		}
+	}
 }
 .partyArtifacts {
 	display: flex;
@@ -421,4 +436,135 @@ body {
 }
 .allowEvents {
 	pointer-events: initial;
+}
+.partyCharName {
+	text-align: center;
+}
+.partyPopupTravelerType {
+	display: flex;
+	align-items: center;
+	img {
+		margin-right: 8px;
+	}
+}
+.partyPopup {
+	.partyChar & {
+		max-height: 260px;
+		position: absolute;
+		transform: translateX(90%);
+		z-index: 1;
+		background: #ebe4d6;
+		border: 2px solid #4a5366;
+		border-radius: 4px;
+		.partyPopupContent {
+			max-height: 100px;
+		}
+	}
+	.partyAddChar & {
+		position: absolute;
+		z-index: 1;
+		width: fit-content;
+		background: #ebe4d6;
+		border: 2px solid #4a5366;
+		border-radius: 4px;
+		.partyPopupContent {
+			display: grid;
+			padding-bottom: 10px;
+			max-height: 70vh;
+			grid-template-columns: 1fr 1fr 1fr 1fr 1fr;
+		}
+	}
+	.partyPopupHeader {
+		display: flex;
+		justify-content: space-between;
+		padding: 0 8px;
+		color: #4a5366;
+		user-select: none;
+		gap: 8px;
+		.partyPopupClose {
+			cursor: pointer;
+		}
+	}
+	.partyArtifactImage+& {
+		transform: none;
+		&::before {
+			content: "";
+			position: absolute;
+			top: -17px;
+			left: 6px;
+			height: 0;
+			width: 0;
+			border: 8px solid transparent;
+			display: block;
+			border-bottom-color: #4a5366;
+		}
+	}
+	.partyPopupContent {
+		overflow-y: scroll;
+		div:not([class]) {
+			min-height: 120px;
+			max-height: 120px;
+			min-width: 105px;
+			max-width: 105px;
+			justify-content: end;
+		}
+		.rarityIcon {
+			display: none;
+		}
+	}
+}
+.partyIntractable {
+	cursor: pointer;
+	.party[popupdisabled] & {
+		cursor: auto;
+	}
+}
+.partyPopupWeapon, .partyPopupArtifact, .partyMeta>div {
+	display: flex;
+	align-items: center;
+}
+.partyCombos {
+	margin-left: 1em;
+	display: flex;
+	&>span {
+		display: inline-flex;
+	}
+}
+.partyComboIcon {
+	margin: 0 0.25em;
+	display: flex;
+	line-height: 1;
+	background-color: black;
+	border: 1px solid var(--elementColor,transparent);
+	border-radius: 50px;
+	height: fit-content;
+	padding: 2px;
+	box-shadow: 0 0 4px inset var(--elementColor,transparent), 0 0 4px var(--elementColor,transparent);
+	&+& {
+		margin: 0 0.25em 0 0;
+	}
+	&.elementTypePyro {
+		--elementColor: #ef7938;
+	}
+	&.elementTypeHydro {
+		--elementColor: #4cc2f1;
+	}
+	&.elementTypeElectro {
+		--elementColor: #af8ec1;
+	}
+	&.elementTypeCryo {
+		--elementColor: #9fd6e3;
+	}
+	&.elementTypeAnemo {
+		--elementColor: #74c2a8;
+	}
+	&.elementTypeGeo {
+		--elementColor: #fab632;
+	}
+	&.elementTypeDendro {
+		--elementColor: #a5c83b;
+	}
+	&.elementTypeUnaligned {
+		--elementColor: #13131e;
+	}
 }

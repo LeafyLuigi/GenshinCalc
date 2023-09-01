@@ -1220,10 +1220,10 @@ const allCatalysts = [];
 const allClaymores = [];
 const allPolearms = [];
 const allSwords = [];
-var k = ["Bow","Catalyst","Claymore","Polearm","Sword"];
-var l = [allBows,allCatalysts,allClaymores,allPolearms,allSwords];
-for (var i in weapDB) {
-	for (var j in k) {
-		if(weapDB[i].type == k[j]){l[j].push(i)}
+const allWeaponTypes = ["Bow","Catalyst","Claymore","Polearm","Sword"];
+const allWeapons = [allBows,allCatalysts,allClaymores,allPolearms,allSwords];
+for (let i in weapDB) {
+	for (let j in allWeaponTypes) {
+		if(weapDB[i].type == allWeaponTypes[j]){allWeapons[j].push(i)}
 	}
 }
