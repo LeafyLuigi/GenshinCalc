@@ -270,25 +270,24 @@ const chars = {
 		"weeklyBoss": "Spirit Locket of Boreas"
 	},
 	"Freminet": {
-		"include": false,
 		"rarity": 4,
 		"weapon": "Claymore",
 		"region": "Fontaine",
 		"visionType": "Pneuma",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
-		"boss": "Unknown",
-		"local": "Unknown",
-		"common": "Unknown",
-		"books": "Unknown",
-		"weeklyBoss": "Unknown"		
+		"boss": "Artificed Spare Clockwork Component - Coppelius",
+		"local": "Romaritime Flower",
+		"common": "transoceanic",
+		"books": "Justice",
+		"weeklyBoss": "Worldspan Fern"		
 	},
 	"Furina": {
 		"include": false,
 		"rarity": 5,
 		"weapon": "Unknown",
 		"region": "Fontaine",
-		"visionType": "",
+		// "visionType": "",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
 		"boss": "Unknown",
