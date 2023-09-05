@@ -147,18 +147,18 @@ var addCharacter = (char="Lynette",fromInit=false,forcedId=null,charPage=false,i
 		html+=" travtype=\""+pos+"\"";
 		img = "Traveler";
 	}
-	html += "><div class='topFlex'><div class='boxName'><img loading='lazy' width='64' height='64' src='images/char/"+img+".png'>"+charName;
+	html += "><div class='topFlex'><div class='boxName'><img draggable=\"false\" loading='lazy' width='64' height='64' src='images/char/"+img+".png'>"+charName;
 	if(img != "Traveler") {
 		var vision = region+"_"+type;
 		if(chars[charName].visionType != undefined && chars[charName].visionType != "") vision = vision+"_"+chars[charName].visionType;
-		if(region != undefined) html+="<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+vision+".png'>";
+		if(region != undefined) html+="<img loading='lazy' draggable=\"false\" class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+vision+".png'>";
 		if(chars[charName].vision !== undefined) {
-			html+= "<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+chars[charName].vision+".png'>";
+			html+= "<img loading='lazy' draggable=\"false\" class='extraIcon vision' width='48' height='48' src='images/icons/visions/"+chars[charName].vision+".png'>";
 		}
 	} else {
-		html+= "<img loading='lazy' class='extraIcon vision' width='48' height='48' src='images/icons/visions/Traveler_"+type+".png'>";
+		html+= "<img loading='lazy' draggable=\"false\" class='extraIcon vision' width='48' height='48' src='images/icons/visions/Traveler_"+type+".png'>";
 	}
-	if(weapon !== undefined) html+="<img loading='lazy' class='extraIcon' width='32' height='32' src='images/icons/weapon/"+weapon+".png'>";
+	if(weapon !== undefined) html+="<img draggable=\"false\" loading='lazy' class='extraIcon' width='32' height='32' src='images/icons/weapon/"+weapon+".png'>";
 	html +="</div>";
 	if(!charPage) {
 		html+="<button class='removeButton' onclick='removeId(&quot;"+id+"&quot;)'>Remove</button>";
@@ -172,11 +172,13 @@ var addCharacter = (char="Lynette",fromInit=false,forcedId=null,charPage=false,i
 	if(!charPage) {
 		html+="<br><div class='boxTitle'>Targeted Stats:</div><div class='charWeapInputs'><span>Character Level:</span><input type='number' size='3' min='1' max='90' value='"+targetValues[0]+"' id='"+id+"-targetCharLvl'><span>Ascension level: </span><input size='3' type='number' min='0' max='6' value='"+targetValues[1]+"' id='"+id+"-targetAsc'><span>Normal attack level: </span><input size='3' type='number' min='1' max='10' value='"+targetValues[2]+"' id='"+id+"-targetTal1'><span>Skill level: </span><input size='3' type='number' min='1' max='10' value='"+targetValues[3]+"' id='"+id+"-targetTal2'><span>Burst level: </span><input size='3' type='number' min='1' max='10' value='"+targetValues[4]+"' id='"+id+"-targetTal3'></div><div id='"+id+"-charOutput'></div>";
 	}
-	html+="</div>";
 	if(!charPage) {
+		html+="</div>";
 		get("inputs").innerHTML += html;
 	} else {
-		var array = [html,char,id];
+		// html+="<span>something about weapons and/or artifacts?</span>"
+		html+="</div>";
+		var array = [html,{"artifacts":[{},{},{},{},{}],"weapon":undefined,"name":char},id];
 		return array;
 	}
 	if(!fromInit) addSelectedChar("char",char,id);
@@ -211,7 +213,7 @@ var addWeapon = (char="The Catch",fromInit=false,forcedId=null) => {
 	}
 	var id = createId("weapon",char,null,7,forcedId);
 	var type = weapDB[char].type;
-	var html = "<div class='weaponBlock' id=\""+id+"\"><div class='topFlex'><div class='boxName'><img loading='lazy' src='images/weapon/"+spaceToUnderscore(char)+".png'>"+title+"<img loading='lazy' class='extraIcon' width='32' height='32' src='images/icons/weapon/"+type+".png'></div><button class='removeButton' onclick='removeId(&quot;"+id+"&quot;)'>Remove</button></div><div class='boxTitle'>Weapon Stats:</div><div class='charWeapInputs'><span>Ascension level: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+current+"' id='"+id+"-asc'></div><br><div class='boxTitle'>Targeted Stats:</div><div class='charWeapInputs'><span>Ascension level: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+target+"' id='"+id+"-targetAsc'></div><div id='"+id+"-weapOutput'></div></div>";
+	var html = "<div class='weaponBlock' id=\""+id+"\"><div class='topFlex'><div class='boxName'><img draggable=\"false\" loading='lazy' src='images/weapon/"+spaceToUnderscore(char)+".png'>"+title+"<img draggable=\"false\" loading='lazy' class='extraIcon' width='32' height='32' src='images/icons/weapon/"+type+".png'></div><button class='removeButton' onclick='removeId(&quot;"+id+"&quot;)'>Remove</button></div><div class='boxTitle'>Weapon Stats:</div><div class='charWeapInputs'><span>Ascension level: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+current+"' id='"+id+"-asc'></div><br><div class='boxTitle'>Targeted Stats:</div><div class='charWeapInputs'><span>Ascension level: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+target+"' id='"+id+"-targetAsc'></div><div id='"+id+"-weapOutput'></div></div>";
 	get("inputs").innerHTML += html;
 	if(!fromInit) addSelectedChar("weapon",char,id);
 	var j = ["asc","targetAsc"]

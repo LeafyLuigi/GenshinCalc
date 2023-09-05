@@ -12,11 +12,13 @@
 		<script type="text/javascript" src="scripts/inventory.js"></script>
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
+	<!-- TODO: merge traveler into one box? -->
+	<!-- TODO: add weapons and artifacts? -->
 	<body>
 		<div>
 			<a href="index.html">Home</a>
 			<a href="inv.html">Inventory</a>
-			<!-- <a href="party.html">Party Saver</a> -->
+			<a href="party.html">Party Saver</a>
 		</div>
 		<div class="invBlock" id="characters"></div>
 		<footer style="font-size:12px;overflow-x:auto;">
@@ -34,13 +36,17 @@
 		var value = 0;
 		var charKeys = [];
 		var charsDone = {};
-		ownedChars = loadCharacters();
+		if (getLSItem("char") != undefined) {
+			ownedChars = loadCharacters();
+		}
 		for(var i in chars) {
 			charKeys[charKeys.length] = i;
 		}
 		for(var i in charKeys) {
+			if(chars[charKeys[i]].include == false) continue;
 			if(charKeys[i] == "Traveler") {
 				for(var j = 0; j < chars[charKeys[i]].regions.length; j++) {
+					if(chars[charKeys[i]].regions.include == false) continue;
 					var unaligned = false;
 					if (j == chars[charKeys[i]].regions.length - 1) unaligned = true;
 					var travName = chars[charKeys[i]].regions[j].type + " " + charKeys[i];
@@ -57,6 +63,7 @@
 		}
 		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveCharacters()\">Save Characters</button><!--<button id=\"clearcharactersbutton\" onClick=\"clearInventory()\">Clear Inventory</button>--></div></div>";
 		get("characters").innerHTML = html;
+		console.log(charKeys,charsDone)
 		var j = ["asc","tal1","tal2","tal3"];
 		for(var i in charsDone) {
 			for(var k in j) {

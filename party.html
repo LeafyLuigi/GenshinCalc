@@ -91,7 +91,7 @@
 		// 	for (var j in artifactTypes) {
 		// 		console.log(i,j)
 		// 		if(artifactDB[i][artifactTypes[j]] == undefined) continue;
-		// 		html+="<img height=\"16\" width=\"16\" src=\"images/artifacts/"+artifactTypes[j]+"/"+removeQuotes(spaceToUnderscore(artifactDB[i][artifactTypes[j]]))+".png\">";
+		// 		html+="<img draggable=\"false\" height=\"16\" width=\"16\" src=\"images/artifacts/"+artifactTypes[j]+"/"+removeQuotes(spaceToUnderscore(artifactDB[i][artifactTypes[j]]))+".png\">";
 		// 	}
 		// }
 		// get("artis").innerHTML = html;
@@ -301,7 +301,7 @@
 		// this should probably be a dropdown
 		html += "<div class=\"partyWeapon\">";
 
-		html += "<img class=\"partyWeaponImg partyIntractable\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/weapon/"+spaceToUnderscore(weapon)+".png\" onclick=\"changeWeaponStart(this)\">";
+		html += "<img draggable=\"false\" class=\"partyWeaponImg partyIntractable\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/weapon/"+spaceToUnderscore(weapon)+".png\" onclick=\"changeWeaponStart(this)\">";
 
 		html += "</div>";
 
@@ -330,7 +330,7 @@
 				}
 				artifactIcon = "fallback";
 			}
-			html += "<img class=\"partyArtifactImage\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/artifacts/"+artifactTypes[j]+"/"+spaceToUnderscore(removeQuotes(artifactIcon))+".png\" onclick=\"changeArtifactStart(this)\">";
+			html += "<img draggable=\"false\" class=\"partyArtifactImage\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/artifacts/"+artifactTypes[j]+"/"+spaceToUnderscore(removeQuotes(artifactIcon))+".png\" onclick=\"changeArtifactStart(this)\">";
 			html += "</div>";
 		}
 		// close artifact group
@@ -365,14 +365,14 @@
 		html += "<div class=\"partyCharName\">"+char+"</div>";
 		// get char type icon, image, rarity and throw them into a nice box
 		html += "<div class=\"partyCharIcon rarity-"+rarity+"\">";
-		html += "<img loading=\"lazy\" class=\"partyCharImage\" src=\"images/char/"+spaceToUnderscore(char)+".png\">";
+		html += "<img draggable=\"false\" loading=\"lazy\" class=\"partyCharImage\" src=\"images/char/"+spaceToUnderscore(char)+".png\">";
 
 		// type
-		html += "<img loading=\"lazy\" class=\"partyCharType";
+		html += "<img draggable=\"false\" loading=\"lazy\" class=\"partyCharType";
 		if(char == "Traveler" && partyID != "") html += " partyTravType partyIntractable\" id=\""+partyID+"-travType\" onclick=\"changeTravTypeStart(this);";
 		html += "\" height=\"32\" width=\"32\" src=\"images/icons/elements/"+type+".svg\">";
 
-		html += "<img loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">";
+		html += "<img draggable=\"false\" loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">";
 		// close icon group
 		html += "</div>";
 		html += "</div>";
@@ -419,7 +419,7 @@
 		// IF IT SO HAPPENS THAT IF ANY PARTY MEMBER IS UNALIGNED AND NO RESONANCES HAPPEN, THIS ENTIRE SECTION WILL BE SKIPPED.
 		if(Object.keys(counts).length == 4 && Object.keys(counts).indexOf("Unaligned") == -1) {
 			html += "<span>Elemental Resonance: ";
-			for(let i in partyTypes) {html += "<div class=\"partyComboIcon elementType"+partyTypes[i]+"\"><img height=\"24\" width=\"24\" loading=\"lazy\" src=\"images/icons/elements/"+partyTypes[i]+".svg\"></div>"}
+			for(let i in partyTypes) {html += "<div class=\"partyComboIcon elementType"+partyTypes[i]+"\"><img draggable=\"false\" height=\"24\" width=\"24\" loading=\"lazy\" src=\"images/icons/elements/"+partyTypes[i]+".svg\"></div>"}
 			html += " Protective Canopy</span>"
 		} else {
 			var potentialHtml = "<span>Elemental Resonance(s): ";
@@ -428,7 +428,7 @@
 			for(let i in partyTypes) {
 				elementsDone[partyTypes[i]] = (elementsDone[partyTypes[i]] || 0) + 1;
 				if(counts[Object.keys(counts)[i]] > 1) {resonances.push(Object.keys(counts)[i]);}
-				if(counts[partyTypes[i]] > 1 && elementsDone[partyTypes[i]] < 3) potentialHtml += "<div class=\"partyComboIcon elementType"+partyTypes[i]+"\"><img height=\"24\" width=\"24\" loading=\"lazy\" src=\"images/icons/elements/"+partyTypes[i]+".svg\"></div>";
+				if(counts[partyTypes[i]] > 1 && elementsDone[partyTypes[i]] < 3) potentialHtml += "<div class=\"partyComboIcon elementType"+partyTypes[i]+"\"><img draggable=\"false\" height=\"24\" width=\"24\" loading=\"lazy\" src=\"images/icons/elements/"+partyTypes[i]+".svg\"></div>";
 			}
 			for (let i in resonances) {
 				if(resonances[i] == "Pyro") {potentialHtml+="Fervent Flames"}
@@ -528,7 +528,7 @@
 			for (var i in data) {
 				html += "<div onclick=\"changeWeapon(this,&quot;"+data[i]+"&quot;)\" class=\"partyIntractable partyPopupWeapon rarity-"+weapDB[data[i]].rarity;
 				if(weapDB[data[i]].source == "event") html += " limited";
-				html += "\"><img height=\"32\" width=\"32\" src=\"images/weapon/"+spaceToUnderscore(data[i])+".png\"><span>";
+				html += "\"><img draggable=\"false\" height=\"32\" width=\"32\" src=\"images/weapon/"+spaceToUnderscore(data[i])+".png\"><span>";
 				if(weapDB[data[i]].title != undefined) {html += weapDB[data[i]].title} else {html += data[i]}
 				html += "</span></div>";
 			}
@@ -538,7 +538,7 @@
 			for (let i in data) {
 				var artifactIcon = "fallback";
 				if(data[i] != "fallback") {artifactIcon = spaceToUnderscore(removeQuotes(artifactDB[data[i]][artifactType]))}
-				html += "<div class=\"partyPopupArtifact partyIntractable\" onclick=\"changeArtifact(this,&quot;"+artifactType+"&quot;,&quot;"+data[i]+"&quot;)\"><img loading=\"lazy\" src=\"images/artifacts/"+artifactType+"/"+artifactIcon+".png\" height=\"32\" width=\"32\"><span>";
+				html += "<div class=\"partyPopupArtifact partyIntractable\" onclick=\"changeArtifact(this,&quot;"+artifactType+"&quot;,&quot;"+data[i]+"&quot;)\"><img draggable=\"false\" loading=\"lazy\" src=\"images/artifacts/"+artifactType+"/"+artifactIcon+".png\" height=\"32\" width=\"32\"><span>";
 				if(data[i] != "fallback") {html += artifactDB[data[i]][artifactType]} else {html += "Remove"}
 				html += "</span></div>";
 			}
@@ -547,7 +547,7 @@
 			for (var i in data) {
 				html += "<div onclick=\"changeTravType(this,'"+data[i]+"')\" class=\"partyIntractable partyPopupTravelerType";
 				if(data[i] == "Unaligned") html += " limited";
-				html += "\"><img width=\"48\" height=\"48\" src=\"images/icons/elements/"+data[i]+".svg\"><span>"+data[i]+"</span></div>";
+				html += "\"><img draggable=\"false\" width=\"48\" height=\"48\" src=\"images/icons/elements/"+data[i]+".svg\"><span>"+data[i]+"</span></div>";
 			}
 		} else {
 			console.error("missing title. we gon abort.");

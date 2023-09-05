@@ -19,6 +19,9 @@
 		<!-- TODO: add converting as an option. "using [all your|the maximum needed] dust of azoth, you can use x 'wildcard' gems" and "using [all|max] dream solvents, you can use x 'wildcard' weeklyBoss drops". -->
 		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
 		<!-- 
+			make character page soon:tm:?
+			for weapons, maybe add a "Owned by" thing?
+
 			Ferminet's icon
 			Maybe convert rarity stars to svg?
 		-->
@@ -51,7 +54,7 @@
 		<div class="addButtons">
 			<div class="charDropdown">
 				<div class="fauxButton">
-					<img loading="lazy" id="dropdownCharIcon" class="dropdownCharImg" src="images/char/Unknown.png">
+					<img draggable="false" loading="lazy" id="dropdownCharIcon" class="dropdownCharImg" src="images/char/Unknown.png">
 					<input id="dropdownCharName" placeholder="Character" type="text" onfocusout="dropdownLoseFocus('charDropdown')" onfocusin="dropdownFocus('charDropdown')" oninput="searchDropdown(this.value,'charDropdownButton')">
 				</div>
 				<div class="dropdownContent" id="dropdownCharContent"></div>
@@ -60,7 +63,7 @@
 			
 			<div class="weaponDropdown">
 				<div class="fauxButton">
-					<img loading="lazy" id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
+					<img draggable="false" loading="lazy" id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
 					<input id="dropdownWeaponName" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="searchDropdown(this.value,'weaponDropdownButton')">
 				</div>
 				<div class="dropdownContent" id="dropdownWeaponContent"></div>
@@ -105,16 +108,16 @@
 				if(charName == "Aloy") html += " limited";
 				html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;))\" name=\""+charName+"\">";
 				html += "<span>";
-				html += "<img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+charName+"</span>";
+				html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+charName+"</span>";
 				html += "<span class=\"iconsGroup\">";
 				// html += "<img loading="lazy" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/elements/"+chars[charName].type+".svg\">";
 				if(chars[charName].region != undefined) {
 					var vision = chars[charName].region+"_"+chars[charName].type;
 					if(chars[charName].visionType != undefined && chars[charName].visionType != "") vision = vision+"_"+chars[charName].visionType;
-					html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+vision+".png\">";
+					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+vision+".png\">";
 				}
-				if(chars[charName].vision != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].vision+".png\">";
-				if(chars[charName].weapon != undefined) html += "<img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars[charName].weapon+".png\">";
+				if(chars[charName].vision != undefined) html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].vision+".png\">";
+				if(chars[charName].weapon != undefined) html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars[charName].weapon+".png\">";
 				html += "</span>";
 				html += "</div>";
 			} else {
@@ -125,8 +128,8 @@
 					if(travVariant.type == "Unaligned") html+=" limited";
 					html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;),this.getAttribute(&quot;num&quot;))\" name=\""+travVariant.type+" "+charName+"\" num=\""+j+"\"><span><img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+travVariant.type+" "+charName+"</span>";
 					html += "<span class=\"iconsGroup\">"
-					html += "<img loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/Traveler_"+travVariant.type+".png\">";
-					html += "<img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars["Traveler"].weapon+".png\">";
+					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/Traveler_"+travVariant.type+".png\">";
+					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars["Traveler"].weapon+".png\">";
 					html += "</span>";
 					html += "</div>";
 				}
@@ -143,7 +146,7 @@
 			if (weapDB[i].title != undefined) title = weapDB[i].title;
 			html += "<div class=\"weaponDropdownButton fauxButton rarity-"+rarity;
 			if(weapDB[i].source != undefined && weapDB[i].source == "event") html+=" limited";
-			html += "\" onclick=\"pickWeapon(this.children[0].children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><span><img loading=\"lazy\" class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></span><img loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/" + weapDB[weapName].type +".png\"></div>";
+			html += "\" onclick=\"pickWeapon(this.children[0].children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><span><img draggable=\"false\" loading=\"lazy\" class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></span><img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/" + weapDB[weapName].type +".png\"></div>";
 		}
 		get("dropdownWeaponContent").innerHTML = html;
 		html = "";

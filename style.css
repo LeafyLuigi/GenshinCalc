@@ -63,8 +63,9 @@ body {
   display: flex;
   align-items: center;
 }
-.boxName > img:not([src*=icons]) {
+.boxName > img:not([src*="/icons/"]) {
   width: 64px;
+  height: 64px;
 }
 
 .boxTitle {
@@ -401,7 +402,6 @@ body {
 
 .vision {
   filter: drop-shadow(0 0 2px rgba(0, 0, 0, 0.4));
-  pointer-events: none;
 }
 
 .partyCharImage {

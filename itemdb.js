@@ -1768,7 +1768,7 @@ const itemGroupDB = {
 		"craftUp": false,
 		"convertType": "intra",
 		"source": "Dropped in Narukami Island: Tenshukaku at domain levels 2 and higher.",
-		"items": ["Molten Moment", "Hellfire Butterfly", "Ashen Heart"]
+		"items": ["Molten Moment", "Ashen Heart", "Hellfire Butterfly"]
 	},
 	"Shogun": {
 		"priority": 5,

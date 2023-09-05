@@ -220,15 +220,15 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 	if(rarity != undefined && rarity != 0) html+= " rarity-"+rarity;
 	html += "\">";
 	if(showSource && itemDB[item].source != undefined) {
-		html += "<img loading='lazy' onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/icons/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>";
+		html += "<img draggable=\"false\" loading='lazy' onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/icons/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>";
 	}
 	html +="<img loading='lazy'";
 	if(fallback != item) {
 		html+=" fallback=\""+fallback+"\"";
 		console.warn("[MakeItemIcon] Fallback doesn't match item.")
 	}
-	html +=" class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">";
-	if(rarity != undefined && rarity != 0) html += "<img loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">"; // height is set in css
+	html +=" draggable=\"false\" class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">";
+	if(rarity != undefined && rarity != 0) html += "<img loading=\"lazy\" draggable=\"false\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">"; // height is set in css
 	html +="<span class=\"itemCount\">"+count+"</span></div>";
 	html +="<div class=\"itemName\">"+item+"</div></div>";
 	return html;

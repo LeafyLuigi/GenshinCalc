@@ -56,8 +56,9 @@ body {
 	gap: 4px;
 	display: flex;
 	align-items: center;
-	> img:not([src*="icons"]) {
+	> img:not([src*="/icons/"]) {
 		width: 64px;
+		height: 64px;
 	}
 }
 .boxTitle {
@@ -365,7 +366,6 @@ body {
 }
 .vision {
 	filter: drop-shadow(0 0 2px #0006);
-	pointer-events: none;
 }
 .partyCharImage {
 	position: absolute;
