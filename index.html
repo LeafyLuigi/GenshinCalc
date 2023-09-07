@@ -319,7 +319,7 @@
 			} else {
 				var weapAsc = val(id + "-asc");
 				var target = val(id + "-targetAsc");
-				if (weapAsc == target) continue;
+				if (weapAsc >= target) continue;
 
 				var selectedWeapon = selectedChars[idNameIndex.indexOf(id)].name;
 				var weapData = weapDB[selectedWeapon];
@@ -327,7 +327,7 @@
 				var weapItems = [];
 
 				neededItemsForAscTal = {};
-				for (var j = weapAsc - 1; j < target; j++) {
+				for (var j = weapAsc; j < target; j++) {
 					for (var k in weaponAscOfRarirty[j]) {
 						if (k == "cost") {
 							weapItems = addItem("Mora", weaponAscOfRarirty[j][k], weapItems);
