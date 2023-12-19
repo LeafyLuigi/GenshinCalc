@@ -9,50 +9,147 @@
 		<script type="text/javascript" src="ascdb.js"></script>
 		<script type="text/javascript" src="scripts.js"></script>
 		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+		<script type="text/javascript" src="scripts/prefs.js"></script>
 		<script type="text/javascript" src="scripts/inventory.js"></script>
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
 	<body>
-		<div id="warning">
+		<!-- <div id="warning">
 			<strong>The way inventories are saved in localStorage have been altered and may have been wiped. Please check your inventory is working correctly. This warning will persist until the next update.</strong>
-		</div>
+		</div> -->
 		<div>
 			<a href="index.html">Home</a>
-			<!-- <a href="characters.html">Characters</a> -->
+			<a href="characters.html">Characters</a>
 			<a href="party.html">Party Saver</a>
 		</div>
 		<div>
-			<input type="checkbox" class="defaultInput" onclick="toggleExtraIcons()" id="toggleExtraIcons" name="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars."><label for="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars.">Hide Extra Icons</label>
+			<span title="Icons that would be toggled are visions, weapon used and rarity stars.">
+				<label for="toggleExtraIcons">Hide Extra Icons</label>
+				<input type="checkbox" class="defaultInput" key="prefs" pref="hideExtraIcons" onchange="prefs.hideExtraIcons = this.checked;updatePrefs();toggleExtraIcons()" id="toggleExtraIcons" name="toggleExtraIcons">
+			</span>
 		</div>
-		<div class="invBlock" id="inventory"></div>
+		<div class="invBlock" id="inventory">
+			<div class="boxName">Inventory</div>
+			<em style="display:block">You can hold Shift to adjust by 10 or CTRL (CMD on Mac) to adjust by 100.</em>
+			<br>
+			<div class="outputRequired" id="items"></div>
+			<br>
+			<button id="clearinvbutton" onclick="clearInventory()">Clear Inventory</button>
+		</div>
 		<footer style="font-size:12px;overflow-x:auto;">
 			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site, the interactive map and from the game itself. This site <strong>does not</strong> use Cookies and is completely open source. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
 		</footer>
 	</body>
 	<script>
 	'use strict';
+	pageType = "inventory";
+	var inv = parseLSItem("inv",{})
 	window.addEventListener("load", () => {
-		if(getLSItem("invNotURIDecoded") == null) {
-			fixInv();
-		} else {
-			get("warning").style = "display:none";
-		}
-		var html = "<div class=\"boxName\">Inventory</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><br><div class=\"outputRequired\">";
-		var maxInputSize = 4;
-		var inv = loadInventory();
-		var value = 0;
+		// if(getLSItem("invNotURIDecoded") == null) {
+		// 	fixInv();
+		// } else {
+		// 	get("warning").style = "display:none";
+		// }
+
 		var itemKeys = [];
-		for(var i in itemDB) {
+		for(let i in itemDB) {
 			itemKeys[itemKeys.length] = i;
 		}
 		orderItems(itemKeys);
-		if(inv == null) inv = {};
-		for(var i in itemKeys) {
-			if(inv != null && inv[itemKeys[i]]) {value = inv[itemKeys[i]];} else {value = 0;}
-			html+="<div class=\"askForItem\">"+makeItemIcon(itemKeys[i],"<input class=\"userInvInput\" type=\"number\" size=\""+maxInputSize+"\" min=\"0\" value=\""+value+"\" id=\"userItemCount"+spaceToUnderscore(itemKeys[i])+"\">",-1,"mini",true)+"</div>";
+		for(let i in itemKeys) {
+			var value = 0;
+			if(inv[itemKeys[i]]) {
+				value = inv[itemKeys[i]];
+			}
+			newItem(itemKeys[i],value);
 		}
-		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveInventory()\">Save Inventory</button><button id=\"clearinvbutton\" onClick=\"clearInventory()\">Clear Inventory</button></div></div>";
-		get("inventory").innerHTML = html;
 	});
+
+	function newItem(item,value) {
+		var type = itemDB[item].type;
+		let img = spaceToUnderscore(item);
+		let rarity = itemDB[item].rarity;
+
+		let wrapper = Object.assign(document.createElement("div"));
+		wrapper.classList.add("askForItem");
+		
+		let container = Object.assign(document.createElement("div"));
+		container.classList.add("itemIconContainer");
+		container.classList.add("mini");
+		
+		let iconElemContainer = Object.assign(document.createElement("div"));
+		iconElemContainer.classList.add("itemIcon");
+		if(rarity != undefined && rarity != 0) {
+			iconElemContainer.classList.add("rarity-"+rarity);
+		}
+
+		if(itemDB[item].source != undefined) {
+			let sourceImg = Object.assign(document.createElement("img"));
+			sourceImg.classList.add("itemSource");
+			sourceImg.height = 20;
+			sourceImg.width = 20;
+			sourceImg.src = "images/icons/info.svg";
+			sourceImg.setAttribute("draggable","false");
+			sourceImg.setAttribute("loading","lazy");
+			sourceImg.setAttribute("onclick","toggleClass(this,'active')");
+			iconElemContainer.appendChild(sourceImg)
+
+			let sourceDiv = Object.assign(document.createElement("div"),{textContent:itemDB[item].source});
+			sourceDiv.classList.add("itemSourceTooltip");
+			iconElemContainer.appendChild(sourceDiv);
+		}
+
+		if(type=="crown") {type="other";} // crown item is placed in "other" directory
+
+		let elemItemImg = Object.assign(document.createElement("img"));
+		elemItemImg.src = "images/"+type+"/"+img+".png";
+		elemItemImg.height = 72;
+		elemItemImg.width = 72;
+		elemItemImg.classList.add("itemIconImg");
+		iconElemContainer.appendChild(elemItemImg)
+
+		if(rarity != undefined && rarity != 0) {
+			let rarityIcon = Object.assign(document.createElement("img"));
+			rarityIcon.classList.add("rarityIcon");
+			rarityIcon.classList.add("extraIcon");
+			rarityIcon.src = "images/icons/rarity/"+rarity+".png";
+			rarityIcon.setAttribute("draggable", "false");
+			rarityIcon.setAttribute("loading", "lazy");
+
+			iconElemContainer.appendChild(rarityIcon)
+		}
+
+		let input = Object.assign(document.createElement("input"));
+		input.classList.add("userInvInput");
+		input.type = "number";
+		input.setAttribute("min","0");
+		input.value = value;
+		input.setAttribute("id","userItemCount"+spaceToUnderscore(item));
+		input.setAttribute("onwheel","adjustStep(this.id,true)");
+		input.setAttribute("onkeydown","adjustStep(this.id)");
+		input.setAttribute("onchange","saveItem(this)");
+
+		iconElemContainer.appendChild(input);
+		container.appendChild(iconElemContainer);
+
+		let nameContainer = Object.assign(document.createElement("div"),{textContent:item});
+		nameContainer.classList.add("itemName");
+		container.appendChild(nameContainer);
+		wrapper.appendChild(container);
+
+		get("items").appendChild(wrapper);
+	}
+
+	function saveItem(element) {
+		let itemName = underscoreToSpace(element.id.slice(13))
+		let itemCount = element.valueAsNumber
+		if(isNaN(itemCount) || itemCount <= 0) {
+			delete inv[itemName]
+		} else {
+			inv[itemName] = itemCount;
+		}
+		setLSItem("inv",JSON.stringify(inv));
+	}
+
 	</script>
 </html>

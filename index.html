@@ -9,46 +9,185 @@
 		<script type="text/javascript" src="ascdb.js"></script>
 		<script type="text/javascript" src="scripts.js"></script>
 		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+		<script type="text/javascript" src="scripts/prefs.js"></script>
 		<script type="text/javascript" src="scripts/inventory.js"></script>
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
 	<body class="hideLimited">
-		<!-- TODO:save options? -->
-		<!-- Options: not sure what else that hasn't been added yet would be. -->
-		<!-- TODO: char levels (for char exp mats), add weapon exp mats? -->
+		<!-- Bugs:
+			Adding new anything reverts changed stats between page refreshes. i need to stop using innerHTML lol
+			Clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists.
+		-->
 		<!-- TODO: add converting as an option. "using [all your|the maximum needed] dust of azoth, you can use x 'wildcard' gems" and "using [all|max] dream solvents, you can use x 'wildcard' weeklyBoss drops". -->
-		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
 		<!-- 
-			make character page soon:tm:?
 			for weapons, maybe add a "Owned by" thing?
 
-			Ferminet's icon
 			Maybe convert rarity stars to svg?
 		-->
+		<!--
+			DONE + CONFIRMED
+
+			update selectedChars weapons to new format (seems done?)
+			
+			--
+			SEEMS TO WORK
+
+			exp calcs for outside desired ascension bands should not be ran
+			exp calcs for weapons
+			hide warning if no issues exist
+			removeSelectedChar() to "move" traveler targets to a different traveler if initial traveler is deleted
+			removing selected characters works
+			only first trav to have exp when adding (first in selectedChars list)
+			saveCharacter() to not be fucked up with traveler
+			saveCharacter() to work with weapons
+			editing char "current stats" works for exp, asc, talents
+			change addCharacter() to have cons *not* in NA/S/B loop
+			editing char "target stats" works for exp, asc, talents
+			cons show up when editing characters
+			editing weap "current stats" works for exp, asc
+			editing weap "target stats" works for exp, asc
+			removeId() works with weapon refinement checking
+
+			adding existing (in localStorage) and new (not in localStorage) works:
+				- existing char
+				- not existing char
+				- new traveler (any element)
+				- new traveler (trav exists in LS)
+				- new weapon
+				- existing weapon (via new dropdown)
+
+			createId() to be changed to have global id list of sorts i guess. can use id "index" as pointers
+				- not currently done for parties
+				- not currently done for sets
+				- not currently done for artifacts
+				
+			test() works with at least the following:
+				- (any type) Traveler
+				- (any other type) Traveler
+				- Hu Tao/Yun Jin/etc (space in name)
+				- Ganyu/Keqing/Collei/Yelan/etc (spaceless name)
+					- max a level
+					- crown a talent
+					- have incorrect ascension
+				- "The Catch"/Amos' Bow/etc (quotes and space in name, especially "The Catch")
+				- Halberd/Slingshot/etc (spaceless name)
+				- Multiple of the same weapon at different initial ascensions
+
+
+			--
+			TODO / CONFIRM BEFORE RELEASE
+
+			addWeapon() has hissy fit with createId after putting delay on loadIDs().
+
+			sets, once added, need to be checked in (at least) the following locations:
+				- removeId() for weapons to confirm deletion and/or delete from sets
+				- removeId() as a category of things to delete. this shouldn't delete weapons per se but update their usedIn(s) to remove the set from them.
+				- showExistingWeapons() should note what characters use that weapon
+
+			allow already saved weapons to be added back to the list
+				- add exp bar to non-maxed weapons within selection list
+				- add usedIn stuff when sets are implemented
+				- potentially skip max exp/refinement/ascension weapons?
+				
+			removeId() to have the following work with it:
+				- weapons need to check "usedIn" before deletion once sets implemented
+
+			implement charInfoIndex usage instead of entirely relying on localStorage?
+			addWeapon() to support refinement for relevant weapons
+			removeSelectedChar() to add exp stuff to nextTrav if found (best done not using innerHTML)
+			targets to have exp bar(?)
+			[workaround made] remove button should not be using "travType + Traveler" but id
+			[good enough] change addWeapon() to not outright add the new item to ls
+			
+		-->
 		<div id="warning">
-			<strong>The way inventories are saved in localStorage have been altered and may have been wiped. Please check your inventory is working correctly. This warning will persist until the next update.</strong>
+			<strong>The way selectedChars and preferences are formatted in localStorage has been changed. Notable changes are below.</strong>
+			<div id="selectedCharsIssues"></div>
 		</div>
 		<div>
 			<a href="inv.html">Inventory</a>
-			<!-- <a href="characters.html">Characters</a> -->
+			<a href="characters.html">Characters</a>
 			<a href="party.html">Party Saver</a>
 		</div>
 		<div class="vertFlex inputs">
-			<div>
-				<span>Default <strong>target</strong> values for <label for="defaultTargetCharLvl">Character Level</label>, <label for="defaultTargetAsc">Character Ascension</label>, <label for="defaultTargetTal1">Normal Attack</label>, <label for="defaultTargetTal2">Skill</label> and <label for="defaultTargetTal3">Burst</label>:</span>
-				<input type="number" class="defaultInput" id="defaultTargetCharLvl" size="3" max="90" min="1" value="90">
-				<input type="number" class="defaultInput" id="defaultTargetAsc" size="3" max="6" min="0" value="6">
-				<input type="number" class="defaultInput" id="defaultTargetTal1" size="3" max="10" min="1" value="9">
-				<input type="number" class="defaultInput" id="defaultTargetTal2" size="3" max="10" min="1" value="9">
-				<input type="number" class="defaultInput" id="defaultTargetTal3" size="3" max="10" min="1" value="9">
+			<div id="characterInputs">
+				<span>Default <strong>target</strong> values for characters:</span>
+				<label for="defaultTargetCharLvl">Level</label>
+				<input type="number" class="defaultInput" id="defaultTargetCharLvl" onchange="forceValue(this);charTargets.exp = getExpFromLevel('char',this.valueAsNumber);updatePrefs()" size="3" max="90" min="1" value="90">
+				<label for="defaultTargetAsc">Ascension</label>
+				<input type="number" class="defaultInput" id="defaultTargetAsc" onchange="forceValue(this);charTargets.ascension = this.valueAsNumber;updatePrefs()" size="3" max="6" min="0" value="6">
+				<label for="defaultTargetTal1">Normal Attack</label>
+				<input type="number" class="defaultInput" id="defaultTargetTal1" onchange="forceValue(this);charTargets.talents[0] = this.valueAsNumber;updatePrefs()" size="3" max="10" min="1" value="9">
+				<label for="defaultTargetTal2">Skill</label>
+				<input type="number" class="defaultInput" id="defaultTargetTal2" onchange="forceValue(this);charTargets.talents[1] = this.valueAsNumber;updatePrefs()" size="3" max="10" min="1" value="9">
+				<label for="defaultTargetTal3">Burst</label>
+				<input type="number" class="defaultInput" id="defaultTargetTal3" onchange="forceValue(this);charTargets.talents[2] = this.valueAsNumber;updatePrefs()" size="3" max="10" min="1" value="9">
 			</div>
-			<div>
-				<span>Default <strong>target</strong> value for <label for="defaultWeaponAsc">Weapon Ascension</label></span>
-				<input type="number" class="defaultInput" id="defaultWeaponAsc" size="3" max="6" min="0" value="6">
+			<div id="weaponInputs">
+				<em>
+					<label for="showAdvancedWeaponInputs">Show all for Weapons?</label>
+					<input type="checkbox" name="showAdvancedWeaponInputs" id="showAdvancedWeaponInputs" onchange="prefs.showAdvancedWeaponInputs = this.checked;updatePrefs();toggleAdvancedWeaponInputs()">
+				</em>
+				<!-- "basic" / uses 5* as base with "target max exp" toggle -->
+				<div>
+					<span>Default <strong>target</strong> value for</span>
+					<span title="1 and 2 stars have a maximum of 4 ascensions. They'll target 4 if this is above 4.">
+						<label for="defaultWeaponAsc">Ascension</label>
+						<input type="number" class="defaultInput" id="defaultWeaponAsc" size="3" max="6" min="0" value="6" onchange="forceValue(this);weaponTargets.basicAscension = this.valueAsNumber;updatePrefs()">
+					</span>
+					<label for="defaultWeaponExp">Target Maximum Level?</label>
+					<input type="checkbox" class="defaultInput" id="defaultWeaponExp" checked onchange="weaponTargets.basicTargetMaxLevel = this.checked;updatePrefs()">
+				</div>
+				<!-- "advanced" / by rarity -->
+				<div>
+					<div>Default <strong>target</strong> values for weapons:</div>
+					<div>
+						<img loading="lazy" draggable="false" class="extraIcon" height="16" src="images/icons/rarity/1.png"> One Star Weapon
+						<label for="defaultWeaponR1Asc">Ascension</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR1Asc" size="3" max="4" min="0" value="4" onchange="forceValue(this);weaponTargets.byRarity[0].ascension = this.valueAsNumber;updatePrefs()">
+						<label for="defaultWeaponR1Exp">Level</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR1Exp" size="3" max="70" min="0" value="70" onchange="forceValue(this);weaponTargets.byRarity[0].exp = getExpFromLevel('weap',this.valueAsNumber,1);updatePrefs()">
+					</div>
+					<div>
+						<img loading="lazy" draggable="false" class="extraIcon" height="16" src="images/icons/rarity/2.png"> Two Star Weapon
+						<label for="defaultWeaponR2Asc">Ascension</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR2Asc" size="3" max="4" min="0" value="4" onchange="forceValue(this);weaponTargets.byRarity[1].ascension = this.valueAsNumber;updatePrefs()">
+						<label for="defaultWeaponR2Exp">Level</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR2Exp" size="3" max="70" min="0" value="70" onchange="forceValue(this);weaponTargets.byRarity[1].exp = getExpFromLevel('weap',this.valueAsNumber,2);updatePrefs()">
+					</div>
+					<div>
+						<img loading="lazy" draggable="false" class="extraIcon" height="16" src="images/icons/rarity/3.png"> Three Star Weapon
+						<label for="defaultWeaponR3Asc">Ascension</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR3Asc" size="3" max="6" min="0" value="6" onchange="forceValue(this);weaponTargets.byRarity[2].ascension = this.valueAsNumber;updatePrefs()">
+						<label for="defaultWeaponR3Exp">Level</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR3Exp" size="3" max="90" min="0" value="90" onchange="forceValue(this);weaponTargets.byRarity[2].exp = getExpFromLevel('weap',this.valueAsNumber,3);updatePrefs()">
+					</div>
+					<div>
+						<img loading="lazy" draggable="false" class="extraIcon" height="16" src="images/icons/rarity/4.png"> Four Star Weapon
+						<label for="defaultWeaponR4Asc">Ascension</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR4Asc" size="3" max="6" min="0" value="6" onchange="forceValue(this);weaponTargets.byRarity[3].ascension = this.valueAsNumber;updatePrefs()">
+						<label for="defaultWeaponR4Exp">Level</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR4Exp" size="3" max="90" min="0" value="90" onchange="forceValue(this);weaponTargets.byRarity[3].exp = getExpFromLevel('weap',this.valueAsNumber,4);updatePrefs()">
+					</div>
+					<div>
+						<img loading="lazy" draggable="false" class="extraIcon" height="16" src="images/icons/rarity/5.png"> Five Star Weapon
+						<label for="defaultWeaponR5Asc">Ascension</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR5Asc" size="3" max="6" min="0" value="6" onchange="forceValue(this);weaponTargets.byRarity[4].ascension = this.valueAsNumber;updatePrefs()">
+						<label for="defaultWeaponR5Exp">Level</label>
+						<input type="number" class="defaultInput advancedWeaponInput" id="defaultWeaponR5Exp" size="3" max="90" min="0" value="90" onchange="forceValue(this);weaponTargets.byRarity[4].exp = getExpFromLevel('weap',this.valueAsNumber,5);updatePrefs()">
+					</div>
+				</div>
+			</div>
+			<div id="preferences">
+				<span title="Limited-Timed items include Aloy and Flagship Event Weapons.">
+					<label for="toggleLimited">Hide Limited-Timed Items</label>
+					<input type="checkbox" class="defaultInput" key="prefs" pref="hideLimited" onchange="prefs.hideLimited = this.checked;updatePrefs();toggleLimitedItems()" id="toggleLimited" name="toggleLimited" checked>
+				</span>
 				<span> | </span>
-				<input type="checkbox" class="defaultInput" onclick="toggleLimitedItems()" id="toggleLimited" name="toggleLimited" checked title="Limited-Timed items include Aloy and Flagship Event Weapons."><label for="toggleLimited" title="Limited-Timed items include Aloy and Flagship Event Weapons.">Hide Limited-Timed Items</label>
-				<span> | </span>
-				<input type="checkbox" class="defaultInput" onclick="toggleExtraIcons()" id="toggleExtraIcons" name="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars."><label for="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars.">Hide Extra Icons</label>
+				<span title="Icons that would be toggled are visions, weapon used and rarity stars.">
+					<label for="toggleExtraIcons">Hide Extra Icons</label>
+					<input type="checkbox" class="defaultInput" key="prefs" pref="hideExtraIcons" onchange="prefs.hideExtraIcons = this.checked;updatePrefs();toggleExtraIcons()" id="toggleExtraIcons" name="toggleExtraIcons">
+				</span>
 			</div>
 		</div>
 		<div class="addButtons">
@@ -60,18 +199,18 @@
 				<div class="dropdownContent" id="dropdownCharContent"></div>
 			</div>
 			<div class="fauxButton" onclick="addCharacter(get('dropdownCharName').value);searchDropdown('','charDropdownButton')">Add Character</div>
-			
 			<div class="weaponDropdown">
 				<div class="fauxButton">
 					<img draggable="false" loading="lazy" id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
-					<input id="dropdownWeaponName" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="searchDropdown(this.value,'weaponDropdownButton')">
+					<input id="dropdownWeaponName" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="showExistingWeapons(this.value);searchDropdown(this.value,'weaponDropdownButton')">
 				</div>
 				<div class="dropdownContent" id="dropdownWeaponContent"></div>
+				<div class="unusedWeaponsDropdown" id="unusedWeaponsDropdown"></div>
 			</div>
-			<div class="fauxButton" onclick="addWeapon(get('dropdownWeaponName').value);searchDropdown('','weaponDropdownButton')">Add Weapon</div>
-			
+			<div class="fauxButton" onclick="getByClass('weaponDropdown')[0].classList.remove('unusedFound');addWeapon(allWeaponsLowerCase[removeQuotes(get('dropdownWeaponName').value.toLowerCase())]);searchDropdown('','weaponDropdownButton')">Add Weapon</div>
 		</div>
-		<div class="notes">Do note that only the first Traveler's Ascension gets counted</div>
+		<em style="display:block">Do note that ascension is not tied to level and vice versa. You can completely remove specific weapons by setting all current stats to their minimum values.</em>
+		<div><strong>Known bug where changing a stats and adding a new char/weap reverts the changes. This is mostly visual with calculations prior to a reload using the pre-change numbers.</strong> <span>It should be fixed if I stop using innerHTML.</span></div>
 		<div id="inputs"></div>
 		<button class="testButton" onclick="test()">Click to calculate</button>
 		<div class="invBlock empty">
@@ -89,12 +228,17 @@
 	
 	<script>
 	'use strict';
+	// set vars
+	var travelerAscensionDone = false;
+	pageType = "index";
+
 	window.addEventListener("load", () => {
-		if (getLSItem("invNotURIDecoded") == null) {
-			fixInv();
-		} else {
-			get("warning").style = "display:none";
-		}
+		// if (getLSItem("invNotURIDecoded") == null) {
+		// 	fixInv();
+		// } else {
+		// 	get("warning").style = "display:none";
+		// }
+
 		// Generate Dropdown HTML
 		var html = "";
 		for (var i in chars) {
@@ -108,16 +252,18 @@
 				if(charName == "Aloy") html += " limited";
 				html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;))\" name=\""+charName+"\">";
 				html += "<span>";
-				html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+charName+"</span>";
+				html += makeImg("images/char/"+img+".png",32,32,["dropdownCharImg"]);
+				html += charName+"</span>";
 				html += "<span class=\"iconsGroup\">";
 				// html += "<img loading="lazy" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/elements/"+chars[charName].type+".svg\">";
-				if(chars[charName].region != undefined) {
+				if(chars[charName].vision != undefined) {
+					html += makeImg("images/icons/visions/"+chars[charName].vision+".png",48,48,["dropdownType","extraIcon","vision"]);
+				} else if(chars[charName].region != undefined) {
 					var vision = chars[charName].region+"_"+chars[charName].type;
 					if(chars[charName].visionType != undefined && chars[charName].visionType != "") vision = vision+"_"+chars[charName].visionType;
-					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+vision+".png\">";
+					html += makeImg("images/icons/visions/"+vision+".png",48,48,["dropdrownType","extraIcon","vision"]);
 				}
-				if(chars[charName].vision != undefined) html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].vision+".png\">";
-				if(chars[charName].weapon != undefined) html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars[charName].weapon+".png\">";
+				if(chars[charName].weapon != undefined) html += makeImg("images/icons/weapon/"+chars[charName].weapon+".png",32,32,["dropdownType","extraIcon"]);
 				html += "</span>";
 				html += "</div>";
 			} else {
@@ -126,10 +272,12 @@
 					var travVariant = chars[i].regions[j];
 					html += "<div class=\"charDropdownButton fauxButton rarity-"+rarity;
 					if(travVariant.type == "Unaligned") html+=" limited";
-					html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;),this.getAttribute(&quot;num&quot;))\" name=\""+travVariant.type+" "+charName+"\" num=\""+j+"\"><span><img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+travVariant.type+" "+charName+"</span>";
+					html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;),this.getAttribute(&quot;num&quot;))\" name=\""+travVariant.type+" "+charName+"\" num=\""+j+"\"><span>";
+					html += makeImg("images/char/"+img+".png",32,32,["dropdownCharImg"]);
+					html += travVariant.type+" "+charName+"</span>";
 					html += "<span class=\"iconsGroup\">"
-					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/Traveler_"+travVariant.type+".png\">";
-					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars["Traveler"].weapon+".png\">";
+					html += makeImg("images/icons/visions/Traveler_"+travVariant.type+".png",48,48,["dropdownType","extraIcon","vision"]);
+					html += makeImg("images/icons/weapon/"+chars["Traveler"].weapon+".png",32,32,["dropdownType","extraIcon"]);
 					html += "</span>";
 					html += "</div>";
 				}
@@ -146,32 +294,110 @@
 			if (weapDB[i].title != undefined) title = weapDB[i].title;
 			html += "<div class=\"weaponDropdownButton fauxButton rarity-"+rarity;
 			if(weapDB[i].source != undefined && weapDB[i].source == "event") html+=" limited";
-			html += "\" onclick=\"pickWeapon(this.children[0].children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><span><img draggable=\"false\" loading=\"lazy\" class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></span><img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/" + weapDB[weapName].type +".png\"></div>";
+			html += "\" onclick=\"showExistingWeapons(this.children[0].children[1].innerText);pickWeapon(this.children[0].children[1].innerText,this.getAttribute(&quot;data-rarity&quot;))\" data-rarity=\"" + rarity + "\" name=\"" + weapName + "\"><span>";
+			if(weapDB[i].icons !== undefined && Array.isArray(weapDB[i].icons)) {
+				for(var j in weapDB[i].icons) {
+					html += makeImg("images/weapon/"+img+"_"+weapDB[i].icons[j]+".png",32,32,["dropdownWeaponImg"]);
+				}
+			} else {
+				html += makeImg("images/weapon/"+img+".png",32,32,["dropdownWeaponImg"]);
+			}
+			html += "<span>"+title+"</span></span>";
+			html += makeImg("images/icons/weapon/"+weapDB[weapName].type+".png",32,32,["dropdownType","extraIcon"]);
+			html += "</div>";
 		}
 		get("dropdownWeaponContent").innerHTML = html;
 		html = "";
 		selectedChars = getSelectedChars();
 		if(selectedChars != null) {
-			for(var i = 0; i < selectedChars.length; i++) {
-				selectedCharsIndex = selectedChars.map(i => i.id);
-				if(typeof(selectedChars[i].current) != "number") {
-					addCharacter(selectedChars[i].name,true,selectedChars[i].id);
+			selectedCharsIndex = selectedChars.map(i => {
+				if (i.id != undefined) { return i.id }
+				if (i.useTravElement != undefined && i.name == undefined) { return i.useTravElement }
+				return i.name;
+			});
+			let travPosition = selectedCharsIndex.indexOf("Traveler") != -1 ? selectedCharsIndex.indexOf("Traveler") : null;
+			for(let i = 0; i < selectedChars.length; i++) {
+				let item = selectedChars[i]; 
+				if(travPosition !== null && item.name == "Traveler") {
+					addCharacter("Traveler",true,item.useTravElement,item.targetExp,item.byElement[item.useTravElement].targetTalents,item.ascension);
+				} else if(travPosition !== null && item.name == undefined) {
+					addCharacter(null,true,item.useTravElement,null,selectedChars[travPosition].byElement[item.useTravElement].targetTalents,undefined);
+				} else if(chars[item.name] != undefined) {
+					addCharacter(item.name,true);
 				} else {
-					addWeapon(selectedChars[i].name,true,selectedChars[i].id);
+					console.log(item)
+					addWeapon(item.name,true,item.id,item.targetExp,item.ascension);
 				}
 			}
 		} else {
 			selectedChars = [];
 		}
-		var prefs = JSON.parse(getLSItem("prefs"));
-		for(var i = 0; i < defaultInputs.length; i++) {
-			if(prefs != null) setVal(defaultInputs[i],prefs[i],true);
-			defaultInputs[i].setAttribute("onChange","forceValue(this.id,this.value,this.min,this.max);updateDefaultTargetPrefs();");
-		}
-		if(!val("toggleLimited")) document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
-		if(val("toggleExtraIcons")) document.getElementsByTagName("body")[0].classList.toggle("hideExtraIcons");
+		if(!prefs.hideLimited) document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
+		if(prefs.hideExtraIcons) document.getElementsByTagName("body")[0].classList.toggle("hideExtraIcons");
 	});
-	const defaultInputs = getByClass("defaultInput");
+
+	var showExistingWeapons = (weaponName) => {
+		// trigger on #dropdownWeaponName matches a weapon [done]
+		// go through weaponIDIndex[<weaponName>]
+		// ids not in selectedCharsIndex should be displayed with current stats and who they're used by
+		// this wont be fun
+		if(weaponName == "") return; // skip empty strings
+		weaponName = removeQuotes(weaponName.toLowerCase());
+		if(allWeaponsLowerCase[weaponName] == undefined) return; // skip not-found weapons
+		if(weapDB[allWeaponsLowerCase[weaponName]].include == false) return; // skip include false
+		let weapon = allWeaponsLowerCase[weaponName];
+		if(weaponIDIndex[weapon] == undefined) return; // skip when no weapons are found
+		console.log(weapon)
+		let rarity = weapDB[weapon].rarity;
+		const unusedWeapons = []; // "unused" being exists in LS but not in selectedChars
+
+		let lsItem = parseLSItem(weapon,[]);
+		if(JSON.stringify(lsItem) == "[]") return; // Abort on broken weapon.
+
+		for(let i in weaponIDIndex[weapon]) {
+			let item = weaponIDIndex[weapon][i];
+			if(selectedCharsIndex.indexOf(item) == -1) unusedWeapons.push(item);
+		}
+		if(unusedWeapons.length == 0) return; // if no unused weapons are found this shouldn't be ran anymore.
+
+		getByClass("addButtons")[0].children[3].classList.add("disabled");
+		getByClass("weaponDropdown")[0].classList.add("unusedFound");
+		console.log(unusedWeapons)
+		var html = "";
+		for(let i in unusedWeapons) {
+			let item = lsItem[weaponIDIndex[weapon].indexOf(unusedWeapons[i])]; // info about the weapon
+			if(item==undefined) continue;
+			// console.log(item);
+			html += "<div class=\"fauxButton\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"',false,'"+item.id+"')\">";
+			// exp stuff
+			let exp = getLevelFromExp("weap",item.exp,rarity);
+			html+="Level "+exp[0]+"/"+(weapLevelValues[rarity-1].length+1);
+			if(exp[0] != (weapLevelValues[rarity-1].length+1)) {
+				// TODO add small bar for fun
+				html+=", "+exp[1]+"/"+weapLevelValues[rarity-1][exp[0]-1];
+			}
+			// ascension
+			html+=" | Ascension "+(item.ascension != undefined ? item.ascension : 0);
+			// refinement
+			if(rarity > 2 && weapDB[weapon].canRefine != false) {
+				html+=" | Refinement "+(item.refinement != undefined ? item.refinement : 1);
+			}
+			html+="</div>";
+		}
+		html += "<div style=\"display:flex\">";
+		html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"')\">Add New</div>";
+		html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons()\">Cancel</div>";
+		html += "</div>";
+		get("unusedWeaponsDropdown").innerHTML = html;
+	}
+	var clearExistingWeapons = () => {
+		getByClass("unusedFound")[0].classList.remove("unusedFound");
+		getByClass("addButtons")[0].children[3].classList.remove("disabled");
+		get("dropdownWeaponName").value="";
+		get("dropdownWeaponIcon").src="images/weapon/Unknown.png";
+		searchDropdown("","weaponDropdownButton");
+	}
+
 	var searchDropdown = (string,className) => {
 		// TODO? - Sort by closest match? ie searching "zh" should bring Zhongli first then Baizhu.
 		var buttons = getByClass(className);
@@ -195,43 +421,39 @@
 	var dropdownLoseFocus = (parentClass) => {
 		getByClass(parentClass)[0].classList.remove("active");
 	}
-	var updateDefaultTargetPrefs = () => {
-		var prefs = [];
-		for(var i = 0; i < defaultInputs.length; i++) {
-			prefs[i] = val(defaultInputs[i],true);
-		}
-
-		if(JSON.stringify(prefs) === "[90,6,9,9,9,6,true,false]" ) {
-			clearLSItem("prefs");
-		} else {
-			setLSItem("prefs",JSON.stringify(prefs));
-		}
-	}
 
 	var test = () => {
-		if (ids.length == 0) return;
+		var neededItems;
+		if (selectedCharsIndex.length == 0) return;
 		resetItemLists();
-		for (var perID in ids) {
+		for (let i in selectedCharsIndex) {
+			let item = selectedChars[i];
+			let id = item.id != undefined ? item.id : null;
+			let name = item.name != undefined ? item.name : null;
 			var html = "";
-			var id = ids[perID].id;
-			var boxType = ids[perID].type;
-			if (boxType == "char") {
-				var selectedCharacter = "";
-				selectedCharacter = get(id).children[0].children[0].innerText;
-				var charName = selectedCharacter;
-				var travelerType = undefined
-				if (get(id).hasAttribute("travtype")) {
-					selectedCharacter = "Traveler";
-					travelerType = get(id).getAttribute("travtype")
+			if(id === null) {
+				var charData, charSet = false;
+				let travType = null;
+				if(name == "Traveler") {
+					travType = item.useTravElement;
+					name+=travType;
+					charData = chars["Traveler"];
+
+				} else if (name == undefined) {
+					travType = item.useTravElement;
+					name = "Traveler"+travType;
+					charData = chars["Traveler"];
 				}
-				var charStats = [val(id + "-charLvl"), val(id + "-asc"), val(id + "-tal1"), val(id + "-tal2"), val(id + "-tal3")];
-				var targets = [val(id + "-targetCharLvl"), val(id + "-targetAsc"), val(id + "-targetTal1"), val(id + "-targetTal2"), val(id + "-targetTal3")];
+				var charStats = [getExpFromLevel("char",val(name+"-lvl")) + val(name+"-expRemainder"), val(name + "-asc")];
+				for (let i in charTalentSuffix) {
+					charStats.push(val(name+charTalentSuffix[i]));
+				}
+				var targets = [getExpFromLevel("char",val(name+"-targetLvl")),val(name+"-targetAsc"),val(name+"-targetTal1"),val(name+"-targetTal2"), val(name + "-targetTal3")];
 				if (JSON.stringify(charStats) == JSON.stringify(targets)) {
-					get(id + "-charOutput").innerHTML = "<div class=\"boxTitle\">You don't need anything for " + selectedCharacter + ".</div>"
+					get(name + "-charOutput").innerHTML = "<div class=\"boxTitle\">You don't need anything for " + name + ".</div>"
 					continue;
 				}
 				const order = [charLevelValues, ascValues, talValues, talValues, talValues];
-				var charData, charSet = false;
 				var skip;
 				var charItems = {};
 				var offset = 0;
@@ -241,47 +463,107 @@
 				const gemSuffix = [" Sliver", " Fragment", " Chunk", " Gemstone"];
 				const booksPrefix = ["Teachings of ", "Guide to ", "Philosophies of "];
 
-
-				for (var i = 0; i < 5; i++) {
-					skip = false;
-					if (i < 2 && travelerAscensionDone && selectedCharacter == "Traveler") continue;
+				// console.log(name,travType,charSet)
+				for (let i = 0; i < 5; i++) {
+					if (i < 2 && travelerAscensionDone && name == "Traveler") continue; // skip already done traveler ascension
 					if (charStats[i] >= targets[i]) continue;
+					skip = false;
 					if (i > 2 && charStats[i] == charStats[i - 1] && targets[i] == targets[i - 1]) skip = true;
 					if (!charSet) {
-						if (i == 0 || selectedCharacter != "Traveler") {
-							charData = chars[selectedCharacter];
-							if (selectedCharacter != "Traveler") charSet = true;
-						} else {
-							charData = chars[selectedCharacter].regions[travelerType];
-							charData["gem"] = chars[selectedCharacter].gem; // something was throwing errors :)
+						if (i > 1 && name.indexOf("Traveler") != -1) {
+							// is trav and is talents
+							charData = chars["Traveler"].regions[travType];
+							charData["gem"] = chars["Traveler"].gem; // something was throwing errors :)
 							charSet = true;
+						} else if(name.indexOf("Traveler") == -1) {
+							// is not trav
+							charSet = true;
+							charData = chars[name];
+						} else {
+							// is trav and ascension / exp	
+							charData = chars["Traveler"];
 						}
 					}
 					if (i != 1) { offset = 1 } else { offset = 0 }
-					if (!skip) neededItemsForAscTal = {};
+					if (!skip) neededItems = {};
 					if (i == 0) {
-						// var expHave = 0;
-						// var totalExpNeeded = 0;
-						// var level = 0;
-						// for(var j = 0; j < charStats[i] - 1; j++) {
-						// 	expHave += charLevelValues[j];
-						// }
-						// for(var j = charStats[i] - 1; j < targets[i] - 1; j++) {
-						// 	totalExpNeeded += charLevelValues[j];
-						// }
-						// console.log([expHave,totalExpNeeded, (totalExpNeeded / charExpItems[0])])
+						html+="<div><label for=\""+name+"-toggleExpVisibility\">Show Exp Requirements?</label>";
+						html+="<input id=\""+name+"-toggleExpVisibility\" type=\"checkbox\" class=\"toggleNextVisible\">";
+						html+="<div class=\"hiddenDiv\">";
+						let exp = charStats[0] != undefined ? charStats[0] : 0;
+						let expTarget = targets[0] != undefined ? targets[0] : 0;
+						let level = getLevelFromExp("char",exp)[0];
+						// get ascension band
+						var ascBand = undefined;
+						for(let j = 0; j < charAscAtLevels.length; j++) {
+							if(ascBand != undefined) continue;
+							if(level < charAscAtLevels[j]) {
+								ascBand = j;
+								continue;
+							}
+						}
+						if(ascBand === undefined) {
+							// console.error("fuckin undefined")
+							ascBand = 0;
+						}
+						// console.log("ascBand",ascBand);
+						let arr = [];
+						for(let i = 0; i < charAscAtExp.length && arr[(i-1)] != expTarget; i++) {
+							if(charAscAtExp[i] < expTarget) {
+								arr.push(charAscAtExp[i]);
+							} else {
+								arr.push(expTarget);
+							}
+						}
+						if(JSON.stringify(charAscAtExp) == JSON.stringify(arr) && charAscAtExp[charAscAtExp.length - 1] < expTarget) {
+							arr.push(expTarget);
+						}
+
+						for(let i = ascBand; i < arr.length; i++) {
+							neededItems = {};
+							var remainingExpInBand = i == ascBand ? arr[i] - exp : arr[i] - arr[i-1];
+							while(remainingExpInBand >= 0) {
+								if(remainingExpInBand - charExpItems[0] >= 0) {
+									neededItems = addItem(itemGroupDB.charExp.items[0],1,neededItems);
+									remainingExpInBand -= charExpItems[0];
+								} else if(remainingExpInBand - charExpItems[1] >= 0) {
+									neededItems = addItem(itemGroupDB.charExp.items[1],1,neededItems);
+									remainingExpInBand -= charExpItems[1];
+								} else {
+									neededItems = addItem(itemGroupDB.charExp.items[2], 1, neededItems);
+									remainingExpInBand -= charExpItems[2];
+								}
+							}
+							if(neededItems[itemGroupDB.charExp.items[2]] >= 5) {
+								if(neededItems[itemGroupDB.charExp.items[1]] == undefined) neededItems[itemGroupDB.charExp.items[1]] = 0;
+								neededItems[itemGroupDB.charExp.items[1]] += Math.floor(neededItems[itemGroupDB.charExp.items[2]] / 5);
+								neededItems[itemGroupDB.charExp.items[2]] = neededItems[itemGroupDB.charExp.items[2]] % 5;
+							}
+							if(neededItems[itemGroupDB.charExp.items[1]] >= 4) {
+								if(neededItems[itemGroupDB.charExp.items[0]] == undefined) neededItems[itemGroupDB.charExp.items[0]] = 0;
+								neededItems[itemGroupDB.charExp.items[0]] += Math.floor(neededItems[itemGroupDB.charExp.items[1]] / 4);
+								neededItems[itemGroupDB.charExp.items[1]] = neededItems[itemGroupDB.charExp.items[1]] % 4;
+							}
+
+							html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",charStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
+							if(remainingExpInBand != 0) html+=" A total of "+(-remainingExpInBand)+" Exp is wasted."
+							html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+							charItems = mergeItems(neededItems, charItems)
+						}
+						html+="</div></div>";
 						continue;
 					}
-					for (var j = charStats[i] - offset; j < targets[i] - offset; j++) {
+					for (let j = charStats[i] - offset; j < targets[i] - offset; j++) {
 						if (skip) continue; // don't need to recalculate if it's the exact same
-						for (var k in order[i][j]) {
+						for (let k in order[i][j]) {
+							if (charData[k] == undefined) continue; // skip undefined
 							if (k == "cost") {
-								neededItemsForAscTal = addItem("Mora", order[i][j][k], neededItemsForAscTal);
+								neededItems = addItem("Mora", order[i][j][k], neededItems);
 							} else if (k == "crown") {
-								neededItemsForAscTal = addItem("Crown of Insight", order[i][j][k], neededItemsForAscTal);
+								neededItems = addItem("Crown of Insight", order[i][j][k], neededItems);
 							} else if (k == "local" || k == "weeklyBoss" || k == "boss") {
-								if (charData[k] == null) continue;
-								neededItemsForAscTal = addItem(charData[k], order[i][j][k], neededItemsForAscTal);
+								if (charData[k] === undefined) continue;
+								neededItems = addItem(charData[k], order[i][j][k], neededItems);
 							} else if (k == "gem" || k == "books") {
 								var rank = order[i][j][k].rank;
 								var itemName = "";
@@ -294,54 +576,138 @@
 								}
 								if (k == "gem") itemName = itemName + gemSuffix[rank];
 								if (k == "books") itemName = booksPrefix[rank] + itemName;
-								neededItemsForAscTal = addItem(itemName, order[i][j][k].count, neededItemsForAscTal);
+								neededItems = addItem(itemName, order[i][j][k].count, neededItems);
 							} else if (k == "common") {
 								if (charData[k] == null) continue;
 								var rank = order[i][j][k].rank;
 								var group = itemGroupDB[charData[k]].items;
-								neededItemsForAscTal = addItem(group[rank], order[i][j][k].count, neededItemsForAscTal);
+								neededItems = addItem(group[rank], order[i][j][k].count, neededItems);
 							}
 						}
 					}
-					charItems = mergeItems(neededItemsForAscTal, charItems);
+					charItems = mergeItems(neededItems, charItems);
 					html += "The required materials for leveling ";
 					html += valueNames[i];
 					html += " from " + charStats[i] + " to " + targets[i] + " are:";
-					// orderItems(neededItemsForAscTal);
-					html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItemsForAscTal, "tiny") + "</div>";
-					if (selectedCharacter == "Traveler" && i == 1) travelerAscensionDone = true;
+					// orderItems(neededItems);
+					html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+					if (name == "Traveler" && i == 1) travelerAscensionDone = true;
 				}
-				html += "<br><div class=\"boxTitle\">The total for " + charName + " is:</div>";
+				html += "<br><div class=\"boxTitle\">The total for ";
+				if(name.indexOf("Traveler") == -1) {
+					html += name
+				} else {
+					html += chars["Traveler"].regions[travType].type + " Traveler";
+				}
+				html+=" is:</div>";
 				// orderItems(charItems);
 				html += "<div class=\"outputRequired\">" + getItemsNeeded(charItems, "mini") + "</div>";
-				get(id + "-charOutput").innerHTML = html;
+				get(name + "-charOutput").innerHTML = html;
 				items = mergeItems(charItems, items);
 			} else {
-				var weapAsc = val(id + "-asc");
-				var target = val(id + "-targetAsc");
-				if (weapAsc >= target) continue;
-
-				var selectedWeapon = selectedChars[idNameIndex.indexOf(id)].name;
+				var selectedWeapon = item.name;
 				var weapData = weapDB[selectedWeapon];
-				var weaponAscOfRarirty = weapAscValues[Math.floor(weapData.rarity - 1)];
-				var weapItems = [];
+				var rarity = weapData.rarity;
+				var weaponAscOfRarirty = weapAscValues[Math.floor(rarity-1)];
+				var weapStats = [getExpFromLevel("weap",val(id+"-lvl"),rarity) + val(id+"-expRemainder"), val(id+"-asc")]
+				var targets = [getExpFromLevel("weap",val(id+"-targetLvl"),rarity),val(id+"-targetAsc")];
+				
+				neededItems = {};
+				for(let i = 0; i < 2; i++) {
 
-				neededItemsForAscTal = {};
-				for (var j = weapAsc; j < target; j++) {
-					for (var k in weaponAscOfRarirty[j]) {
-						if (k == "cost") {
-							weapItems = addItem("Mora", weaponAscOfRarirty[j][k], weapItems);
-						} else {
-							var rank = weaponAscOfRarirty[j][k].rank;
-							var group = itemGroupDB[weapData[k]].items;
-							weapItems = addItem(group[rank], weaponAscOfRarirty[j][k].count, weapItems);
+					if (weapStats[i] >= targets[i]) continue;
+
+					let weapItems = [];
+					if(i == 0) { // level and exp
+						// console.log("weapon level/exp calculations not correctly implemented")
+						// continue;
+						html+="<div><label for=\""+id+"-toggleExpVisibility\">Show Exp Requirements?</label>";
+						html+="<input id=\""+id+"-toggleExpVisibility\" type=\"checkbox\" class=\"toggleNextVisible\">";
+						html+="<div class=\"hiddenDiv\">";
+						let exp = weapStats[0] != undefined ? weapStats[0] : 0;
+						let expTarget = targets[0] != undefined ? targets[0] : 0;
+						let level = getLevelFromExp("weap",exp,rarity)[0];
+						// get ascension band
+						var ascBand = undefined;
+						for(let j = 0; j < charAscAtLevels.length; j++) {
+							if(ascBand != undefined) continue;
+							if(level < charAscAtLevels[j]) {
+								ascBand = j;
+								continue;
+							}
 						}
+						if(ascBand === undefined) {
+							// console.error("fuckin undefined")
+							ascBand = 0;
+						}
+						// console.log("ascBand",ascBand,"expCurrent",weapStats[0],"expTarget",targets[0]);
+						let arr = [];
+						for(let i = 0; i < charAscAtExp.length && arr[(i-1)] != expTarget; i++) {
+							if(charAscAtExp[i] < expTarget) {
+								arr.push(charAscAtExp[i]);
+							} else {
+								arr.push(expTarget);
+							}
+						}
+						if(JSON.stringify(charAscAtExp) == JSON.stringify(arr) && charAscAtExp[charAscAtExp.length - 1] < expTarget) {
+							arr.push(expTarget);
+						}
+
+						for(let i = ascBand; i < arr.length; i++) {
+							let neededItems = {};
+							var remainingExpInBand = i == ascBand ? arr[i] - exp : arr[i] - arr[i-1];
+							while(remainingExpInBand >= 0) {
+								if(remainingExpInBand - weapExpItems[0] >= 0) {
+									neededItems = addItem(itemGroupDB.weapExp.items[0],1,neededItems);
+									remainingExpInBand -= weapExpItems[0];
+								} else if(remainingExpInBand - weapExpItems[1] >= 0) {
+									neededItems = addItem(itemGroupDB.weapExp.items[1],1,neededItems);
+									remainingExpInBand -= weapExpItems[1];
+								} else {
+									neededItems = addItem(itemGroupDB.weapExp.items[2],1,neededItems);
+									remainingExpInBand -= weapExpItems[2];
+								}
+							}
+							if(neededItems[itemGroupDB.weapExp.items[2]] >= 5) {
+								if(neededItems[itemGroupDB.weapExp.items[1]] == undefined) neededItems[itemGroupDB.weapExp.items[1]] = 0;
+								neededItems[itemGroupDB.weapExp.items[1]] += Math.floor(neededItems[itemGroupDB.weapExp.items[2]] / 5);
+								neededItems[itemGroupDB.weapExp.items[2]] = neededItems[itemGroupDB.weapExp.items[2]] % 5;
+							}
+
+							if(neededItems[itemGroupDB.weapExp.items[1]] >= 5) {
+								if(neededItems[itemGroupDB.weapExp.items[0]] == undefined) neededItems[itemGroupDB.weapExp.items[0]] = 0;
+								neededItems[itemGroupDB.weapExp.items[0]] += Math.floor(neededItems[itemGroupDB.weapExp.items[1]] / 5);
+								neededItems[itemGroupDB.weapExp.items[1]] = neededItems[itemGroupDB.weapExp.items[1]] % 5;
+							}
+
+							html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",weapStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
+							if(remainingExpInBand != 0) html+=" A total of "+(-remainingExpInBand)+" Exp is wasted."
+							html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+							weapItems = mergeItems(neededItems, weapItems)
+						}
+						html+="</div></div>";
+						neededItems = mergeItems(weapItems,neededItems);
+						continue;
 					}
+					if(i == 1) { // ascension
+						if (weapStats[1] >= targets[1]) continue;
+						for (let j = weapStats[1]; j < targets[1]; j++) {
+							for (let k in weaponAscOfRarirty[j]) {
+								if (k == "cost") {
+									weapItems = addItem("Mora", weaponAscOfRarirty[j][k], weapItems);
+								} else {
+									var rank = weaponAscOfRarirty[j][k].rank;
+									var group = itemGroupDB[weapData[k]].items;
+									weapItems = addItem(group[rank], weaponAscOfRarirty[j][k].count, weapItems);
+								}
+							}
+						}
+						html += "The required materials for leveling ascension from "+weapStats[1]+" to "+targets[1]+" are:";
+						html += "<div class=\"outputRequired\">"+getItemsNeeded(weapItems, "mini")+"</div>";
+					}
+					items = mergeItems(weapItems, items);
 				}
-				html += "The required materials for leveling ascension from " + weapAsc + " to " + target + " are:";
-				html += "<div class=\"outputRequired\">" + getItemsNeeded(weapItems, "mini") + "</div>";
-				get(id + "-weapOutput").innerHTML = html;
-				items = mergeItems(weapItems, items);
+				get(id+"-weapOutput").innerHTML = html;
 			}
 
 		}
@@ -354,11 +720,12 @@
 	var getItemsNeeded = (items, size = "mini", hideBelowZero = true, showSource = false) => {
 		var html = "";
 		var itemKeys = [];
-		for (var i in items) {
+		for (let i in items) {
+			if(i == null || i == undefined) continue;
 			itemKeys[itemKeys.length] = i;
 		}
 		orderItems(itemKeys)
-		for (var i in itemKeys) {
+		for (let i in itemKeys) {
 			if (items[itemKeys[i]] == undefined) continue;
 			if (hideBelowZero && items[itemKeys[i]] < 1) continue;
 			html += makeItemIcon(itemKeys[i], items[itemKeys[i]], -1, size, showSource);
@@ -388,10 +755,10 @@
 		var inv = loadInventory();
 		var value = 0;
 		// html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div><button id=\"toggleConverts\" class=\"removeButton\" onclick=\"toggleConverts()\">Show Converts?</button></div><div class=\"outputRequired\">";
-		html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div></div><div class=\"outputRequired\">";
+		html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div></div><em style=\"display:block\">You can hold Shift to adjust by 10 or CTRL (CMD on Mac) to adjust by 100.</em><div class=\"outputRequired\">";
 		for (var i = 0; i < itemKeys.length; i++) {
 			if (inv != null && inv[itemKeys[i]] != undefined) { value = inv[itemKeys[i]] } else { value = 0 }
-			html += "<div class=\"askForItem\">" + makeItemIcon(itemKeys[i], "<input class=\"userInvInput\" type=\"number\" min=\"0\" value=\"" + value + "\" id=\"userItemCount" + itemKeys[i] + "\">", -1, "mini", true) + "</div>";
+			html += "<div class=\"askForItem\">" + makeItemIcon(itemKeys[i], "<input class=\"userInvInput\" type=\"number\" min=\"0\" value=\"" + value + "\" id=\"userItemCount" + itemKeys[i] + "\" onwheel=\"adjustStep(this.id,true)\" onkeydown=\"adjustStep(this.id)\">", -1, "mini", true) + "</div>";
 		}
 		html += "</div><div id=\"converts\"></div><br><button onclick=\"getItemsRemaining()\">Submit</button>";
 		showConvertsBool = false;
@@ -617,15 +984,41 @@
 		get("whatDoYouHave").innerHTML = "";
 		get("whatToObtain").innerHTML = "";
 		get("textOutput").innerHTML = "";
-		for (var perID in ids) {
-			var id = ids[perID].id;
-			var boxType = ids[perID].type;
-			if (boxType == "char") {
-				get(id + "-charOutput").innerHTML = "";
+
+		for (let i in selectedCharsIndex) {
+			let item = selectedCharsIndex[i];
+			var id;
+			// console.log(item)
+			if(!isNaN(Math.floor(item))) {
+				// non-initial traveler
+				get("Traveler"+item+"-charOutput").innerHTML = "";
+				continue;
+			} else if(item == "Traveler") {
+				// initial traveler
+				var useTravElement = selectedChars[selectedCharsIndex.indexOf("Traveler")].useTravElement;
+				if(useTravElement === undefined) {
+					console.error("How the fuck did an undefined traveler type happen");
+					continue;
+				}
+				get("Traveler"+useTravElement+"-charOutput").innerHTML = "";
+				continue;
+			} else if(chars[item] != undefined) {
+				// non-traveler characters
+				get(item+"-charOutput").innerHTML = "";
 			} else {
-				get(id + "-weapOutput").innerHTML = "";
+				// weapons
+				get(item+"-weapOutput").innerHTML = "";
 			}
 		}
+
+		// for (let i in selectedChars) {
+		// 	let id = selectedChars[i].id != undefined ? selectedChars[i].id : selectedChars[i].name != undefined && selectedChars[i].name != "Traveler" ? selectedChars[i].name : "Traveler"+selectedChars[i].useTravElement;
+		// 	if (get(id+"-weapOutput") != null) {
+		// 		get(id + "-weapOutput").innerHTML = "";
+		// 	} else {
+		// 		get(id + "-charOutput").innerHTML = "";
+		// 	}
+		// }
 	}
 	</script>
 </html>

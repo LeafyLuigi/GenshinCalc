@@ -10,7 +10,8 @@ const chars = {
 		"local": "Cecilia",
 		"common": "samachurl",
 		"books": "Ballad",
-		"weeklyBoss": "Tusk of Monoceros Caeli"
+		"weeklyBoss": "Tusk of Monoceros Caeli",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Alhaitham": {
 		"rarity": 5,
@@ -22,9 +23,11 @@ const chars = {
 		"local": "Sand Grease Pupa",
 		"common": "eremites",
 		"books": "Ingenuity",
-		"weeklyBoss": "Mirror of Mushin"
+		"weeklyBoss": "Mirror of Mushin",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Aloy": {
+		"hasCons": false,
 		"rarity": 5,
 		"vision": "Aloy",
 		"weapon": "Bow",
@@ -47,7 +50,8 @@ const chars = {
 		"local": "Small Lamp Grass",
 		"common": "hilichurlShooter",
 		"books": "Freedom",
-		"weeklyBoss": "Dvalin's Sigh"
+		"weeklyBoss": "Dvalin's Sigh",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Arataki Itto": {
 		"rarity": 5,
@@ -59,7 +63,22 @@ const chars = {
 		"local": "Onikabuto",
 		"common": "slime",
 		"books": "Elegance",
-		"weeklyBoss": "Ashen Heart"
+		"weeklyBoss": "Ashen Heart",
+		"conBonus": {"2":3,"3":5}
+	},
+	"Arlecchino": {
+		"include": false,
+		"rarity": 5,
+		"weapon": "Polearm",
+		"region": "Snezhnaya",
+		"type": "Pyro",
+		"gem": "Agnidus Agate",
+		"boss": null,
+		"local": null,
+		"common": null,
+		"books": null,
+		"weeklyBoss": null,
+		"conBonus": null
 	},
 	"Baizhu": {
 		"rarity": 5,
@@ -71,7 +90,8 @@ const chars = {
 		"local": "Violetgrass",
 		"common": "fungus",
 		"books": "Gold",
-		"weeklyBoss": "Worldspan Fern"
+		"weeklyBoss": "Worldspan Fern",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Barbara": {
 		"rarity": 4,
@@ -83,7 +103,8 @@ const chars = {
 		"local": "Philanemo Mushroom",
 		"common": "samachurl",
 		"books": "Freedom",
-		"weeklyBoss": "Ring of Boreas"
+		"weeklyBoss": "Ring of Boreas",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Beidou": {
 		"rarity": 4,
@@ -95,7 +116,8 @@ const chars = {
 		"local": "Noctilucous Jade",
 		"common": "treasureHoarder",
 		"books": "Gold",
-		"weeklyBoss": "Dvalin's Sigh"
+		"weeklyBoss": "Dvalin's Sigh",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Bennett": {
 		"rarity": 4,
@@ -107,7 +129,8 @@ const chars = {
 		"local": "Windwheel Aster",
 		"common": "treasureHoarder",
 		"books": "Resistance",
-		"weeklyBoss": "Dvalin's Plume"
+		"weeklyBoss": "Dvalin's Plume",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Candace": {
 		"rarity": 4,
@@ -119,21 +142,37 @@ const chars = {
 		"local": "Henna Berry",
 		"common": "eremites",
 		"books": "Admonition",
-		"weeklyBoss": "Tears of the Calamitous God"
+		"weeklyBoss": "Tears of the Calamitous God",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Charlotte": {
-		"include": false,
 		"rarity": 4,
 		"weapon": "Catalyst",
 		"region": "Fontaine",
 		"visionType": "Ousia",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
-		"boss": "Unknown",
-		"local": "Unknown",
-		"common": "Unknown",
-		"books": "Unknown",
-		"weeklyBoss": "Unknown"
+		"boss": "Tourbillon Device",
+		"local": "Beryl Conch",
+		"common": "clockworkMeka",
+		"books": "Justice",
+		"weeklyBoss": "Lightless Silk String",
+		"conBonus": {"3":3,"2":5}
+	},
+	"Chevreuse": {
+		"include": false,
+		"rarity": 4,
+		"weapon": "Polearm",
+		"region": "Fontaine",
+		"visionType": "Ousia",
+		"type": "Pyro",
+		"gem": "Agnidus Agate",
+		"boss": null,
+		"local": null,
+		"common": null,
+		"books": null,
+		"weeklyBoss": null,
+		"conBonus": null
 	},
 	"Chongyun": {
 		"rarity": 4,
@@ -145,21 +184,23 @@ const chars = {
 		"local": "Cor Lapis",
 		"common": "hilichurl",
 		"books": "Diligence",
-		"weeklyBoss": "Dvalin's Sigh"
+		"weeklyBoss": "Dvalin's Sigh",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Clorinde": {
 		"include": false,
-		"rarity": 4,
-		"weapon": "Sword", // could it be a gun? no idea!
+		"rarity": 5,
+		"weapon": "Sword",
 		"region": "Fontaine",
 		"visionType": "Pneuma",
 		"type": "Electro",
 		"gem": "Vajrada Amethyst",
-		"boss": "Unknown",
-		"local": "Unknown",
-		"common": "Unknown",
-		"books": "Unknown",
-		"weeklyBoss": "Unknown"
+		"boss": null,
+		"local": null,
+		"common": null,
+		"books": null,
+		"weeklyBoss": null,
+		"conBonus": null
 	},
 	"Collei": {
 		"rarity": 4,
@@ -171,7 +212,8 @@ const chars = {
 		"local": "Rukkhashava Mushrooms",
 		"common": "hilichurlShooter",
 		"books": "Praxis",
-		"weeklyBoss": "Tears of the Calamitous God"
+		"weeklyBoss": "Tears of the Calamitous God",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Cyno": {
 		"rarity": 5,
@@ -183,7 +225,8 @@ const chars = {
 		"local": "Scarab",
 		"common": "samachurl",
 		"books": "Admonition",
-		"weeklyBoss": "Mudra of the Malefic General"
+		"weeklyBoss": "Mudra of the Malefic General",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Dehya": {
 		"rarity": 5,
@@ -195,7 +238,8 @@ const chars = {
 		"local": "Sand Grease Pupa",
 		"common": "eremites",
 		"books": "Praxis",
-		"weeklyBoss": "Puppet Strings"
+		"weeklyBoss": "Puppet Strings",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Diluc": {
 		"rarity": 5,
@@ -207,7 +251,8 @@ const chars = {
 		"local": "Small Lamp Grass",
 		"common": "fatuiSkirmisher",
 		"books": "Resistance",
-		"weeklyBoss": "Dvalin's Plume"
+		"weeklyBoss": "Dvalin's Plume",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Diona": {
 		"rarity": 4,
@@ -219,7 +264,8 @@ const chars = {
 		"local": "Calla Lily",
 		"common": "hilichurlShooter",
 		"books": "Freedom",
-		"weeklyBoss": "Shard of a Foul Legacy"
+		"weeklyBoss": "Shard of a Foul Legacy",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Dori": {
 		"rarity": 4,
@@ -231,7 +277,8 @@ const chars = {
 		"local": "Kalpalata Lotus",
 		"common": "eremites",
 		"books": "Ingenuity",
-		"weeklyBoss": "Bloodjade Branch"
+		"weeklyBoss": "Bloodjade Branch",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Eula": {
 		"rarity": 5,
@@ -243,7 +290,8 @@ const chars = {
 		"local": "Dandelion Seed",
 		"common": "hilichurl",
 		"books": "Resistance",
-		"weeklyBoss": "Dragon Lord's Crown"
+		"weeklyBoss": "Dragon Lord's Crown",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Faruzan": {
 		"rarity": 4,
@@ -255,7 +303,8 @@ const chars = {
 		"local": "Henna Berry",
 		"common": "eremites",
 		"books": "Admonition",
-		"weeklyBoss": "Puppet Strings"
+		"weeklyBoss": "Puppet Strings",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Fischl": {
 		"rarity": 4,
@@ -267,7 +316,8 @@ const chars = {
 		"local": "Small Lamp Grass",
 		"common": "hilichurlShooter",
 		"books": "Ballad",
-		"weeklyBoss": "Spirit Locket of Boreas"
+		"weeklyBoss": "Spirit Locket of Boreas",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Freminet": {
 		"rarity": 4,
@@ -280,21 +330,36 @@ const chars = {
 		"local": "Romaritime Flower",
 		"common": "transoceanic",
 		"books": "Justice",
-		"weeklyBoss": "Worldspan Fern"		
+		"weeklyBoss": "Worldspan Fern",
+		"conBonus": {"1":3,"2":5}	
 	},
 	"Furina": {
-		"include": false,
 		"rarity": 5,
-		"weapon": "Unknown",
+		"weapon": "Sword",
+		"vision": "Furina",
 		"region": "Fontaine",
-		// "visionType": "",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
-		"boss": "Unknown",
-		"local": "Unknown",
-		"common": "Unknown",
-		"books": "Unknown",
-		"weeklyBoss": "Unknown"
+		"boss": "Water That Failed To Transcend",
+		"local": "Lakelight Lily",
+		"common": "whopperflower",
+		"books": "Justice",
+		"weeklyBoss": "Lightless Mass",
+		"conBonus": {"2":3,"3":5}
+	},
+	"Gaming": {
+		"include": false,
+		"rarity": 4,
+		"weapon": null,
+		"region": "Liyue",
+		"type": "Pyro",
+		"gem": "Agnidus Agate",
+		"boss": null,
+		"local": null,
+		"common": null,
+		"books": null,
+		"weeklyBoss": null,
+		"conBonus": null
 	},
 	"Ganyu": {
 		"rarity": 5,
@@ -306,7 +371,8 @@ const chars = {
 		"local": "Qingxin",
 		"common": "whopperflower",
 		"books": "Diligence",
-		"weeklyBoss": "Shadow of the Warrior"
+		"weeklyBoss": "Shadow of the Warrior",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Gorou": {
 		"rarity": 4,
@@ -318,7 +384,8 @@ const chars = {
 		"local": "Sango Pearl",
 		"common": "specter",
 		"books": "Light",
-		"weeklyBoss": "Molten Moment"
+		"weeklyBoss": "Molten Moment",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Hu Tao": {
 		"rarity": 5,
@@ -330,7 +397,8 @@ const chars = {
 		"local": "Silk Flower",
 		"common": "whopperflower",
 		"books": "Diligence",
-		"weeklyBoss": "Shard of a Foul Legacy"
+		"weeklyBoss": "Shard of a Foul Legacy",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Jean": {
 		"rarity": 5,
@@ -342,7 +410,8 @@ const chars = {
 		"local": "Dandelion Seed",
 		"common": "hilichurl",
 		"books": "Resistance",
-		"weeklyBoss": "Dvalin's Plume"
+		"weeklyBoss": "Dvalin's Plume",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Kaedehara Kazuha": {
 		"rarity": 5,
@@ -354,7 +423,8 @@ const chars = {
 		"local": "Sea Ganoderma",
 		"common": "treasureHoarder",
 		"books": "Diligence",
-		"weeklyBoss": "Gilded Scale"
+		"weeklyBoss": "Gilded Scale",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Kaeya": {
 		"rarity": 4,
@@ -366,7 +436,8 @@ const chars = {
 		"local": "Calla Lily",
 		"common": "treasureHoarder",
 		"books": "Ballad",
-		"weeklyBoss": "Spirit Locket of Boreas"
+		"weeklyBoss": "Spirit Locket of Boreas",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Kamisato Ayaka": {
 		"rarity": 5,
@@ -378,7 +449,8 @@ const chars = {
 		"local": "Sakura Bloom",
 		"common": "nobushi",
 		"books": "Elegance",
-		"weeklyBoss": "Bloodjade Branch"
+		"weeklyBoss": "Bloodjade Branch",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Kamisato Ayato": {
 		"rarity": 5,
@@ -390,7 +462,8 @@ const chars = {
 		"local": "Sakura Bloom",
 		"common": "nobushi",
 		"books": "Elegance",
-		"weeklyBoss": "Mudra of the Malefic General"
+		"weeklyBoss": "Mudra of the Malefic General",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Kaveh": {
 		"rarity": 4,
@@ -402,7 +475,8 @@ const chars = {
 		"local": "Mourning Flower",
 		"common": "fungus",
 		"books": "Ingenuity",
-		"weeklyBoss": "Primordial Greenbloom"
+		"weeklyBoss": "Primordial Greenbloom",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Keqing": {
 		"rarity": 5,
@@ -414,7 +488,8 @@ const chars = {
 		"local": "Cor Lapis",
 		"common": "whopperflower",
 		"books": "Prosperity",
-		"weeklyBoss": "Ring of Boreas"
+		"weeklyBoss": "Ring of Boreas",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Kirara": {
 		"rarity": 4,
@@ -426,7 +501,8 @@ const chars = {
 		"local": "Amakumo Fruit",
 		"common": "specter",
 		"books": "Transience",
-		"weeklyBoss": "Everamber"
+		"weeklyBoss": "Everamber",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Klee": {
 		"rarity": 5,
@@ -438,7 +514,8 @@ const chars = {
 		"local": "Philanemo Mushroom",
 		"common": "samachurl",
 		"books": "Freedom",
-		"weeklyBoss": "Ring of Boreas"
+		"weeklyBoss": "Ring of Boreas",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Kujou Sara": {
 		"rarity": 4,
@@ -450,7 +527,8 @@ const chars = {
 		"local": "Dendrobium",
 		"common": "hilichurl",
 		"books": "Elegance",
-		"weeklyBoss": "Ashen Heart"
+		"weeklyBoss": "Ashen Heart",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Kuki Shinobu": {
 		"rarity": 4,
@@ -462,7 +540,8 @@ const chars = {
 		"local": "Naku Weed",
 		"common": "specter",
 		"books": "Elegance",
-		"weeklyBoss": "Tears of the Calamitous God"
+		"weeklyBoss": "Tears of the Calamitous God",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Layla": {
 		"rarity": 4,
@@ -474,7 +553,8 @@ const chars = {
 		"local": "Nilotpala Lotus",
 		"common": "samachurl",
 		"books": "Ingenuity",
-		"weeklyBoss": "Mirror of Mushin"
+		"weeklyBoss": "Mirror of Mushin",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Lisa": {
 		"rarity": 4,
@@ -486,7 +566,8 @@ const chars = {
 		"local": "Valberry",
 		"common": "slime",
 		"books": "Ballad",
-		"weeklyBoss": "Dvalin's Claw"
+		"weeklyBoss": "Dvalin's Claw",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Lynette": {
 		"rarity": 4,
@@ -499,7 +580,8 @@ const chars = {
 		"local": "Lumidouce Bell",
 		"common": "clockworkMeka",
 		"books": "Order",
-		"weeklyBoss": "Everamber"
+		"weeklyBoss": "Everamber",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Lyney": {
 		"rarity": 5,
@@ -512,7 +594,8 @@ const chars = {
 		"local": "Rainbow Rose",
 		"common": "fatuiSkirmisher",
 		"books": "Equity",
-		"weeklyBoss": "Primordial Greenbloom"
+		"weeklyBoss": "Primordial Greenbloom",
+		"conBonus": {"1":3,"3":5}
 	},
 	"Mika": {
 		"rarity": 4,
@@ -524,7 +607,8 @@ const chars = {
 		"local": "Wolfhook",
 		"common": "fatuiSkirmisher",
 		"books": "Ballad",
-		"weeklyBoss": "Mirror of Mushin"
+		"weeklyBoss": "Mirror of Mushin",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Mona": {
 		"rarity": 5,
@@ -536,7 +620,8 @@ const chars = {
 		"local": "Philanemo Mushroom",
 		"common": "whopperflower",
 		"books": "Resistance",
-		"weeklyBoss": "Ring of Boreas"
+		"weeklyBoss": "Ring of Boreas",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Nahida": {
 		"rarity": 5,
@@ -548,7 +633,8 @@ const chars = {
 		"local": "Kalpalata Lotus",
 		"common": "fungus",
 		"books": "Ingenuity",
-		"weeklyBoss": "Puppet Strings"
+		"weeklyBoss": "Puppet Strings",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Navia": {
 		"include": false,
@@ -558,25 +644,26 @@ const chars = {
 		"visionType": "Ousia",
 		"type": "Geo",
 		"gem": "Prithiva Topaz",
-		"boss": "Unknown",
-		"local": "Unknown",
-		"common": "Unknown",
-		"books": "Unknown",
-		"weeklyBoss": "Unknown"
+		"boss": "Artificed Spare Clockwork Component - Coppelius",
+		"local": "Spring of the First Dewdrop",
+		"common": "transoceanic",
+		"books": "Equity",
+		"weeklyBoss": "Lightless Silk String",
+		"conBonus": null
 	},
 	"Neuvillette": {
-		"include": false,
-		"rarity": 4,
-		"weapon": "Unknown",
+		"rarity": 5,
+		"weapon": "Catalyst",
 		"region": "Fontaine",
 		"visionType": "Pneuma",
 		"type": "Hydro",
 		"gem": "Varunada Lazurite",
-		"boss": "Unknown",
-		"local": "Unknown",
-		"common": "Unknown",
-		"books": "Unknown",
-		"weeklyBoss": "Unknown"
+		"boss": "Fontemer Unihorn",
+		"local": "Lumitoile",
+		"common": "transoceanic",
+		"books": "Equity",
+		"weeklyBoss": "Everamber",
+		"conBonus": {"1":3,"3":5}
 	},
 	"Nilou": {
 		"rarity": 5,
@@ -588,7 +675,8 @@ const chars = {
 		"local": "Padisarah",
 		"common": "fungus",
 		"books": "Praxis",
-		"weeklyBoss": "Tears of the Calamitous God"
+		"weeklyBoss": "Tears of the Calamitous God",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Ningguang": {
 		"rarity": 4,
@@ -600,7 +688,8 @@ const chars = {
 		"local": "Glaze Lily",
 		"common": "fatuiSkirmisher",
 		"books": "Prosperity",
-		"weeklyBoss": "Spirit Locket of Boreas"
+		"weeklyBoss": "Spirit Locket of Boreas",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Noelle": {
 		"rarity": 4,
@@ -612,7 +701,8 @@ const chars = {
 		"local": "Valberry",
 		"common": "hilichurl",
 		"books": "Resistance",
-		"weeklyBoss": "Dvalin's Claw"
+		"weeklyBoss": "Dvalin's Claw",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Qiqi": {
 		"rarity": 5,
@@ -624,7 +714,8 @@ const chars = {
 		"local": "Violetgrass",
 		"common": "samachurl",
 		"books": "Prosperity",
-		"weeklyBoss": "Tail of Boreas"
+		"weeklyBoss": "Tail of Boreas",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Raiden Shogun": {
 		"rarity": 5,
@@ -636,7 +727,8 @@ const chars = {
 		"local": "Amakumo Fruit",
 		"common": "nobushi",
 		"books": "Light",
-		"weeklyBoss": "Molten Moment"
+		"weeklyBoss": "Molten Moment",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Razor": {
 		"rarity": 4,
@@ -648,7 +740,8 @@ const chars = {
 		"local": "Wolfhook",
 		"common": "hilichurl",
 		"books": "Resistance",
-		"weeklyBoss": "Dvalin's Claw"
+		"weeklyBoss": "Dvalin's Claw",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Rosaria": {
 		"rarity": 4,
@@ -660,7 +753,8 @@ const chars = {
 		"local": "Valberry",
 		"common": "fatuiSkirmisher",
 		"books": "Ballad",
-		"weeklyBoss": "Shadow of the Warrior"
+		"weeklyBoss": "Shadow of the Warrior",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Sangonomiya Kokomi": {
 		"rarity": 5,
@@ -672,7 +766,8 @@ const chars = {
 		"local": "Sango Pearl",
 		"common": "specter",
 		"books": "Transience",
-		"weeklyBoss": "Hellfire Butterfly"
+		"weeklyBoss": "Hellfire Butterfly",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Sayu": {
 		"rarity": 4,
@@ -684,7 +779,8 @@ const chars = {
 		"local": "Crystal Marrow",
 		"common": "whopperflower",
 		"books": "Light",
-		"weeklyBoss": "Gilded Scale"
+		"weeklyBoss": "Gilded Scale",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Shenhe": {
 		"rarity": 5,
@@ -696,7 +792,8 @@ const chars = {
 		"local": "Qingxin",
 		"common": "whopperflower",
 		"books": "Prosperity",
-		"weeklyBoss": "Hellfire Butterfly"
+		"weeklyBoss": "Hellfire Butterfly",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Shikanoin Heizou": {
 		"rarity": 4,
@@ -708,7 +805,23 @@ const chars = {
 		"local": "Onikabuto",
 		"common": "treasureHoarder",
 		"books": "Transience",
-		"weeklyBoss": "The Meaning of Aeons"
+		"weeklyBoss": "The Meaning of Aeons",
+		"conBonus": {"2":3,"3":5}
+	},
+	"Sigewinne": {
+		"include": false,
+		"rarity": 4,
+		"weapon": null,
+		"region": "Fontaine",
+		"visionType": "Pneuma",
+		"type": "Hydro",
+		"gem": "Varunada Lazurite",
+		"boss": null,
+		"local": null,
+		"common": null,
+		"books": null,
+		"weeklyBoss": null,
+		"conBonus": null
 	},
 	"Sucrose": {
 		"rarity": 4,
@@ -720,7 +833,8 @@ const chars = {
 		"local": "Windwheel Aster",
 		"common": "whopperflower",
 		"books": "Freedom",
-		"weeklyBoss": "Spirit Locket of Boreas"
+		"weeklyBoss": "Spirit Locket of Boreas",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Tartaglia": {
 		"rarity": 5,
@@ -732,7 +846,8 @@ const chars = {
 		"local": "Starconch",
 		"common": "fatuiSkirmisher",
 		"books": "Freedom",
-		"weeklyBoss": "Shard of a Foul Legacy"
+		"weeklyBoss": "Shard of a Foul Legacy",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Thoma": {
 		"rarity": 4,
@@ -744,7 +859,8 @@ const chars = {
 		"local": "Fluorescent Fungus",
 		"common": "treasureHoarder",
 		"books": "Transience",
-		"weeklyBoss": "Hellfire Butterfly"
+		"weeklyBoss": "Hellfire Butterfly",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Tighnari": {
 		"rarity": 5,
@@ -756,7 +872,8 @@ const chars = {
 		"local": "Nilotpala Lotus",
 		"common": "fungus",
 		"books": "Admonition",
-		"weeklyBoss": "The Meaning of Aeons"
+		"weeklyBoss": "The Meaning of Aeons",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Venti": {
 		"rarity": 5,
@@ -768,9 +885,11 @@ const chars = {
 		"local": "Cecilia",
 		"common": "slime",
 		"books": "Ballad",
-		"weeklyBoss": "Tail of Boreas"
+		"weeklyBoss": "Tail of Boreas",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Wanderer": {
+		"canRename": true,
 		"rarity": 5,
 		"weapon": "Catalyst",
 		"region": "Sumeru",
@@ -780,21 +899,22 @@ const chars = {
 		"local": "Rukkhashava Mushrooms",
 		"common": "nobushi",
 		"books": "Praxis",
-		"weeklyBoss": "Daka's Bell"
+		"weeklyBoss": "Daka's Bell",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Wriothesley": {
-		"include": false,
 		"rarity": 5,
-		"weapon": "Unknown",
+		"weapon": "Catalyst",
 		"region": "Fontaine",
 		"visionType": "Ousia",
 		"type": "Cryo",
 		"gem": "Shivada Jade",
-		"boss": "Unknown",
-		"local": "Unknown",
-		"common": "Unknown",
-		"books": "Unknown",
-		"weeklyBoss": "Unknown"
+		"boss": "Tourbillon Device",
+		"local": "Subdetection Unit",
+		"common": "clockworkMeka",
+		"books": "Order",
+		"weeklyBoss": "Primordial Greenbloom",
+		"conBonus": {"1":3,"3":5}
 	},
 	"Xiangling": {
 		"rarity": 4,
@@ -806,7 +926,22 @@ const chars = {
 		"local": "Jueyun Chili",
 		"common": "slime",
 		"books": "Diligence",
-		"weeklyBoss": "Dvalin's Claw"
+		"weeklyBoss": "Dvalin's Claw",
+		"conBonus": {"3":3,"2":5}
+	},
+	"Xianyun": {
+		"include": false,
+		"rarity": 5,
+		"weapon": null,
+		"region": "Liyue",
+		"type": "Anemo",
+		"gem": "Vayuda Turquoise",
+		"boss": null,
+		"local": null,
+		"common": null,
+		"books": null,
+		"weeklyBoss": null,
+		"conBonus": null
 	},
 	"Xiao": {
 		"rarity": 5,
@@ -818,7 +953,8 @@ const chars = {
 		"local": "Qingxin",
 		"common": "slime",
 		"books": "Prosperity",
-		"weeklyBoss": "Shadow of the Warrior"
+		"weeklyBoss": "Shadow of the Warrior",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Xingqiu": {
 		"rarity": 4,
@@ -830,7 +966,8 @@ const chars = {
 		"local": "Silk Flower",
 		"common": "hilichurl",
 		"books": "Gold",
-		"weeklyBoss": "Tail of Boreas"
+		"weeklyBoss": "Tail of Boreas",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Xinyan": {
 		"rarity": 4,
@@ -842,7 +979,8 @@ const chars = {
 		"local": "Violetgrass",
 		"common": "treasureHoarder",
 		"books": "Gold",
-		"weeklyBoss": "Tusk of Monoceros Caeli"
+		"weeklyBoss": "Tusk of Monoceros Caeli",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Yae Miko": {
 		"rarity": 5,
@@ -854,7 +992,8 @@ const chars = {
 		"local": "Sea Ganoderma",
 		"common": "nobushi",
 		"books": "Light",
-		"weeklyBoss": "The Meaning of Aeons"
+		"weeklyBoss": "The Meaning of Aeons",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Yanfei": {
 		"rarity": 4,
@@ -866,7 +1005,8 @@ const chars = {
 		"local": "Noctilucous Jade",
 		"common": "treasureHoarder",
 		"books": "Gold",
-		"weeklyBoss": "Bloodjade Branch"
+		"weeklyBoss": "Bloodjade Branch",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Yaoyao": {
 		"rarity": 4,
@@ -878,7 +1018,8 @@ const chars = {
 		"local": "Jueyun Chili",
 		"common": "slime",
 		"books": "Diligence",
-		"weeklyBoss": "Daka's Bell"
+		"weeklyBoss": "Daka's Bell",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Yelan": {
 		"rarity": 5,
@@ -890,7 +1031,8 @@ const chars = {
 		"local": "Starconch",
 		"common": "fatuiSkirmisher",
 		"books": "Prosperity",
-		"weeklyBoss": "Gilded Scale"
+		"weeklyBoss": "Gilded Scale",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Yoimiya": {
 		"rarity": 5,
@@ -902,7 +1044,8 @@ const chars = {
 		"local": "Naku Weed",
 		"common": "samachurl",
 		"books": "Transience",
-		"weeklyBoss": "Dragon Lord's Crown"
+		"weeklyBoss": "Dragon Lord's Crown",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Yun Jin": {
 		"rarity": 4,
@@ -914,7 +1057,8 @@ const chars = {
 		"local": "Glaze Lily",
 		"common": "hilichurl",
 		"books": "Diligence",
-		"weeklyBoss": "Ashen Heart"
+		"weeklyBoss": "Ashen Heart",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Zhongli": {
 		"rarity": 5,
@@ -926,55 +1070,98 @@ const chars = {
 		"local": "Cor Lapis",
 		"common": "slime",
 		"books": "Gold",
-		"weeklyBoss": "Tusk of Monoceros Caeli"
+		"weeklyBoss": "Tusk of Monoceros Caeli",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Traveler": {
+		"canRename": true,
+		"region": null,
+		"type": null,
 		"rarity": 5,
 		"weapon": "Sword",
 		"gem": "Brilliant Diamond",
 		"boss": null,
 		"local": "Windwheel Aster",
 		"common": "hilichurl",
+		"weeklyBoss": null,
 		"regions": [
 			{
-				"region": "Mondstadt",
-				"type": "Anemo",
-				"books": ["Freedom", "Resistance", "Ballad"],
-				"weeklyBoss": "Dvalin's Sigh",
-				"common": "samachurl"
-			},{
-				"region": "Liyue",
-				"type": "Geo",
-				"books": ["Prosperity", "Diligence", "Gold"],
-				"weeklyBoss": "Tail of Boreas",
-				"common": "hilichurlShooter"
-			},{
-				"region": "Inazuma",
-				"type": "Electro",
-				"books": ["Transience", "Elegance", "Light"],
-				"weeklyBoss": "Dragon Lord's Crown",
-				"common": "nobushi"
-			},{
-				"region": "Sumeru",
-				"type": "Dendro",
-				"books": ["Admonition", "Ingenuity", "Praxis"],
-				"weeklyBoss": "Mudra of the Malefic General",
-				"common": "fungus"
-			},{
-				"region": "Fontaine",
-				"type": "Hydro",
-				"books": ["Equity", "Justice", "Order"],
-				"weeklyBoss": "Worldspan Fern",
-				"common": "taintedWater"
-			},{
+				"hasCons": false,
 				"region": null,
 				"type": "Unaligned",
 				"books": ["Freedom", "Resistance", "Ballad"],
 				"weeklyBoss": "Dvalin's Sigh",
 				"common": "samachurl"
+			},{
+				"region": "Mondstadt",
+				"type": "Anemo",
+				"books": ["Freedom", "Resistance", "Ballad"],
+				"weeklyBoss": "Dvalin's Sigh",
+				"common": "samachurl",
+				"conBonus": {"3":3,"2":5}
+			},{
+				"region": "Liyue",
+				"type": "Geo",
+				"books": ["Prosperity", "Diligence", "Gold"],
+				"weeklyBoss": "Tail of Boreas",
+				"common": "hilichurlShooter",
+				"conBonus": {"3":3,"2":5}
+			},{
+				"region": "Inazuma",
+				"type": "Electro",
+				"books": ["Transience", "Elegance", "Light"],
+				"weeklyBoss": "Dragon Lord's Crown",
+				"common": "nobushi",
+				"conBonus": {"3":3,"2":5}
+			},{
+				"region": "Sumeru",
+				"type": "Dendro",
+				"books": ["Admonition", "Ingenuity", "Praxis"],
+				"weeklyBoss": "Mudra of the Malefic General",
+				"common": "fungus",
+				"conBonus": {"2":3,"3":5}
+			},{
+				"region": "Fontaine",
+				"type": "Hydro",
+				"books": ["Equity", "Justice", "Order"],
+				"weeklyBoss": "Worldspan Fern",
+				"common": "taintedWater",
+				"conBonus": {"2":3,"3":5}
+			},{
+				"include": false,
+				"region": "Natlan",
+				"type": "Pyro",
+				"books": null,
+				"weeklyBoss": null,
+				"common": null,
+				"conBonus": null
+			},{
+				"include": false,
+				"region": "Snezhnaya",
+				"type": "Cryo",
+				"books": null,
+				"weeklyBoss": null,
+				"common": null,
+				"conBonus": null
 			}
 		]
 	}
 }
+const charTypes = ["Pyro","Hydro","Electro","Cryo","Dendro","Anemo","Geo","Unaligned"];
+const charRegions = [null,"Mondstadt","Liyue","Inazuma","Sumeru","Fontaine","Natlan","Snezhnaya","Khaenri'ah"];
+const maxCon = 6;
+const charMaxTalents = [10,10,10];
+const charTalentSuffix = ["-tal1","-tal2","-tal3"];
+const charTalentNames = ["Normal Attack", "Skill", "Burst"];
 const allChars = [];
 for (let i in chars) {allChars.push(i)}
+const travTypeOrder = [];
+const emptyByElement = [];
+for (let i in chars["Traveler"].regions) {
+	let r = chars["Traveler"].regions[i];
+	if(r.include === false) {
+		continue;
+	}
+	emptyByElement.push({});
+	travTypeOrder.push(r.type);
+}

@@ -1,10 +1,4 @@
-const defaultWeapons = {
-	"Bow": "Hunters Bow",
-	"Catalyst": "Apprentices Notes",
-	"Claymore": "Waster Greatsword",
-	"Polearm": "Beginners Protector",
-	"Sword": "Dull Blade"
-};
+"use strict";
 const weapDB = {
 	"Apprentices Notes": {
 		"rarity": 1,
@@ -106,7 +100,7 @@ const weapDB = {
 		"rarity": 3,
 		"type": "Sword",
 		"source": "NPC",
-		"maxRefinement": 1,
+		"canRefine": false,
 		"weapon": "guyunPillars",
 		"elite": "fatuiPyroAgent",
 		"common": "hilichurl"
@@ -282,6 +276,14 @@ const weapDB = {
 		"weapon": "distantSeaBranches",
 		"elite": "ruinSentinel",
 		"common": "nobushi"
+	},
+	"Ballad of the Boundless Blue": {
+		"rarity": 4,
+		"source": "event",
+		"type": "Catalyst",
+		"weapon": "borealWolfTeeth",
+		"elite": "vishap",
+		"common": "treasureHoarder"
 	},
 	"Ballad of the Fjords": {
 		"rarity": 4,
@@ -518,7 +520,7 @@ const weapDB = {
 		"rarity": 4,
 		"type": "Sword",
 		"source": "quest",
-		"maxRefinement": 1,
+		"canRefine": false,
 		"weapon": "oniMasks",
 		"elite": "blackSerpents",
 		"common": "specter"
@@ -642,6 +644,13 @@ const weapDB = {
 		"elite": "riftwolf",
 		"common": "specter"
 	},
+	"Portable Power Saw": {
+		"rarity": 4,
+		"type": "Claymore",
+		"weapon": "pristineSeaGoblet",
+		"elite": "breacherPrimuses",
+		"common": "clockworkMeka"
+	},
 	"Predator": {
 		"rarity": 4,
 		"type": "Bow",
@@ -649,6 +658,14 @@ const weapDB = {
 		"weapon": "narukami",
 		"elite": "mirrorMaiden",
 		"common": "hilichurlShooter"
+	},
+	"Prospectors Drill": {
+		"rarity": 4,
+		"type": "Polearm",
+		"title": "Prospector's Drill",
+		"weapon": "ancientChord",
+		"elite": "fatuiOperative",
+		"common": "clockworkMeka"
 	},
 	"Prototype Amber": {
 		"rarity": 4,
@@ -691,6 +708,13 @@ const weapDB = {
 		"weapon": "elixirs",
 		"elite": "fatuiCicinMage",
 		"common": "samachurl"
+	},
+	"Range Gauge": {
+		"rarity": 4,
+		"type": "Bow",
+		"weapon": "ancientChord",
+		"elite": "taintedWater",
+		"common": "transoceanic"
 	},
 	"Rightful Reward": {
 		"rarity": 4,
@@ -826,6 +850,15 @@ const weapDB = {
 		"elite": "abyssMage",
 		"common": "treasureHoarder"
 	},
+	"Sword of Narzissenkreuz": {
+		"rarity": 4,
+		"type": "Sword",
+		"icons": ["Pneuma","Ouisa"],
+		"source": "NPC",
+		"weapon": "ancientChord",
+		"elite": "fatuiOperative",
+		"common": "transoceanic"
+	},
 	"The Alley Flash": {
 		"rarity": 4,
 		"type": "Sword",
@@ -846,6 +879,14 @@ const weapDB = {
 		"weapon": "borealWolfTeeth",
 		"elite": "abyssMage",
 		"common": "slime"
+	},
+	"The Dockhands Assistant": {
+		"rarity": 4,
+		"type": "Sword",
+		"title": "The Dockhand's Assistant",
+		"weapon": "pureSacredDewdrop",
+		"elite": "fatuiOperative",
+		"common": "transoceanic"
 	},
 	"The Flute": {
 		"rarity": 4,
@@ -984,6 +1025,13 @@ const weapDB = {
 		"weapon": "elixirs",
 		"elite": "fatuiCicinMage",
 		"common": "whopperflower"
+	},
+	"Cashflow Supervision": {
+		"rarity": 5,
+		"type": "Catalyst",
+		"weapon": "pristineSeaGoblet",
+		"elite": "fatuiOperative",
+		"common": "transoceanic"
 	},
 	"Elegy for the End": {
 		"rarity": 5,
@@ -1149,6 +1197,13 @@ const weapDB = {
 		"elite": "mitachurl",
 		"common": "hilichurl"
 	},
+	"Splendor of Tranquil Waters": {
+		"rarity": 5,
+		"type": "Sword",
+		"weapon": "pureSacredDewdrop",
+		"elite": "taintedWater",
+		"common": "transoceanic"
+	},
 	"Staff of Homa": {
 		"rarity": 5,
 		"type": "Polearm",
@@ -1191,6 +1246,13 @@ const weapDB = {
 		"elite": "mirrorMaiden",
 		"common": "hilichurlShooter"
 	},
+	"Tome of the Eternal Flow": {
+		"rarity": 5,
+		"type": "Catalyst",
+		"weapon": "pureSacredDewdrop",
+		"elite": "breacherPrimuses",
+		"common": "clockworkMeka"
+	},
 	"Tulaytullahs Remembrance": {
 		"rarity": 5,
 		"type": "Catalyst",
@@ -1220,10 +1282,22 @@ const allCatalysts = [];
 const allClaymores = [];
 const allPolearms = [];
 const allSwords = [];
+const defaultWeapons = {};
 const allWeaponTypes = ["Bow","Catalyst","Claymore","Polearm","Sword"];
+const allWeaponsLowerCase = {};
 const allWeapons = [allBows,allCatalysts,allClaymores,allPolearms,allSwords];
 for (let i in weapDB) {
-	for (let j in allWeaponTypes) {
-		if(weapDB[i].type == allWeaponTypes[j]){allWeapons[j].push(i)}
+	// add weapon to all<typeOfWeapon>
+	allWeapons[allWeaponTypes.indexOf(weapDB[i].type)].push(i);
+
+	// add weapon to allWeaponsLowerCase
+	allWeaponsLowerCase[i.toLowerCase()] = i;
+
+	// if weapon is default, add to defaultWeapons
+	if(defaultWeapons[weapDB[i].type] !== undefined) {
+		continue;
+	}
+	if(weapDB[i].rarity == 1) {
+		defaultWeapons[weapDB[i].type] = i;
 	}
 }

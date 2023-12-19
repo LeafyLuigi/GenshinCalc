@@ -33,14 +33,7 @@ var saveInventory = () => {
 	}
 }
 var loadInventory = () => {
-	try {
-		var inv = JSON.parse(getLSItem("inv"));
-	}
-	catch {
-		console.warn("Inventory was corrupted; returning empty string.")
-		return "";
-	}
-	return inv;
+	return parseLSItem("inv","");
 }
 var wasInvCleared = false, clearInvDoConfirm = false;
 var clearInventory = () => {

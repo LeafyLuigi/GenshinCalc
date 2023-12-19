@@ -7,8 +7,7 @@ const artifactDB = {
 		"goblet": "Adventurer's Golden Goblet",
 		"circlet": "Adventurer's Bandana",
 		"rarityMin": 1,
-		"rarityMax": 3,
-		"source": "Stolen from Celestia."
+		"rarityMax": 3
 	},
 	"Lucky Dog": {
 		"flower": "Lucky Dog's Clover",
@@ -17,8 +16,7 @@ const artifactDB = {
 		"goblet": "Lucky Dog's Goblet",
 		"circlet": "Lucky Dog's Silver Circlet",
 		"rarityMin": 1,
-		"rarityMax": 3,
-		"source": "Stolen from Celestia."
+		"rarityMax": 3
 	},
 	"Traveling Doctor": {
 		"flower": "Traveling Doctor's Silver Lotus",
@@ -27,8 +25,7 @@ const artifactDB = {
 		"goblet": "Traveling Doctor's Medicine Pot",
 		"circlet": "Traveling Doctor's Handkerchief",
 		"rarityMin": 1,
-		"rarityMax": 3,
-		"source": "Stolen from Celestia."
+		"rarityMax": 3
 	},
 	"Resolution of Sojourner": {
 		"flower": "Heart of Comradeship",
@@ -37,8 +34,7 @@ const artifactDB = {
 		"goblet": "Goblet of the Sojourner",
 		"circlet": "Crown of Parting",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Tiny Miracle": {
 		"flower": "Tiny Miracle's Flower",
@@ -47,8 +43,7 @@ const artifactDB = {
 		"goblet": "Tiny Miracle's Goblet",
 		"circlet": "Tiny Miracle's Earrings",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Berserker": {
 		"flower": "Berserker's Rose",
@@ -57,8 +52,7 @@ const artifactDB = {
 		"goblet": "Berserker's Bone Goblet",
 		"circlet": "Berserker's Battle Mask",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Instructor": {
 		"flower": "Instructor's Brooch",
@@ -67,8 +61,7 @@ const artifactDB = {
 		"goblet": "Instructor's Tea Cup",
 		"circlet": "Instructor's Cap",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"The Exile": {
 		"flower": "Exile's Flower",
@@ -77,18 +70,17 @@ const artifactDB = {
 		"goblet": "Exile's Goblet",
 		"circlet": "Exile's Circlet",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
-	"Defender's Will": {
+	"Defenders Will": {
+		"title": "Defender's Will",
 		"flower": "Guardian's Flower",
 		"plume": "Guardian's Sigil",
 		"sands": "Guardian's Clock",
 		"goblet": "Guardian's Vessel",
 		"circlet": "Guardian's Band",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Brave Heart": {
 		"flower": "Medal of the Brave",
@@ -97,8 +89,7 @@ const artifactDB = {
 		"goblet": "Outset of the Brave",
 		"circlet": "Crown of the Brave",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Martial Artist": {
 		"flower": "Martial Artist's Red Flower",
@@ -107,8 +98,7 @@ const artifactDB = {
 		"goblet": "Martial Artist's Wine Cup",
 		"circlet": "Martial Artist's Bandana",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Gambler": {
 		"flower": "Gambler's Brooch",
@@ -117,8 +107,7 @@ const artifactDB = {
 		"goblet": "Gambler's Dice Cup",
 		"circlet": "Gambler's Earrings",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Scholar": {
 		"flower": "Scholar's Bookmark",
@@ -127,52 +116,47 @@ const artifactDB = {
 		"goblet": "Scholar's Ink Cup",
 		"circlet": "Scholar's Lens",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Prayers for Wisdom": {
 		"circlet": "Tiara of Thunder",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Prayers for Destiny": {
 		"circlet": "Tiara of Torrents",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Prayers for Illumination": {
 		"circlet": "Tiara of Flame",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
 	"Prayers to Springtime": {
 		"circlet": "Tiara of Frost",
 		"rarityMin": 3,
-		"rarityMax": 4,
-		"source": "Stolen from Celestia."
+		"rarityMax": 4
 	},
-	"Gladiator's Finale": {
+	"Gladiators Finale": {
+		"title": "Gladiator's Finale",
 		"flower": "Gladiator's Nostalgia",
 		"plume": "Gladiator's Destiny",
 		"sands": "Gladiator's Longing",
 		"goblet": "Gladiator's Intoxication",
 		"circlet": "Gladiator's Triumphus",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
-	"Wanderer's Troupe": {
+	"Wanderers Troupe": {
+		"title": "Wanderer's Troupe",
 		"flower": "Troupe's Dawnlight",
 		"plume": "Bard's Arrow Feather",
 		"sands": "Concert's Final Hour",
 		"goblet": "Wanderer's String-Kettle",
 		"circlet": "Conductor's Top Hat",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Noblesse Oblige": {
 		"flower": "Royal Flora",
@@ -181,8 +165,7 @@ const artifactDB = {
 		"goblet": "Royal Silver Urn",
 		"circlet": "Royal Masque",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Bloodstained Chivalry": {
 		"flower": "Bloodstained Flower of Iron",
@@ -191,8 +174,7 @@ const artifactDB = {
 		"goblet": "Bloodstained Chevalier's Goblet",
 		"circlet": "Bloodstained Iron Mask",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Maiden Beloved": {
 		"flower": "Maiden's Distant Love",
@@ -201,8 +183,7 @@ const artifactDB = {
 		"goblet": "Maiden's Fleeting Leisure",
 		"circlet": "Maiden's Fading Beauty",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Viridescent Venerer": {
 		"flower": "In Remembrance of Viridescent Fields",
@@ -211,8 +192,7 @@ const artifactDB = {
 		"goblet": "Viridescent Venerer's Vessel",
 		"circlet": "Viridescent Venerer's Diadem",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Archaic Petra": {
 		"flower": "Flower of Creviced Cliff",
@@ -221,8 +201,7 @@ const artifactDB = {
 		"goblet": "Goblet of Chiseled Crag",
 		"circlet": "Mask of Solitude Basalt",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Retracing Bolide": {
 		"flower": "Summer Night's Bloom",
@@ -231,8 +210,7 @@ const artifactDB = {
 		"goblet": "Summer Night's Waterballoon",
 		"circlet": "Summer Night's Mask",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Thundersoother": {
 		"flower": "Thundersoother's Heart",
@@ -241,8 +219,7 @@ const artifactDB = {
 		"goblet": "Thundersoother's Goblet",
 		"circlet": "Thundersoother's Diadem",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Thundering Fury": {
 		"flower": "Thunderbird's Mercy",
@@ -251,8 +228,7 @@ const artifactDB = {
 		"goblet": "Omen of Thunderstorm",
 		"circlet": "Thunder Summoner's Crown",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Lavawalker": {
 		"flower": "Lavawalker's Resolution",
@@ -261,8 +237,7 @@ const artifactDB = {
 		"goblet": "Lavawalker's Epiphany",
 		"circlet": "Lavawalker's Wisdom",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Crimson Witch of Flames": {
 		"flower": "Witch's Flower of Blaze",
@@ -271,8 +246,7 @@ const artifactDB = {
 		"goblet": "Witch's Heart Flames",
 		"circlet": "Witch's Scorching Hat",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Blizzard Strayer": {
 		"flower": "Snowswept Memory",
@@ -281,8 +255,7 @@ const artifactDB = {
 		"goblet": "Frost-Weaved Dignity",
 		"circlet": "Broken Rime's Echo",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Heart of Depth": {
 		"flower": "Gilded Corsage",
@@ -291,8 +264,7 @@ const artifactDB = {
 		"goblet": "Goblet of Thundering Deep",
 		"circlet": "Wine-Stained Tricorne",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Tenacity of the Millelith": {
 		"flower": "Flower of Accolades",
@@ -301,8 +273,7 @@ const artifactDB = {
 		"goblet": "Noble's Pledging Vessel",
 		"circlet": "General's Ancient Helm",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Pale Flame": {
 		"flower": "Stainless Bloom",
@@ -311,18 +282,17 @@ const artifactDB = {
 		"goblet": "Surpassing Cup",
 		"circlet": "Mocking Mask",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
-	"Shimenawa's Reminiscence": {
+	"Shimenawas Reminiscence": {
+		"title": "Shimenawa's Reminiscence",
 		"flower": "Entangling Bloom",
 		"plume": "Shaft of Remembrance",
 		"sands": "Morning Dew's Moment",
 		"goblet": "Hopeful Heart",
 		"circlet": "Capricious Visage",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Emblem of Severed Fate": {
 		"flower": "Magnificent Tsuba",
@@ -331,8 +301,7 @@ const artifactDB = {
 		"goblet": "Scarlet Vessel",
 		"circlet": "Ornate Kabuto",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Husk of Opulent Dreams": {
 		"flower": "Bloom Times",
@@ -341,8 +310,7 @@ const artifactDB = {
 		"goblet": "Calabash of Awakening",
 		"circlet": "Skeletal Hat",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Ocean-Hued Clam": {
 		"flower": "Sea-Dyed Blossom",
@@ -351,8 +319,7 @@ const artifactDB = {
 		"goblet": "Pearl Cage",
 		"circlet": "Crown of Watatsumi",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Vermillion Hereafter": {
 		"flower": "Flowering Life",
@@ -361,8 +328,7 @@ const artifactDB = {
 		"goblet": "Moment of the Pact",
 		"circlet": "Thundering Poise",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Echoes of an Offering": {
 		"flower": "Soulscent Bloom",
@@ -371,8 +337,7 @@ const artifactDB = {
 		"goblet": "Chalice of the Font",
 		"circlet": "Flowing Rings",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Deepwood Memories": {
 		"flower": "Labyrinth Wayfarer",
@@ -381,8 +346,7 @@ const artifactDB = {
 		"goblet": "Lamp of the Lost",
 		"circlet": "Laurel Coronet",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Gilded Dreams": {
 		"flower": "Dreaming Steelbloom",
@@ -391,8 +355,7 @@ const artifactDB = {
 		"goblet": "Honeyed Final Feast",
 		"circlet": "Shadow of the Sand King",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Desert Pavilion Chronicle": {
 		"flower": "The First Days of the City of Kings",
@@ -401,8 +364,7 @@ const artifactDB = {
 		"goblet": "Defender of the Enchanting Dream",
 		"circlet": "Legacy of the Desert High-Born",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Flower of Paradise Lost": {
 		"flower": "Ay-Khanoum's Myriad",
@@ -411,28 +373,27 @@ const artifactDB = {
 		"goblet": "Secret-Keeper's Magic Bottle",
 		"circlet": "Amethyst Crown",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
-	"Nymph's Dream": {
+	"Nymphs Dream": {
+		"title": "Nymph's Dream",
 		"flower": "Odyssean Flower",
 		"plume": "Wicked Mage's Plumule",
 		"sands": "Nymph's Constancy",
 		"goblet": "Heroes' Tea Party",
 		"circlet": "Fell Dragon's Monocle",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
-	"Vourukasha's Glow": {
+	"Vourukashas Glow": {
+		"title": "Vourukasha's Glow",
 		"flower": "Stamen of Khvarena's Origin",
 		"plume": "Vibrant Pinion",
 		"sands": "Ancient Abscission",
 		"goblet": "Feast of Boundless Joy",
 		"circlet": "Heart of Khvarena's Brilliance",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Marechaussee Hunter": {
 		"flower": "Hunter's Brooch",
@@ -441,8 +402,7 @@ const artifactDB = {
 		"goblet": "Forgotten Vessel",
 		"circlet": "Veteran's Visage",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	},
 	"Golden Troupe": {
 		"flower": "Golden Song's Variation",
@@ -451,8 +411,7 @@ const artifactDB = {
 		"goblet": "Golden Night's Bustle",
 		"circlet": "Golden Troupe's Reward",
 		"rarityMin": 4,
-		"rarityMax": 5,
-		"source": "Stolen from Celestia."
+		"rarityMax": 5
 	}
 }
 const allFlowers = [];
@@ -462,9 +421,26 @@ const allGoblets = [];
 const allCirclets = [];
 const artifactTypes = ["flower","plume","sands","goblet","circlet"];
 const allArtifacts = [allFlowers,allPlumes,allSands,allGoblets,allCirclets];
+const allArtifactGroupsWithOneType = [];
 const allArtifactGroups = Object.keys(artifactDB);
 for(let i in artifactDB) {
+	var has = [];
 	for(let j in artifactTypes) {
-		if(artifactDB[i][artifactTypes[j]] != undefined) allArtifacts[j].push(artifactDB[i][artifactTypes[j]]);
+		if(artifactDB[i][artifactTypes[j]] != undefined) {
+			allArtifacts[j].push(artifactDB[i][artifactTypes[j]]);
+			has.push(artifactTypes[j]);
+		}
+	}
+	if(has.length == 1) {
+		allArtifactGroupsWithOneType.push(i);
+		if(artifactDB[i].flower == undefined && artifactDB[i].plume == undefined) artifactDB[i].hasMainStat = true;
 	}
 }
+const artiValidStats = [
+	"HP",
+	"ATK",
+	["HP%","ATK%","DEF%","EM","ER"],
+	["HP%","ATK%","DEF%","EM","Pyro","Hydro","Electro","Cryo","Dendro","Anemo","Geo","Physical"],
+	["HP%","ATK%","DEF%","EM","CR","CD","HB"]
+];
+const artiValidSubstats = ["HP","ATK","DEF","HP%","ATK%","DEF%","EM","ER","CR","CD"];

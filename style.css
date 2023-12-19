@@ -33,6 +33,10 @@ body {
   margin-bottom: 8px;
 }
 
+.alignEnd {
+  align-items: end;
+}
+
 .invBlock {
   margin-top: 8px;
 }
@@ -106,6 +110,23 @@ body {
 }
 :is(.charDropdown, .weaponDropdown):hover .dropdownContent, :is(.charDropdown, .weaponDropdown).active .dropdownContent {
   display: block;
+}
+
+.weaponDropdown.unusedFound:hover .dropdownContent, .weaponDropdown.unusedFound .dropdownContent {
+  display: none;
+}
+.weaponDropdown.unusedFound .unusedWeaponsDropdown {
+  display: block;
+}
+
+.unusedWeaponsDropdown {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  max-height: 250px;
+  overflow-y: scroll;
+  min-width: inherit;
+  scrollbar-width: thin;
 }
 
 .dropdownContent {
@@ -262,14 +283,6 @@ body {
   padding-inline: 2px;
 }
 
-:is(.inputs, .charWeapInputs) input[type=number] {
-  padding-inline: 2px;
-  padding-block: 2px;
-  border: 1px solid #495366;
-  border-radius: 4px;
-  background-color: transparent;
-}
-
 .rarity-0, .rarity-1 {
   background-color: #a2a2a2;
   background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 100%);
@@ -311,7 +324,7 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-  background: url(images/info.svg);
+  background: url(images/icons/info.svg);
 }
 
 .itemSourceTooltip {
@@ -355,6 +368,13 @@ body {
 .fauxButton:hover {
   border-color: #676774;
   background-color: #d0d0d7;
+}
+.fauxButton.disabled {
+  cursor: unset;
+  pointer-events: none;
+  color: #6d6d6d;
+  background-color: #f4f4f6;
+  border-color: #c2c2ca;
 }
 
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon) {
@@ -445,7 +465,7 @@ body {
   flex-direction: column;
   align-items: center;
 }
-:is(.partyPopupContent, .partyChar) > div:not([class]) {
+:is(.partyPopupContent, .partyChar) > .limited:not(.partyIntractable), :is(.partyPopupContent, .partyChar) > div:not([class]) {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -464,8 +484,11 @@ body {
 }
 
 .partyAddChar {
-  background: url("images/addChar.svg") center/30% no-repeat;
+  background: url(images/icons/addChar.svg) center/30% no-repeat;
   filter: drop-shadow(0 0 5px #88f3ff);
+}
+.party:not([popupdisabled]) .partyAddChar:hover {
+  filter: drop-shadow(0 0 5px #88f3ff) drop-shadow(0 0 5px #88f3ff);
 }
 .partyAddChar.open {
   filter: none;
@@ -551,7 +574,7 @@ body {
 .partyPopup .partyPopupContent {
   overflow-y: scroll;
 }
-.partyPopup .partyPopupContent div:not([class]) {
+.partyPopup .partyPopupContent > .limited:not(.partyIntractable), .partyPopup .partyPopupContent > div:not([class]) {
   min-height: 120px;
   max-height: 120px;
   min-width: 105px;
@@ -620,4 +643,59 @@ body {
 }
 .partyComboIcon.elementTypeUnaligned {
   --elementColor: #13131e;
+}
+
+.collapse:is(.charInfo, .charTravInfo),
+.collapse :is(.charInfo, .charTravInfo) {
+  display: none;
+}
+.collapse.charBlock {
+  padding: 4px 8px;
+}
+.collapse.charBlock .boxName {
+  font-size: 18px;
+  row-gap: 0;
+}
+.collapse.charBlock .boxName > img {
+  width: 24px;
+  height: 24px;
+}
+.collapse.charBlock .boxName > img:not([src*="/icons/"]) {
+  width: 32px;
+  height: 32px;
+}
+.collapse.charBlock .alignEnd {
+  padding: 4px 0 0;
+  flex-flow: row-reverse nowrap;
+}
+
+.realName {
+  font-size: smaller;
+}
+
+.conBonus {
+  color: #00f;
+  border-color: #00f;
+}
+
+.expMaxLevel {
+  color: #222;
+}
+
+.expBar {
+  background: linear-gradient(to right, cyan 0% var(--fill, 0%), rgba(0, 0, 0, 0) var(--fill, 0%) 100%);
+  width: 300px;
+  height: 5px;
+  border: 1px solid #444;
+}
+
+.expTotal {
+  color: #00f;
+}
+
+.hiddenDiv {
+  display: none;
+}
+.toggleNextVisible:checked + .hiddenDiv {
+  display: block;
 }

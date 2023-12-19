@@ -1,0 +1,158 @@
+{
+	"title": "JSON Schema for GenshinCalc 'chars' object.",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "An individual character.",
+	"type": "object",
+	"definitions": {
+		"valid": {
+			"weaponTypes": {
+				"enum": ["Bow", "Catalyst", "Claymore", "Polearm", "Sword"]
+			},
+			"regions": {
+				"enum": ["Mondstadt", "Liyue", "Inazuma", "Sumeru", "Fontaine", "Natlan", "Snezhnaya", "Khaenri'ah"]
+			},
+			"elementalTypes": {
+				"enum": ["Pyro", "Hydro", "Electro", "Cryo", "Dendro", "Anemo", "Geo", "Unaligned"]
+			},
+			"talentBonusAtConLevel": {
+				"type": "integer",
+				"enum": [3, 5]
+			}
+		}
+	},
+	"patternProperties": {
+		"^([^\"'$]+)$": {
+			"required": [
+				"rarity",
+				"weapon",
+				"region",
+				"type",
+				"gem",
+				"boss",
+				"local",
+				"common",
+				"weeklyBoss"
+			],
+			"$ref": "#"
+		}
+	},
+	"properties": {
+		"title": {
+			"description": "Used as a replacement name when displaying the name.",
+			"type": "string"
+		},
+		"rarity": {
+			"description": "The character's rarity. Affects background and star count.",
+			"type": "integer",
+			"maximum": 5,
+			"minimum": 4
+		},
+		"weapon": {
+			"description": "The kind of weapon the character uses. Affects what can be attached to the character and the weapon icon. Use null for unknown.",
+			"oneOf": [{
+				"$ref": "#/definitions/valid/weaponTypes"
+			},{
+				"type": "null"
+			}]
+		},
+		"region": {
+			"description": "Where the character originates from. Use null for no region. Affects vision icon.",
+			"oneOf": [
+				{
+					"$ref": "#/definitions/valid/regions"
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
+		"type": {
+			"description": "The elemental alignment of the character. Affects vision icon. Use null for Traveler.",
+			"oneOf": [
+				{
+					"$ref": "#/definitions/valid/elementalTypes"
+				},
+				{
+					"type": "null"
+				}
+			]
+		},
+		"gem": {
+			"description": "The 'gem' item group used for ascension. While it should generally match the character's type, use null to skip if that's ever needed. Check items for what items can be used.",
+			"type": ["string","null"]
+		},
+		"boss": {
+			"description": "The 'boss' item used for ascension. Check items for what items can be used. Use null to skip.",
+			"type": ["string","null"]
+		},
+		"local": {
+			"description": "The 'local' item used for ascension. Use null if unknown. Check items for what items can be used.",
+			"type": ["string","null"]
+		},
+		"common": {
+			"description": "The 'common' item group used for ascension and talents. Use null if unknown. Check items for what items can be used.",
+			"type": ["string","null"]
+		},
+		"books": {
+			"description": "The 'books' item group(s) used for talents. Use an array for multiple kinds used, mainly for the Traveler. Use null if character isn't yet implemented or item is unknown. Check items for what items can be used.",
+			"type": ["string","array","null"]
+		},
+		"weeklyBoss": {
+			"description": "The 'weeklyBoss' item used for ascension. Use null to skip. Check items for what items can be used.",
+			"type": ["string","null"]
+		},
+		"conBonus": {
+			"description": "What character constellation level specific talents get +3 levels to. This needs two items. Use null if unknown.",
+			"oneOf": [{
+				"type": "object",
+				"minItems": 2,
+				"maxItems": 2,
+				"uniqueItems": true,
+				"properties": {
+					"1": {
+						"description": "Normal Attack",
+						"$ref": "#/definitions/valid/talentBonusAtConLevel"
+					},
+					"2": {
+						"description": "Skill (E by default)",
+						"$ref": "#/definitions/valid/talentBonusAtConLevel"
+					},
+					"3": {
+						"description": "Burst (Q by default)",
+						"$ref": "#/definitions/valid/talentBonusAtConLevel"
+					}
+				}
+			}, {
+				"type": "null"
+			}]
+		},
+		"hasCons": {
+			"description": "Bool if the character has cons or not. Set this to false to disable constellation calculation.",
+			"type": "boolean"
+		},
+		"include": {
+			"description": "Bool if the character should be included in all pages. Set this to false to ignore the character.",
+			"type": "boolean"
+		},
+		"vision": {
+			"description": "Custom Vision for any character. Overrides region+type(+visionType).",
+			"type": "string"
+		},
+		"visionType": {
+			"description": "Variation for Visions depending on region. Required for \"Fontaine\", excluding for the Traveler and any characters with visionType.",
+			"type": "string"
+		},
+		"canRename": {
+			"description": "Bool if the character can be renamed.",
+			"type": "boolean"
+		},
+		"regions": {
+			"description": "What specific stuff is required per region for the Traveler. Do not use this with other characters.",
+			"type": "array",
+			"items": {
+				"type": "object",
+				"$ref": "#"
+			}
+		}
+	}
+}

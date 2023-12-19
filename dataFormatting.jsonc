@@ -1,0 +1,507 @@
+[
+/*******************
+THIS FILE IS NOT TO BE VISIBLE FROM WEBSITE.
+IF YOU ARE SEEING THIS ON THE WEBSITE SOMETHING HAS GONE WRONG.
+
+THIS FILE IS IN JSONC FORMAT; JSON WITH COMMENTS.
+THIS FILE IS ONLY TO BE USED AS DOCUMENTATION FOR HOW A FEW VARIABLES AND LOCALSTORAGE THINGS ARE SAVED.
+MORE INFO ABOUT CERTAIN THINGS CAN BE FOUND WITHIN THE SCHEMAS DIRECTORY.
+DESPITE EVERYTHING BEING SURROUNDED BY QUOTATION MARKS, NOT EVERYTHING WILL BE.
+*******************/
+
+{ // Variable "Version" Differences
+"prefs": [
+	null, // prefs were an array containing [charLevel,charAsc,charNATalent,charSkillTalent,charBurstTalent,weapAsc,hideLimitedBool,hideExtraIconsBool]
+	0.02 // now an object {version, hideLimited bool, hideExtraIcons bool, showAdvancedWeaponInputs bool}
+],
+"charTargets": [
+	0.02 // object {version, ascension int, exp int, talents: [NA int, Skill int, Burst int] }
+],
+"weaponTargets": [
+	0.02 // object {version, basicAscension int, basicTargetMaxLevel bool, "byRarity" array [ (repeat per rarity:) {exp int, ascension int} ] }
+],
+"selectedChars": [ // "version" is stored in a different variable
+	null, // array [ (repeat per character/weapon) {name string, id string, current array [ASC/NA/S/B], target array [ASC/NA/S/B] } ] - weapons were current/target : int
+	0.01, // array adds "LVL" to beginning of current/target array for characters
+	0.02 // array [ (repeat per character/weapon) {name string, targetExp int, ascension int, targetTalents [NA/S/B], id string } ] - weapons do not have targetTalents but have id instead. Characters do not have ID.
+],
+"parties": [ // version is stored in a different variable
+	null, // array [ (repeat per party) {id string, name string, chars array [ (repeat per char) {name string, note string, (trav only) type string, weapon string, artifacts (as string:) array [ (times five) {set string} ] } ] } ]
+	0.02 // PROPOSED array like above sans "weapon" and "artifacts" to be replaced with "set" as a string
+],
+"inv": [ // there is currently no version number for this.
+	"see comment", // initially stored as URI encoded within localStorage
+	"see comment" // the above was changed and a "invNotURIDecoded" was thrown into localStorage with it all not being URI encoded.
+]
+
+},
+
+{ // IDs
+// NOT YET FULLY IMPLEMENTED - MISSING CHARACTERS
+// ids is an object containing a whole bunch of ids with what they are. This should allow for easier pointers than parties[id].chars[char#].set[id].weaponId
+// The types can be prefixed with "weap" for weapons, "set" for the sets and "arti" for artifacts with an additional type for non-prayers sets.
+// An example as follows:
+// "Eula" as a character (either selected or not. she can exist wherever)
+// "Traveler2" as a Geo Traveler (Traveler# for elementally aligned traveler stuff, no number for not byElement stuff)
+// "asdf" as a Waster Greatsword (claymore weapon)
+// "zxcv" as a party
+// "qwer" as one of Eula's equipment sets
+// "mjkn" as a "Golden Song's Variation"; a flower in Golden Troupe set.
+// "vyxh" as a "Tiara of Flame"; a circlet in Prayers for Illumination set.
+"ids": {
+	"Eula": "char",
+	"Traveler2": "char", // do note that characters may not be in here.
+	"asdf": "weap--Waster Greatsword",
+	"zxcv": "party",
+	"qwer": "set--Eula",
+	"mjkn": "arti--Golden Troupe--flower",
+	"vyxh": "arti--Prayers for Illumination" // there are only circlets in the Prayers.. sets
+},
+// idIndex would be a "large" array of every ID used. Should be initially created as idIndex = ids.keys();
+"idIndex": ["Eula","Traveler2","asdf","zxcv","qwer","mjkn","vyxh"]
+
+// Doing it this way allows for pointers to be similar to below:
+
+// assume you want to edit "asdf" to set exp to 125 but the weapon isn't in selectedChars
+// addWeapon(<stuff including "asdf" for id>) -> new box made
+// set level to 1 or exp to 125 -> check ids for "asdf" (gets "weap--Waster Greatsword") or "idOut"
+// splits "idOut" at "--" -> ["weap","Weaster Greatsword"]
+// "idOut"[0] is "weap" so check weaponIDIndex
+// weaponIDIndex["idOut"[1]] exists there and "asdf" might be in there too.
+	// ...it exists in weaponIDIndex:
+	// From this point we know what "asdf" is but we still need to update the stat.
+	// As "idOut"[1] is the chosen weapon, it should be in localStorage as an item of the same name with the id being the index in weaponIDIndex.
+	// JSON.parse(localStorage.getItem("idOut"[1]))[weaponIDIndex.indexOf("asdf")].exp = 125
+
+	// ...it doesn't exist in weaponIDIndex? We'll create it!
+	// the weapon would be as follows: {"id":"asdf","exp":125} - this gets thrown into the localStorage item and weaponIDIndex is remade as is idIndex.
+
+// assume you want to make a new set for "Dori" and add a note and add the weapon "asdf". (id of "tyui")
+// first Dori is checked to exist or not. We'll say it does.
+// Dori's sets are checked to exist or not. We'll say one is found without the desired ID.
+// As the desired set doesn't exist it has to be made.
+// {"id":"tyui","note":"Note Contents Here","weaponID":"asdf"} - this is pushed into her sets. id map is remade with that included.
+
+// assume "asdf" exists in two sets, "qwer" and "tyui" and is to be deleted.
+// as there's a "usedIn" thing for the weapon the set ids will be in that.
+// for each item in usedIn (each id):
+	// checks idIndex for their value, in this case they'd be "set--Eula" and "set--Dori"
+	// split that value at "--" so they're ["set","Eula"] and ["set","Dori"]
+	// checks the contents of the characters ("Eula" and "Dori") for the sets with their IDs ("qwer" and "tyui" respectively)
+	// sets "weapon" to null or deletes it outright
+// checks ids for itself, "asdf" to find where it resides. output here should be "weap--Waster Greatsword"
+// gets the localStorage item for Waster Greatsword and sets the LS item to <lsitem>.splice(weaponIDIndex.indexOf("asdf"),1), effectively removing itself
+// then remakes id stuff
+
+}, // end of IDs
+
+{// preferences/settings
+// there's currently 3 different variables for settings: prefs, charTargets and weaponTargets
+
+// below values are the defaults except for version.
+"prefs": {
+	"version": "number", // internally used thing for making sure this is fiiiine
+	"hideLimited": true, // boolean used to hide limited things such as Aloy, Unaligned Traveler or Flagship Event Weapons
+	"hideExtraIcons": false, // boolean used to hide additional images such as visions and rarity stars
+	"showAdvancedWeaponInputs": false // used to toggle by-rarity weapon targeting. more about that below.
+},
+
+"charTargets": {
+	"version": "number", // internally used thing dont worry about it
+	"ascension": 6, // ascension target
+	"exp": 8362650, // exp target, level is calculated from this value
+	"talents": [9,9,9] // array of the talent levels. this ignores constellations.
+},
+
+"weaponTargets": {
+	"version": "number", // internally used ignore it
+	// "basic-" being for when showAdvancedWeaponInputs is false.
+	"basicAscension": 6, // used for target ascension. rarity 1 and 2 will use 4 if this value is above that.
+	"basicTargetMaxLevel": true, // instead of a simple exp number this is a flat out *target the max* toggle. false will default to 0 exp.
+	// below for when showAdvancedWeaponInputs is true
+	"byRarity": [ // allows for a more granular targeting
+		// below is repeated by rarity
+		{
+			"exp": "number", // default max for rarity
+			"ascension": "number" // default max for rarity
+		}
+	]
+}
+
+}, // end of preferences/settings
+
+// selectedChars
+// Order below is "Ganyu" followed by "Geo Traveler" then "Anemo Traveler" then a "Dull Blade". all are using maxed target stats.
+[{
+	"name": "Ganyu",
+	"targetTalents": [9,9,9],
+	"targetExp": 8362650,
+	"ascension": 6
+},{
+	"name": "Traveler", // this gets listed in the index variable rather than useTravElement
+	"useTravElement": 2, // used as a pointer to the relevent type
+	"targetExp": 8362650,
+	"ascension": 6,
+	"byElement": [
+		{}, // unaligned
+		{
+			// anemo (used by below traveler)
+			"targetTalents": [9,9,9]
+		},
+		{
+			// geo (this traveler)
+			"targetTalents": [9,9,9]
+		} // etc until this matches length of travTypeOrder
+	]
+},{
+	"useTravElement": 1 // used as a pointer to the relevant type. this gets listed in the index variable.
+},{
+	"name": "Dull Blade",
+	"id": "$id",
+	"targetExp": 719875,
+	"ascension": 4
+}
+], // end of selectedChars
+[ // selectedCharsIndex
+// This will use the same order as above.
+	"Ganyu", // Name of not-traveler characters - elements within use this as the id="..." prefix as the remove button
+	"Traveler", // Initial traveler uses the name "Traveler" - box uses (type as word)+" Traveler" as id and remove button but "Traveler_"+(type as number) for the rest
+	1, // subsequent travelers use the useTravElement value - ids are used the same way as above
+	"$weapID" // weapon ID for the weapon in question - elements within use this as the id="..." prefix as the remove button
+],
+
+{// Weapons within localStorage
+// Weapons will be stored within their own (localStorage) variable, such as below. They lack notes.
+"Dull Blade":
+	[{
+	"id": "$id",
+	"exp": 0,
+	"ascension": 0,
+	"refinement": 1, // (not really possible for rarity 1/2 weapons but yea. some exceptions exist tho.)
+	
+	// (if the weapon is used as equipment anywhere)
+	"usedIn": {
+		"Traveler": ["$id"]
+	}
+
+	}]
+}, // end of Weapons within localStorage
+{ // Weapon ID stuff
+// The "weaponInfoIndex" variable contains the localStorage items within.
+"weaponInfoIndex": {
+	"Dull Blade": [{},{},{}] // etc.
+},
+// The "weaponIDIndex" variable exists for mapping it.
+// Below uses "Dull Blade" with two existing IDs, "asdf" and "zxcv" and "Rust" with one ID "poiu"
+"weaponIDIndex": {
+	"Dull Blade": ["asdf","zxcv"],
+	"Rust": ["poiu"]
+}
+// The above is stored in localStorage but can be generated on the fly using below assuming localStorage item exists and is parsed correctly.
+},// end of Weapon ID stuff
+
+{ // Artifacts within localStorage
+// Artifacts, like weapons, will be stored within their own (localstorage) variable.
+// A slight exception to the "Prayers.." sets as they only contain circlets.
+// Below uses "Lucky Dog's Goblet" with id "qwer", "Lucky Dog's Clover" with id "ty12" and "Tiara of Flame" with id "lkjh"
+"Lucky Dog": {
+	"flower": [{ // flowers - main stat is always HP.
+		"id": "ty12",
+		"rarity": 3,
+		"exp": 52275, // max exp for 3*, level 12. this means that the main stat's value is 1893 (not listed here)
+		"substats": {
+			// 3* start with 1-2 substats and can have 2-3 unlocks with 0-1 upgrades.
+			// Calculating the range for these won't be fun so these are bollocks.
+			"DEF": 7.78,
+			"HP%": 2.8,
+			"CR%": 1.63
+		},
+		// (if the item is used as equipment anywhere)
+		"usedIn": {
+			"Traveler": ["ghjk"]
+		}
+	}],
+	"goblet": [{	// goblet - main stat isn't always a single kind so it has to be listed.
+		// Omitted substats and usedIn.
+		"id": "qwer",
+		"rarity": 2,
+		"mainStat": "Pyro", // name is shortened from "Pyro DMG%"
+		"exp": 6525 // max exp for 2*, level 4. This means the main stat, Pyro DMG% value is 9(%).
+	}]
+},
+"Prayers for Illumination": [
+	// as this set only contains circlets, extra arrays of flowers, plumes etc aren't included.
+	{
+		// Omitted substats and usedIn.
+		"id": "lkjh",
+		"rarity": 4,
+		"exp": 122675, // max exp for 4*, level 16
+		"mainStat": "CR%" // Along with the rarity and level, this means the value for Crit Rate% is 23.2(%).
+	}
+]
+
+}, // end of Artifacts within localStorage
+{ // Artifacts
+// The artifactInfoIndex variable exists to hold every used artifact from localStorage.
+"artifactInfoIndex": {
+	"Lucky Dog": {
+		"flower": [{},{},{}], // etc
+		"goblet": [{}]
+	},
+	"Prayers for Illumination": [{},{},{}] // etc
+},
+// Much like how weapons have an ID map for slight easier calculations, artifacts have the same.
+// This example uses the same as the above lot.
+"artifactIDIndex": {
+	"Lucky Dog": {
+		"flower":["ty12"],
+		"goblet": ["qwer"]
+	},
+	"Prayers for Illumination": ["lkjh"]
+}
+
+}, // end of Artifacts
+
+{ // usedIn for weapons and artifacts
+// We'll assume Traveler's set id "ghjk" is using:
+// Dull Blade (id "asdf"),
+// Lucky Dog's Clover (id "ty12")
+// Tiara of Flame (id "lkjh")
+// The same sort of thing will be done for artifacts
+// localStorage save format (irrelevant things omitted):
+"Traveler": {
+	"sets": [
+		{
+			"id": "ghjk",
+			"weapon": "asdf",
+			"artifacts": [
+				"ty12",
+				null,null,null, // empty/unassigned are null
+				"lkjh"
+			]
+		}
+	]
+},
+"Dull Blade": [
+	{
+		"id": "asdf",
+		"usedIn": {
+			"Traveler": ["ghjk"]
+		}
+	}
+],
+"Lucky Dog": {
+	"flower": [{
+		"id": "ty12",
+		"usedIn": {
+			"Traveler": ["ghjk"]
+		}
+	}]
+},
+"Prayers for Illumination": [
+	{
+		"id": "lkjh",
+		"usedIn": {
+			"Traveler": ["ghjk"]
+		}
+	}
+]
+}, // end of usedIn
+
+{ // Parties
+// THIS NEW FORMAT HAS NOT BEEN FULLY IMPLEMENTED.
+"parties": [
+	{
+		"id": "$id",
+		"name": "$name",
+		"note": "$note",
+		"chars": [
+			{
+				"name": "$char",
+				"set": "$id",
+				"type": "$travType" // Traveler only. Undefined for Anemo if name is "Traveler".
+			} // repeat per character
+		]
+	} // repeat per party
+],
+"partiesVersion": "0.02" // gotta make sure this exists
+}, // end of Parties
+
+{ // characters in localStorage
+// any non-defaults are omitted when stored in localStorage
+"$char": {
+	"nickname": "string", // (trav or wanderer) | default empty string or char name
+	"con": "number", // (not aloy or trav) | default 0
+	"talents": ["num","num","num"], // (not trav) | default [1,1,1]
+	"owned": "bool", // (not trav) | default false
+	"exp": "num", // default 0
+	"note": "string", // default empty string
+	"hideInfo": "bool", // default false
+	"activeSet": "string", // this would be the ID of a set. could be used to show a warning icon in party page | default empty string / undefined
+
+	// (trav only, default for an element being "{}")
+	"byElement": [
+		{
+			"con": "num", // (not unaligned/0) | default 0
+			"owned": "bool", // (not unaligned/0; inverted anemo/1) | default false (true for anemo)
+			"talents": ["num","num","num"], // default [1,1,1]
+			"note": "string", // default empty string
+			"hideInfo": "bool" // default false
+		} // (repeat per element)
+	],
+
+	// for all characters
+	"sets": [
+		{
+			"id": "$id",
+			"note": "string",
+			"weapon": "$id", // (id of weapon)
+			"artifacts": [ // length should be 5.
+				"$id", // (id of artifact used)
+				null // for not assigned / empty
+			]
+		} // (repeat per set)
+	]
+}
+}, // end of characters in localStorage
+{ // Character Mapping
+// This variable contains info on every character from localStorage primarily as trying to use a #id as a variable might not go too well.
+"charInfoIndex": {
+	"Traveler": {
+		// char info here
+		"sets": [] // set info here
+	}
+},
+"setsIDIndex": { // much like artifacts and weapons, there's an index for character sets.
+// Mainly here for parity with artis and weaps.
+	"Traveler": ["ghjk"] // <char name> : [<array of set ids>]
+}
+}, // end of Character Mapping
+
+{ // Items Inventory
+	// currently this is a massive key value pair. that's it.
+	"key": "value"
+}, // end of Items Inventory
+
+// "*db.js" file stuff
+{ // chardb.js - chars
+// This is the large JSON object with every character in it.
+"chars": {
+	// As we continue, repeated keys will be omitted.
+	"Albedo": {
+		"rarity": 5, // Valid values are 4 and 5
+		"weapon": "Sword", // Determines what weapons can be attached to the character. Valid values are listed in the const `allWeaponTypes`.
+		"region": "Mondstadt", // Used in vision icon. Valid values are listed in the const `charRegions`. Avoid using null.
+		"type": "Geo", // Used in vision icon. Valid values are listed in the const `charTypes`. Unaligned should not be used.
+		
+		// item type keys - Used for calculating resources required.
+		"gem": "Prithiva Topaz", // This should be an item group.
+		"boss": "Basalt Pillar",
+		"local": "Cecilia",
+		"common": "samachurl", // This should be an item group.
+		"books": "Ballad", // This should be an item group. Traveler uses an array (more on Traveler at the end)
+		"weeklyBoss": "Tusk of Monoceros Caeli",
+
+		"conBonus": {"2":3,"3":5}
+		// An object containing the talent and the bonus applied to it at the con level.
+		// "1" - Normal Attack
+		// "2" - Skill
+		// "3" - Burst
+	},
+	"Aloy": {
+		"hasCons": false, // Omits conBonus as the character cannot get cons
+		"vision": "Aloy" // Changes how vision icon is drawn by using this instead of region+type.
+	},
+	"Charlotte": {
+		"include": false, // Skips the character in a lot of areas. It does not get listed in dropdowns, cannot be used in parties etc.
+		"visionType": "Ousia" // Currently Fontaine characters use this to draw vision icon. It still gets skipped if "vision" exists.
+	},
+	"Wanderer": {
+		"canRename": true // allows renaming of the character in Character page
+	},
+	"Traveler": {
+		"regions": [ // The list of regions for the Traveler
+			{ // Using Mondstadt / Anemo Traveler for this.
+				"books": ["Freedom", "Resistance", "Ballad"]
+				// As the Traveler increases the talent levels, the required book changes.
+				// The items required thus changes depending on the book in the array.
+			}
+		]
+	}
+}
+}, // end of chardb.js - chars
+
+{ // itemdb.js - itemDB and itemGroupDB
+// This contains every item that the calculator/inventory can use/show.
+"itemDB": {
+	// order of the items determines a less important order when displaying items
+	"Mora": {
+		"rarity": "number", // valid range is 0 to 5 inclusive. default 0.
+		"source": "string", // optional string to say how to get the item
+		"type": "string" // used for sorting. must be one of the items in the const `itemTypes`
+	},
+	"Wolfhook": {
+		"region": "Mondstadt" // optional string to say the location the item is from. Currently does nothing.
+	}
+},
+"itemGroupDB": {
+	// these are sorted by group in the object itself.
+	"slime": {
+		"priority": 0, // "optional" number for draw order in the items' groups. common and elite are combined.
+		"source": "string", // optional string to say how to get the items in the group
+		"items": ["array of items"] // array of items in the group to apply source to and draw order.
+	},
+	// converting is currently not implemented but the below will be used
+	"Brilliant Diamond": {
+		"craftUp": false, // (not used for converting) - disables crafting up items array calculations
+		"canConvertTo": false // set to false to disable converting to this group
+	},
+	"Agnidus Agate": {
+		"convertType": "inter", // either "inter" or "intra" are valid. inter requires below to work. intra allows converting between items in group.
+		"convertTo": "gem" // convertType set to inter, this is type the items can be converted to
+	}
+}
+}, // end of itemdb.js - itemDB and itemGroupDB
+
+{ // weapdb.js - weapDB
+// This is the large object that holds weapon information.
+"weapDB": {
+	"Apprentices Notes": {
+		"rarity": 1, // rarity must be between 1 and 5 inclusive.
+		"type": "Catalyst", // Valid values are listed in the const `allWeaponTypes`.
+		"title": "Apprentice's Notes", // Title is used when the actual name has quotations in them.
+		"weapon": "decarabianTiles", // Weapon ascension material. must be a group.
+		"elite": "mitachurl", // item material group
+		"common": "hilichurl" // item material group
+	},
+	"Dark Iron Sword": {
+		"source": "NPC", // valid values are "NPC", "quest", "event" and "bought". Those with "event" are ignored if prefs.hideLimitedItems is true.
+		"canRefine": false // disables refinement for rarity 3+ weapons.
+	},
+	"Ballad of the Boundless Blue": {
+		"include": false // much like characters, these will be skipped if include is false
+	}
+}
+}, // end of weapdb.js - weapDB
+
+{ // artifactdb.js - artifactDB
+"artifactDB": {
+	"Adventurer": { // group name
+		// names of the items in the group
+		"flower": "Adventurer's Flower",
+		"plume": "Adventurer's Tail Feather",
+		"sands": "Adventurer's Pocket Watch",
+		"goblet": "Adventurer's Golden Goblet",
+		"circlet": "Adventurer's Bandana",
+
+		// rarity must be within these values (inclusive)
+		"rarityMin": 1,
+		"rarityMax": 3,
+
+		// (add automatically if only artifact type isn't flower or plume. it would be undefined for Adventurer.)
+		"hasMainStat": true
+	}
+	// though not listed here, any groups missing any of flower, plume, sands etc aren't invalid.
+}
+} // end of artifactdb.js - artifactDB
+]

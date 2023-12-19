@@ -1,15 +1,6 @@
 'use strict';
 // set vars
-var travelerType, neededItemsForAscTal, travelerAscensionDone = false;
 var showConvertsBool;
-
-// stuff on main and inv pages
-var toggleLimitedItems = () => {
-	document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
-}
-var toggleExtraIcons = () => {
-	document.getElementsByTagName("body")[0].classList.toggle("hideExtraIcons");
-}
 
 // shorthands
 var get = (id) => {
@@ -77,6 +68,42 @@ var setVal = (id,val,noGet=false) => {
 		return;
 	}
 }
+// Shift and CTRL/CMD for 10/100 stepping.
+// Optional Shift+CTRL/CMD for 1000 stepping.
+var adjustStep = (id,isWheel=false,allowThousands=false,noGet=false) => {
+	const stepValues = [0,9,99,999]; // all one less to what the step value is.
+	var shift = event.shiftKey;
+	var ctrlCmd = event.ctrlKey, meta = event.metaKey;
+	var step = get(id).step;
+	if(step == "") {
+		step = 1;
+	}
+	if(shift || ctrlCmd || meta) {
+		var oldVal = val(id);
+		if(navigator.userAgent.toLowerCase().indexOf("mac os") != -1) {
+			ctrlCmd = meta;
+		}
+		var arrayIndex = Math.floor(0 + shift + 2*ctrlCmd);
+		if(!allowThousands && arrayIndex == 3) {
+			arrayIndex = 2;
+		}
+		if(!isWheel) {
+			if(event.key == "ArrowUp") {
+				setVal(id,(oldVal+(step*stepValues[arrayIndex])),noGet);
+			}
+			if(event.key == "ArrowDown") {
+				setVal(id,(oldVal-(step*stepValues[arrayIndex])),noGet);
+			}
+		} else {
+			if(event.deltaY < 0) {
+				setVal(id,(oldVal+(step*stepValues[arrayIndex])),noGet);
+			}
+			if(event.deltaY > 0) {
+				setVal(id,(oldVal-(step*stepValues[arrayIndex])),noGet);
+			}
+		}
+	}
+}
 
 // regex stuff
 var spaceToUnderscore = (string) => {
@@ -88,15 +115,19 @@ var underscoreToSpace = (string) => {
 var removeQuotes = (string) => {
 	return string.replace(/['"]+/g, "");
 }
+var parseHTMLSafe = (string) => {
+	return string.replace(/&/g,"&amp;").replace(/"/g,"&quot;").replace(/'/g,"&#39;").replace(/</g,"&lt;").replace(/>/g,"&gt;");
+}
+var parseHTMLUnsafe = (string) => {
+	return string.replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">");
+}
 
 // Pick Character
 var pickChar = (choice,travType=null) => {
-	if(choice.indexOf("Traveler") != -1) {
+	if(choice.indexOf(" Traveler") != -1) {
 		choice = "Traveler";
-		travelerType = chars["Traveler"].regions[travType].type;
-		get("dropdownCharName").value = travelerType+" "+choice;
+		get("dropdownCharName").value = chars["Traveler"].regions[travType].type+" "+choice;
 	} else {
-		travelerType = undefined;
 		get("dropdownCharName").value = choice;
 	}
 	get("dropdownCharIcon").setAttribute("src","images/char/"+spaceToUnderscore(choice)+".png");
@@ -153,18 +184,28 @@ var mergeItems = (firstList,secondList,deleteZeroOrLess=false) => {
 	}
 	return mergedList;
 }
-// Items can also be manually sorted in the itemdb.js file
-const typeOrder = ["local","charExp","commonElite","weeklyBoss","boss","gem","books","crown","weaponAsc","other"];
+// Items can also be manually sorted within groups in the itemdb.js file
+const typeOrder = ["local","exp","commonElite","weeklyBoss","boss","gem","books","crown","weaponAsc","other"];
 const intraTypeOrder = ["group","rarity","count"]; // "Group" is arbitrary and until multiple inputs are added, will be skipped.
 var orderItems = (items) => {
 	// var index = items.map(i => i.name);
+	if(items.length == 1) return items;
+
 	items.sort((a,b) => {
 		var aType, bType;
+		
+		// "Mora" is placed first
 		if(a == "Mora") return -1;
 		if(b == "Mora") return 1;
-		// "Mora" is placed first
+
 		var aItem = itemDB[a];
 		var bItem = itemDB[b];
+		
+		// skip undefined items
+		if(aItem === undefined || bItem === undefined) {
+			console.log(aItem,bItem, "FUCK")
+		};
+
 		if(aItem.type == "common" || aItem.type == "elite") {
 			aType = typeOrder.indexOf("commonElite");
 		} else {
@@ -192,9 +233,9 @@ var orderItems = (items) => {
 // mainly used for adding to $element.innerHTML
 var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceType=null) => {
 	var fallback = item;
-	var validSizes = ["micro","tiny","mini","small","normal","big"];
-	var pixels = [36, 56, 72, 96, 112, 256];
-	// var raritySizes = [8, 12, 15, 20, 24, 55];
+	const validSizes = ["micro","tiny","mini","small","normal","big"];
+	const pixels = [36, 56, 72, 96, 112, 256];
+	// const raritySizes = [8, 12, 15, 20, 24, 55];
 	if (validSizes.indexOf(size) == -1) {
 		console.warn("Invalid size used. Using default (\"mini\"). Valid sizes: "+validSizes);
 		size = "mini";
@@ -222,14 +263,33 @@ var makeItemIcon = (item,count=1,rarity=-1,size="mini",showSource=false,forceTyp
 	if(showSource && itemDB[item].source != undefined) {
 		html += "<img draggable=\"false\" loading='lazy' onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/icons/info.svg\" width=\"20\" height=\"20\"><div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>";
 	}
-	html +="<img loading='lazy'";
 	if(fallback != item) {
-		html+=" fallback=\""+fallback+"\"";
-		console.warn("[MakeItemIcon] Fallback doesn't match item.")
+		console.warn("[MakeItemIcon] Fallback doesn't match item.");
 	}
-	html +=" draggable=\"false\" class=\"itemIconImg\" src=\"images/"+type+"/"+img+".png\" width=\""+pixels[validSizes.indexOf(size)]+"\" height=\""+pixels[validSizes.indexOf(size)]+"\">";
+	if(type=="crown") {type="other";} // crown item is placed in "other" directory
+	html += makeImg("images/"+type+"/"+img+".png",pixels[validSizes.indexOf(size)],pixels[validSizes.indexOf(size)],["itemIconImg"],fallback!=item?{"data-fallback":fallback}:{})
 	if(rarity != undefined && rarity != 0) html += "<img loading=\"lazy\" draggable=\"false\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">"; // height is set in css
 	html +="<span class=\"itemCount\">"+count+"</span></div>";
 	html +="<div class=\"itemName\">"+item+"</div></div>";
 	return html;
+}
+
+var makeImg = (src,width=undefined,height=undefined,classList=[],otherProperties={},draggable=false,lazyLoading=true,useHTML=true) => {
+	if(typeof(src) !== "string") {
+		console.error("src must be a string. aborting");
+		return;
+	}
+	let elem = Object.assign(document.createElement("img"));
+	elem.src = src;
+	elem.height = height !== undefined && Number.isInteger(height) ? height : 16;
+	elem.width = width !== undefined && Number.isInteger(width) ? width : 0;
+	if(JSON.stringify(classList) != "[]" && Array.isArray(classList)) elem.classList = classList.join(" ");
+	elem.draggable = draggable;
+	if(lazyLoading) elem.loading = "lazy";
+	for(let i in Object.keys(otherProperties)) {
+		let key = Object.keys(otherProperties)[i];
+		elem.setAttribute(key,otherProperties[key]);
+	}
+	if(useHTML) return elem.outerHTML;
+	return elem;
 }

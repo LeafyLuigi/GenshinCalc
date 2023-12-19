@@ -1,4 +1,5 @@
 'use strict';
+const itemTypes = ["other","crown","boss","common","elite","weeklyBoss","books","gem","exp","weaponAsc","local"];
 const itemDB = {
 	"Mora": {
 		"rarity": 3,
@@ -151,20 +152,48 @@ const itemDB = {
 		"source": "Dropped by Emperor of Fire and Iron.",
 		"type": "boss"
 	},
-
-	"Adventurer's Experience": {
-		"rarity": 3,
-		"type": "charExp"
+	"Tourbillon Device": {
+		"rarity": 4,
+		"title": "\"Tourbillon Device\"",
+		"source": "Dropped by the Prototype Cal. Breguet.",
+		"type": "boss",
 	},
+	"Fontemer Unihorn": {
+		"rarity": 4,
+		"source": "Dropped by Millennial Pearl Seahorse.",
+		"type": "boss"
+	},
+	"Water That Failed To Transcend": {
+		"rarity": 4,
+		"source": "Dropped by Hydro Tulpas.",
+		"type": "boss"
+	},
+
 	"Hero's Wit": {
 		"rarity": 4,
-		"type": "charExp"
+		"type": "exp"
+	},
+	"Adventurer's Experience": {
+		"rarity": 3,
+		"type": "exp"
 	},
 	"Wanderer's Advice": {
 		"rarity": 2,
-		"type": "charExp"
+		"type": "exp"
 	},
-
+	"Mystic Enhancement Ore": {
+		"rarity": 3,
+		"type": "exp"
+	},
+	"Fine Enhancement Ore": {
+		"rarity": 2,
+		"type": "exp"
+	},
+	"Enhancement Ore": {
+		"rarity": 1,
+		"type": "exp"
+	},
+	
 	"Crystalline Cyst Dust": {
 		"rarity": 3,
 		"type": "common"
@@ -524,6 +553,18 @@ const itemDB = {
 	},
 	"Newborn Tainted Hydro Phantasm": {
 		"rarity": 4,
+		"type": "elite"
+	},
+	"Operative's Constancy": {
+		"rarity": 4,
+		"type": "elite"
+	},
+	"Operative's Standard Pocket Watch": {
+		"rarity": 3,
+		"type": "elite"
+	},
+	"Old Operative's Pocket Watch": {
+		"rarity": 2,
 		"type": "elite"
 	},
 
@@ -1010,22 +1051,42 @@ const itemDB = {
 	"Beryl Conch": {
 		"type": "local",
 		"region": "Fontaine",
-		"source": "Underwater in Fontaine."
+		"source": "Found underwater in Fontaine."
 	},
 	"Romaritime Flower": {
 		"type": "local",
 		"region": "Fontaine",
-		"source": "Primarially underwater in Fontaine with on-land areas needing to be hit with Hydro first."
+		"source": "Primarially found underwater in Fontaine with on-land areas needing to be hit with Hydro first."
 	},
 	"Lumidouce Bell": {
 		"type": "local",
 		"region": "Fontaine",
-		"source": "Scattered around Fontaine's above water areas with the best group in the north of the Court of Fontaine Region, close to the Shrine of Depths."
+		"source": "Found scattered around Fontaine's above water areas with the best group in the north of the Court of Fontaine Region, close to the Shrine of Depths."
 	},
 	"Rainbow Rose": {
 		"type": "local",
 		"region": "Fontaine",
 		"source": "Best found in the west of the Court of Fontaine Region and around the Fountain of Lucine."
+	},
+	"Lumitoile": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "Found underwater in the Liffey Region of Fontaine."
+	},
+	"Lakelight Lily": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "Found around the surface of inland waters in Frinnyes Forest."
+	},
+	"Subdetection Unit": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "Found in and around ruins of Fontaine Research Institute... and Liffey Region."
+	},
+	"Spring of the First Dewdrop": {
+		"type": "local",
+		"region": "Fontaine",
+		"source": "Found underwater in Morte Region."
 	},
 
 	"Bit of Aerosiderite": {
@@ -1365,10 +1426,35 @@ const itemDB = {
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
+	"Lightless Silk String": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Lightless Eye of the Maelstrom": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
+	"Lightless Mass": {
+		"rarity": 5,
+		"type": "weeklyBoss"
+	},
 };
 
 const itemGroupDB = {
 	// NOTE: LOCALS AND BOSS DROPS LACK GROUPS. THEY ARE SORTED MANUALLY IN THE LIST ABOVE.
+
+	// exp stuff
+	"charExp": {
+		"priority": 0,
+		// "source": "",
+		"craftUp": false,
+		"items": ["Hero's Wit", "Adventurer's Experience","Wanderer's Advice"]
+	},
+	"weapExp": {
+		"priority": 1,
+		// "source": "",
+		"items": ["Mystic Enhancement Ore","Fine Enhancement Ore","Enhancement Ore"]
+	},
 
 	// common and elite mats
 	"slime": {
@@ -1520,6 +1606,11 @@ const itemGroupDB = {
 		"priority": 29,
 		"source": "Dropped by Breacher Primuses.",
 		"items": ["Rift Core","Foreign Synapse","Alien Life Core"]
+	},
+	"fatuiOperative": {
+		"priority": 30,
+		"source": "Dropped by Fatui Operatives.",
+		"items": ["Old Operative's Pocket Watch", "Operative's Standard Pocket Watch", "Operative's Constancy"]
 	},
 	
 	// weapon asc mats
@@ -1740,7 +1831,7 @@ const itemGroupDB = {
 		"craftUp": false,
 		"convertType": "intra",
 		"source": "Dropped in Confront Stormterror at domain levels 4 and higher.",
-		"items": ["Dvalin's Claw", "Dvalin's Plume", "Dvalin's Sigh"]
+		"items": ["Dvalin's Plume", "Dvalin's Claw", "Dvalin's Sigh"]
 	},
 	"Andrius": {
 		"priority": 1,
@@ -1761,14 +1852,14 @@ const itemGroupDB = {
 		"craftUp": false,
 		"convertType": "intra",
 		"source": "Dropped in Beneath the Dragon-Queller at domain levels 2 and higher.",
-		"items": ["Bloodjade Branch", "Dragon Lord's Crown", "Gilded Scale"]
+		"items": ["Dragon Lord's Crown", "Bloodjade Branch", "Gilded Scale"]
 	},
 	"La Signora": {
 		"priority": 4,
 		"craftUp": false,
 		"convertType": "intra",
 		"source": "Dropped in Narukami Island: Tenshukaku at domain levels 2 and higher.",
-		"items": ["Molten Moment", "Ashen Heart", "Hellfire Butterfly"]
+		"items": ["Molten Moment", "Hellfire Butterfly", "Ashen Heart"]
 	},
 	"Shogun": {
 		"priority": 5,
@@ -1790,6 +1881,13 @@ const itemGroupDB = {
 		"convertType": "intra",
 		"source": "Dropped in The Realm of Beginnings at domain levels 2 and higher.",
 		"items": ["Worldspan Fern", "Primordial Greenbloom", "Everamber"]
+	},
+	"Narwhal": {
+		"priority": 8,
+		"craftUp": false,
+		"convertType": "intra",
+		"source": "Dropped in Shadow of Another World at domain levels 2 and higher.",
+		"items": ["Lightless Silk String", "Lightless Eye of the Maelstrom", "Lightless Mass"]
 	}
 }
 // adds the group to the item
