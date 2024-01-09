@@ -3,23 +3,90 @@
 	<head>
 		<title>Genshin Calculator - Characters</title>
 		<link rel="stylesheet" href="style.css">
-		<script type="text/javascript" src="chardb.js"></script>
-		<script type="text/javascript" src="itemdb.js"></script>
-		<script type="text/javascript" src="weapdb.js"></script>
+		<script type="text/javascript" src="loadData.js"></script>
 		<script type="text/javascript" src="ascdb.js"></script>
 		<script type="text/javascript" src="scripts.js"></script>
 		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+		<script type="text/javascript" src="scripts/prefs.js"></script>
 		<script type="text/javascript" src="scripts/inventory.js"></script>
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
-	<!-- TODO: merge traveler into one box? -->
-	<!-- TODO: add weapons and artifacts? -->
+	<!--
+	TODO:
+		add hideExtraIcons toggle thingy
+		
+		ascension, either automatically calculated or manually addable. not saved by trav type
+
+		show owned by type for trav
+		"active set"
+
+		events to be added to following:
+			character level and progress - onchange:
+				probably reuse math for artis/weapons
+			
+			anything to do with sets:
+				anything in set changes? save data
+
+		"equipment":
+			add multiple sets per character
+
+			add weapons:
+				setting weapons
+				refinement
+				exp
+				moving to other characters
+				unassigning weapons
+
+			add artifacts
+				setting artifacts
+				exp
+				main stat + substats
+				rarity
+				moving to other characters
+				unassigning artifacts
+		
+		allow saving (and remove on empty/default):
+			equipment (relies on above)
+	-->
+	<!--
+	DONE:
+		skip unowned char's notes, stats etc (by proxy done)
+		collapse unowned characters (hideinfo collapses differently)
+		backend formatting shite (sans sets, still wip)
+		owned characters (auto owned if in localstorage)
+		removal of unowned characters
+
+		allow saving:
+			con
+			exp/level (char)
+			custom names for trav/wanderer
+			talents
+			notes
+			hide info
+	-->
+	<!--
+	trav's data is in a slightly different format.
+	exp is shared between all kinds of travelers.
+	note is still there for entire character. could potentially be replaced with a name.
+	nickname for a custom name (also saved with wanderer)
+
+	saved by element in the order: [unaligned, anemo, geo... (type by region)]
+	Unaligned:
+		con (below) is ignored
+		owned is forced true, cannot uncheck
+
+	All:
+		con and talents are saved by type
+		owned exists for if the type is unlocked or not. default true for anemo (but togglable)
+		note exists for each type
+	-->
 	<body>
 		<div>
 			<a href="index.html">Home</a>
 			<a href="inv.html">Inventory</a>
 			<a href="party.html">Party Saver</a>
 		</div>
+		known issue with holding shift/ctrl/cmd/whatever and not exactly matching maximum exp not allowing level up
 		<div class="invBlock" id="characters"></div>
 		<footer style="font-size:12px;overflow-x:auto;">
 			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site, the interactive map and from the game itself. This site <strong>does not</strong> use Cookies and is completely open source. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
@@ -27,60 +94,549 @@
 	</body>
 	<script>
 	'use strict';
-	var idsToSave = [];
-	var idsToDelete = [];
-	var ownedChars = {};
+	const fallbackCharData = {owned:false,con:0,talents:[1,1,1],exp:0,sets:[],hideInfo:false};
+	var confirmDelete = [];
+	var artifactIDIndex;
+	pageType = "characters";
 	window.addEventListener("load", () => {
-		var html = "<div class=\"boxName\">Characters</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><br><div class=\"characterList\">";
+		var html = "<div class=\"boxName\">Characters</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><em style=\"display:block\">You can hold Shift to adjust EXP by 10 or CTRL (CMD on Mac) to adjust EXP by 100. Use both for 1000.</em><br><div class=\"characterList\">";
 		var maxInputSize = 3;
 		var value = 0;
-		var charKeys = [];
-		var charsDone = {};
-		if (getLSItem("char") != undefined) {
-			ownedChars = loadCharacters();
-		}
-		for(var i in chars) {
-			charKeys[charKeys.length] = i;
-		}
+		var charKeys = Object.keys(charDB);
+		var ownedChars = [];
+		let charOrder = Object.keys(charDB);
 		for(var i in charKeys) {
-			if(chars[charKeys[i]].include == false) continue;
+			if(getLSItem(charKeys[i]) != undefined) {
+				ownedChars.push(charKeys[i]);
+				charOrder = charOrder.filter(itm => itm != charKeys[i]);
+			}
+		}
+		charKeys = ownedChars.concat(charOrder); 
+		for(var i in charKeys) {
+			// if(charDB[charKeys[i]].include == false || charKeys[i] != "Ganyu") continue;
+			if(charDB[charKeys[i]].include == false) continue;
 			if(charKeys[i] == "Traveler") {
-				for(var j = 0; j < chars[charKeys[i]].regions.length; j++) {
-					if(chars[charKeys[i]].regions.include == false) continue;
-					var unaligned = false;
-					if (j == chars[charKeys[i]].regions.length - 1) unaligned = true;
-					var travName = chars[charKeys[i]].regions[j].type + " " + charKeys[i];
-					var output = addCharacter(travName,true,null,true,unaligned);
-					html += output[0];
-					charsDone[output[2]] = output[1];
-					if(j == chars[charKeys[i]].regions.length - 1) idsToSave[idsToSave.length] = output[2];
+				html += addCharacterCharPage(charKeys[i],true);
+			} else {
+				html += addCharacterCharPage(charKeys[i],false);
+				continue;
+			}
+		}
+		get("characters").innerHTML = html;
+
+	})
+
+	var addCharacterCharPage = (char="Lynette",isTrav=false,data={nickname:null,owned:false,hideInfo:false,exp:0,con:0,talents:[1,1,1],note:"",activeSet:""}) => {
+		var owned, exp, con, talents, nickname, note, byElement, hideInfo, setsMap, activeSet;
+
+		data = parseLSItem(char,data);
+
+		var sets = fallbackCharData.sets;
+
+		if (data.sets !== undefined) {
+			sets = data.sets;
+			setsMap = sets.map(i => i.id);
+			if(data.activeSet == undefined || typeof(data.activeSet) != "string" || setsMap.indexOf(data.activeSet) != -1) {
+				activeSet = "";
+			} else {
+				activeSet = data.activeSet;
+			}
+		}
+
+		if (data.exp == undefined) {
+			exp = fallbackCharData.exp;
+		} else {
+			exp = data.exp;
+		}
+
+		if (data.note == undefined) {
+			note = "";
+		} else {
+			note = data.note;
+		}
+
+		if(charDB[char].canRename == true) {
+			if(data.nickname == undefined) {
+				nickname = char;
+			} else {
+				nickname = data.nickname;
+			}
+		}
+
+		if(isTrav) {
+			if (data.hideInfo == undefined) {
+				hideInfo = fallbackCharData.hideInfo;
+			} else {
+				hideInfo = data.hideInfo;
+			}
+			if (data.byElement != undefined) {
+				try {
+					byElement = JSON.parse(data.byElement);
+				}
+				catch {
+					byElement = new Array(travTypeOrder.length).fill({});
 				}
 			} else {
-				var output = addCharacter(charKeys[i],true,null,true);
-				html += output[0];
-				charsDone[output[2]] = output[1];
+				byElement = new Array(travTypeOrder.length).fill({});
 			}
-		}
-		html += "</div><br><div class=\"topFlex\"><button onClick=\"saveCharacters()\">Save Characters</button><!--<button id=\"clearcharactersbutton\" onClick=\"clearInventory()\">Clear Inventory</button>--></div></div>";
-		get("characters").innerHTML = html;
-		console.log(charKeys,charsDone)
-		var j = ["asc","tal1","tal2","tal3"];
-		for(var i in charsDone) {
-			for(var k in j) {
-				get(i+"-"+j[k]).setAttribute("onchange","forceValue(this.id,this.value)");
+			for(let i in travTypeOrder) {
+				let el = {};
+				if (i != 0) {
+					if(byElement[i].owned != undefined) {
+						el.owned = byElement[i].owned;
+					} else {
+						el.owned = false;
+					}
+					if(byElement[i].con != undefined) {
+						el.con = byElement[i].con;
+					} else {
+						el.con = fallbackCharData.con;
+					}
+				}
+				if (i <= 1) {
+					if(byElement[i].owned != undefined) {
+						el.owned = byElement[i].owned;
+					} else {
+						el.owned = true;
+					}
+				}
+
+				if(byElement[i].talents != undefined) {
+					el.talents = byElement[i].talents;
+				} else {
+					el.talents = fallbackCharData.talents;
+				}
+				if(byElement[i].hideInfo != undefined) {
+					el.hideInfo = byElement[i].hideInfo;
+				} else {
+					el.hideInfo = fallbackCharData.hideInfo;
+				}
+				if(byElement[i].note != undefined) {
+					el.note = byElement[i].note;
+				} else {
+					el.note = "";
+				}
+				byElement[i] = el;
 			}
-			get(i+"-owned").setAttribute("onchange","updateCharList(this.id,this.checked)");
-		}
-	});
-	var updateCharList = (id,isChecked) => {
-		var realId = id.slice(0,7);
-		if(isChecked) {
-			idsToSave[idsToSave.length] = realId;
-			if(idsToDelete.indexOf(realId) != -1) idsToDelete.splice(idsToDelete.indexOf(realId),1);
+			// console.log(byElement)
+
 		} else {
-			idsToSave.splice(idsToSave.indexOf(realId),1);
-			idsToDelete[idsToDelete.length] = realId;
+			if(data.owned == undefined && getLSItem(char) != undefined) {
+				owned = true;
+				hideInfo = fallbackCharData.hideInfo;
+			} else {
+				owned = data.owned;
+				if(data.hideInfo == undefined) {
+					hideInfo = fallbackCharData.hideInfo;
+				} else {
+					hideInfo = data.hideInfo;
+				}
+			}
+			if(charDB[char].hasCons != false) {
+				if(data.con == undefined) {
+					con = fallbackCharData.con;
+				} else {
+					con = data.con;
+				}
+			}
+			if(data.talents == undefined) {
+				talents = fallbackCharData.talents;
+			} else {
+				talents = data.talents;
+			}
+		}
+
+		if(charDB[char] == undefined) return;
+
+		var travType = "";
+		var weapon, region, type = null;
+		var id = spaceToUnderscore(char);
+
+		if(char.indexOf("Traveler") != -1) {
+			travType = char.slice(0,char.indexOf("Traveler"));
+			type = charDB["Traveler"].regions[0].type;
+			weapon = charDB["Traveler"].weapon;
+		} else {
+			type = charDB[char].type;
+			weapon = charDB[char].weapon;
+			region = charDB[char].region;
+		}
+		
+		var charName = char;
+		var img = spaceToUnderscore(char);
+		var html= "<div id=\""+id+"\" class='charBlock";
+		if(char == "Aloy") {
+			html+=" eventIcon";
+		}
+		if(!isTrav && !owned) {
+			html+=" collapse";
+		}
+		html+="'><div class='topFlex'><div class='boxName'>";
+		html+=makeImg("images/char/"+img+".png",64,64);
+		if(charDB[char].canRename == true) {
+			html += "<span><span id='"+char+"-nickname'>"+nickname+"</span> <em class='realName'>("+char+")</em></span>";
+		} else {
+			html+=char;
+		}
+		if(img != "Traveler") {
+			var vision = region+"_"+type;
+			if (charDB[char].vision != undefined) {
+				html += makeImg("images/icons/visions/" + charDB[char].vision + ".png", 48, 48, ["dropdownType", "extraIcon", "vision"]);
+			} else if (charDB[char].region != undefined) {
+				var vision = charDB[char].region + "_" + charDB[char].type;
+				if (charDB[char].visionType != undefined && charDB[char].visionType != "") vision = vision + "_" + charDB[char].visionType;
+				html += makeImg("images/icons/visions/" + vision + ".png", 48, 48, ["dropdrownType", "extraIcon", "vision"]);
+			}
+		// } else {
+		// 	html+= "<img loading='lazy' draggable=\"false\" class='extraIcon vision' width='48' height='48' src='images/icons/visions/Traveler_"+type+".png'>";
+		}
+
+		if(weapon !== undefined) {
+			html+=makeImg("images/icons/weapon/"+weapon+".png",32,32,["extraIcon"]);
+		}
+		html +="</div>";
+
+		html+="<div class='vertFlex alignEnd'>";
+		if(!isTrav) {
+			html+="<div>Owned? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+"-owned\" onchange=\"charHideInfo(this.id);saveOwned(this)\"";
+			if(owned) {
+				html+=" checked";
+			}
+			html+="></div>";
+		}
+		html+="<div>Hide info? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+"-hideInfo\" onchange=\"charHideInfo(this.id);saveHideInfo(this)\"";
+		if(hideInfo) {
+			html+=" checked";
+		}
+		html+="></div>"
+
+		html+="</div>";
+		html+="</div>";
+
+		html+="<div class='charInfo";
+		if(hideInfo) {
+			html+=" collapse";
+		}
+		html+="'><div>";
+		if(charDB[char].canRename == true) {
+			html+="<div><span>Name: </span><input type='text' placeholder='"+char+"' id='"+char+"-customName' onchange='saveNickname(this)'";
+			if(nickname != char) {
+				html+=" value='"+nickname+"'";
+			}
+			html+="></div>";
+			html+="<em style='display:block;font-size:small'>Unlike the game, there are no restrictions for nicknames here.</em>";
+		}
+		html+="<div><span>Note: </span><textarea placeholder='Note for "+char+"' cols='50' rows='1' id='"+char+"-note' onchange='saveNote(this)'>"+note+"</textarea></div>";
+		html+="</div>"
+
+		html+="<div class='boxTitle'>Character Stats:</div>";
+		html+="<div>";
+
+		var level, expRemainder;
+		exp = getLevelFromExp("char",exp);
+		level = exp[0];
+		expRemainder = exp[1];
+
+		html+="<div>Level: <input type='number' size='3' min='1' max='"+(charLevelValues.length+1)+"' value='"+level+"' id='"+id+"-lvl' onchange='updateExp(this)'> / <span class='expMaxLevel'>"+(charLevelValues.length+1)+"</span>";
+		var maxExpNeeded = charLevelValues[level-1];
+		if(maxExpNeeded == undefined) {
+			maxExpNeeded = 0;
+		}
+		html+="</div>";
+
+		html+="<div";
+		if(level == charLevelValues.length+1) {
+			html+=" style='display:none'";
+		}
+		html+=">Level progress: <input class='expTotal' type='number' min='0' max='"+maxExpNeeded+"' value='"+expRemainder+"' id='"+id+"-expRemainder' onwheel=\"adjustStep(this.id,true,true)\" onkeydown=\"adjustStep(this.id,false,true)\" onchange='updateBar(this)'><span class='expTotal'>/"+maxExpNeeded+"</span>";
+		html+="</div><div class='expBar' id='"+char+"-expBar' style='--fill:";
+		if(maxExpNeeded == 0) {
+			html += "100";
+		} else {
+			html+=((expRemainder/maxExpNeeded).toPrecision(3)*100);
+		}
+		html+="%'></div>";
+
+		if(isTrav) {
+			html+="</div>";
+			for(let j in travTypeOrder) {
+				html+="<div id='"+char+j+"'";
+				if(j == 0) {
+					html += " class='extraIcon";
+					if(byElement[j].hideInfo) {
+						html+=" collapse";
+					}
+					html += "'";
+				} else {
+					if(!byElement[j].owned || byElement[j].hideInfo) {
+						html+=" class='collapse'";
+					}
+				}
+				html+=">";
+				html+="<div class='topFlex'><div class='boxName boxSubtitle'>"+travTypeOrder[j];
+				html+=makeImg("images/icons/elements/"+travTypeOrder[j]+".svg",32,32,["extraIcon"]);
+				html+="</div><div class='vertFlex alignEnd'><div>Owned? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+j+"-owned\" onchange=\"charHideInfo(this.id);saveOwned(this)\"";
+				if(j == 0) {
+					html+=" checked disabled";
+				} else if(byElement[j].owned) {
+					html+=" checked";
+				}
+				html+="></div>";
+				html+="<div>Hide info? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+j+"-hideInfo\" onchange=\"charHideInfo(this.id);saveHideInfo(this)\"";
+				if(byElement[j].hideInfo) {
+					html+=" checked";
+				}
+				html+="></div></div>";
+				html+="</div>";
+
+				html+="<div class='charTravInfo'><div><span>Note: </span><textarea type='text' cols='50' rows='1' onchange='saveNote(this)' placeholder='Note for "+ charDB[char].regions[j].type+" "+char+"' id='"+id+j+"-note'>"+byElement[j].note+"</textarea></div>";
+			
+				if(charDB[char].regions[j].hasCons != false) {
+					html+="<span>Constellation: </span><input size='3' type='number' min='0' max='"+maxCon+"' value='"+byElement[j].con+"' id='"+id+j+"-con' onChange='updateTalents(this)'>";
+				}
+
+				for(let i in charTalentNames) {
+					html+="<span>"+charTalentNames[i]+" level: </span><input size='3' type='number' id='"+id+j+charTalentSuffix[i]+"' onchange='saveTalents(&quot;"+char+j+"&quot;)'";
+					if(charDB[char].regions[j].hasCons != false && charDB[char].regions[j].conBonus[Math.floor(i)+1] <= byElement[j].con) {
+						html+="min='4' max='"+(charMaxTalents[i]+3)+"' value='"+(byElement[j].talents[i]+3)+"' class='conBonus'>";
+					} else {
+						html+="min='1' max='"+charMaxTalents[i]+"' value='"+byElement[j].talents[i]+"'>";
+					}
+				}
+			
+				html+="</div></div>";
+			}
+			html+="<div class='boxTitle'>Equipment:</div>";
+		} else {
+			if(charDB[char].hasCons != false) {
+				html+="<span>Constellation: </span><input size='3' type='number' min='0' max='"+maxCon+"' value='"+con+"' id='"+id+"-con' onchange='updateTalents(this)'>";
+			} 
+	
+			for(let i in charTalentNames) {
+				html+="<span>"+charTalentNames[i]+" level: </span><input size='3' type='number' id='"+id+charTalentSuffix[i]+"' onchange='saveTalents(&quot;"+char+"&quot;)'";
+				if(charDB[char].hasCons != false && charDB[char].conBonus != null && charDB[char].conBonus[Math.floor(i)+1] <= con) {
+					html+=" min='4' max='"+(charMaxTalents[i]+3)+"' value='"+(talents[i]+3)+"' class='conBonus'>";
+				} else {
+					html+=" min='1' max='"+charMaxTalents[i]+"' value='"+talents[i]+"'>";
+				}
+			}
+
+			html+="</div>";
+		}
+
+
+		html+="<div>Add set module thING here</div>";
+		if(char == "Ganyu") {
+			var html2 = equipmentModule(char,sets,activeSet);
+			console.log(html2)
+		}
+
+		html+="</div>";
+
+		html+="</div>";
+		
+		return html;
+	};
+	var charHideInfo = (id) => {
+		var char, type, isConfirmDelete = false;
+		if(id.indexOf("-owned") != -1) {
+			char = id.slice(0,-6);
+			type = "own";
+			if(!get(id).checked) {
+				isConfirmDelete = true;
+			}
+		} else {
+			char = id.slice(0,-9);
+			type = "hide";
+		}
+		if(type == "hide") {
+			get(char).children[1].classList.toggle("collapse");
+		} else if(type == "own" && !isConfirmDelete) {
+			get(char).classList.toggle("collapse");
 		}
 	};
+	var updateTalents = (element) => {
+		var char, level, travType, keys, cb;
+		char = element.id.slice(0,-4);
+		level = val(element,true);
+		if(char.indexOf("Traveler") != -1) {
+			travType = char.slice(-1);
+			let region = charDB["Traveler"].regions[travType];
+			if(region.hasCons != false && region.conBonus != undefined && !Array.isArray(region.conBonus)) {
+				cb = region.conBonus;
+				keys = Object.keys(cb);
+				saveCon(char, level);
+			}
+		} else {
+			if (charDB[char].hasCons != false && charDB[char].conBonus != undefined && !Array.isArray(charDB[char].conBonus)) {
+				cb = charDB[char].conBonus;
+				keys = Object.keys(cb);
+				// console.log(level)
+				saveCon(char, level);
+			}
+		}
+
+		for(let i in keys) {
+			let em = get(char+"-tal"+(keys[i]));
+			if(level >= cb[keys[i]]) {
+				if(em.max == charMaxTalents[keys[i]-1]) {
+					em.max = charMaxTalents[keys[i]-1]+3;
+					em.value = Math.floor(em.value)+3;
+					em.min = 4;
+					em.classList.toggle("conBonus");
+				}
+			} else {
+				if(em.max != charMaxTalents[keys[i]-1]) {
+					em.min = 1;
+					em.value = Math.floor(em.value)-3;
+					em.max = charMaxTalents[keys[i]-1];
+					em.classList.toggle("conBonus");
+				}
+			}
+		}
+	};
+	var saveCon = (id,con) => {
+		if(con == 0) {
+			con = undefined;
+		}
+		saveCharacter(id,"con",con);
+	}
+	var saveNote = (element) => {
+		var id = element.id.slice(0,-5);
+		var content = parseHTMLSafe(element.value.trim());
+		if(content == "") {
+			content = undefined;
+		}
+		saveCharacter(id,"note",content);
+	}
+	var saveNickname = (element) => {
+		var id = element.id.slice(0,-11);
+		var content = parseHTMLSafe(element.value.trim());
+		if(content != "" && content != id) {
+			saveCharacter(id,"nickname",content);
+			get(id+"-nickname").innerText = parseHTMLUnsafe(content);
+		} else {
+			saveCharacter(id,"nickname",undefined);
+			get(id+"-nickname").innerText = id;
+		}
+	}
+	var saveHideInfo = (element) => {
+		var id = element.id.slice(0,-9);
+		var checked = element.checked;
+		if(!checked) {
+			saveCharacter(id,"hideInfo",undefined);
+		} else {
+			if(id != "Traveler") {
+				saveCharacter(id,"hideInfo",checked,true);
+			} else {
+				saveCharacter(id,"hideInfo",checked);
+			}
+		}
+	}
+	var saveOwned = (element,confirmRemove=false) => {
+		var id = element.id.slice(0,-6);
+		var checked = element.checked;
+		if(!checked) {
+			if(!confirmRemove) {
+				element.checked = true;
+				element.previousSibling.data = "Uncheck again to confirm deletion. ";
+				element.setAttribute("onchange","saveOwned(this,true);confirmDeleteChar('"+id+"')");
+				confirmDelete.push(id);
+				window.setTimeout(function(){
+					if(element.checked){
+						element.previousSibling.data = "Owned? ";
+						element.setAttribute("onchange","charHideInfo(this.id);saveOwned(this)");
+						confirmDelete = confirmDelete.filter(item => item !== id);
+					}
+				},5000);
+			} else {
+				element.previousSibling.data = "Owned? ";
+				element.setAttribute("onchange","charHideInfo(this.id);saveOwned(this)");
+				saveCharacter(id,"owned",undefined);
+				get(id).classList.toggle("collapse");
+			}
+		} else if(id != "Traveler") {
+			saveCharacter(id,"owned",checked);
+		}
+	}
+	var confirmDeleteChar = (id) => {
+		confirmDelete = confirmDelete.filter(item => item !== id);
+		saveCharacter(id,"owned",undefined);
+	}
+	var equipmentModule = (char, setsData, activeSet) => {
+		// check for empty setsData and empty activeSet
+		// if(setsData === undefined || JSON.stringify(setsData) === "[]") 
+		// if(activeSet === "")
+		console.log("START EQUIP MODULE",char,setsData,activeSet);
+
+		var html = "";
+
+		// create wrapper
+		html += "<div class='equipmentModule' id='equip-"+char+"'>";
+
+		
+		
+		// close wrapper
+		html += "</div>";
+
+		return html;
+	};
+	var addItemToChar = (item="",char="",setNumber=-1,itemID="",artifactType=-1,rarity=0,ignoreErrors=false) => {
+		var id;
+		var lsItem = parseLSItem(item,[]);
+		// TODO: ADD FALLBACK FOR NOT-FOUND itemID TO MAKE NEW ID.
+		if(itemID == "") {
+			id = "a1234";
+		} else {
+			id = itemID;
+		}
+		if(!ignoreErrors) {
+			// if(itemID) {
+			//	// itemID needs to be real. this error shouldn't be avoided. blank ids make a new id.
+			// 	console.error("[addItemToChar] newItem variable must be a bool.");
+			// 	return;
+			// }
+			if(item == "" || char == "" || setNumber == -1) {
+				console.error("[addItemToChar] Do not use default values for this. Below are your inputs.");
+				console.info("Item:",item,"\nChar:",char,"\nSet Number",setNumber);
+				return;
+			}
+			if(artifactDB[item] != undefined) {
+				if(rarity > artifactDB[item].rarityMax || rarity < artifactDB[item].rarityMin) {
+					console.warn("[addItemToChar] Rarity outside expected range. It should be within "+artifactDB[item].rarityMin+" and "+artifactDB[item].rarityMax+". Using minimum valid rarity.");
+					rarity = artifactDB[item].rarityMin;
+				}
+				if(artifactType == -1) {
+					throw new Error("[addItemToChar] Do not use default value for artifactType.");
+				} else if(artifactType > artifactTypes.length - 1) {
+					console.error("[addItemToChar] artifactType value was too high. It should be between 0 and "+(artifactTypes.length - 1)+".");
+					return;
+				}
+			}
+			if(weapDB[item] != undefined && weapDB[item].type != charDB[char].weapon) {
+				console.error("[addItemToChar] Do not add incompatable weapon types to characters.");
+				return;
+			}
+		} else {
+			console.warn("[addItemToChar] You're at fault for any errors.");
+		}
+		if(artifactDB[item] != undefined) {
+			if(lsItem.length != 5 || JSON.stringify(lsItem) == "[]") {
+				lsItem = [[],[],[],[],[]];
+			}
+			// if item not in lsItem[artifactType]
+			lsItem[artifactType].push({id:id,rarity:rarity,exp:0})
+
+			// if(artifactIDIndex[id][char] != undefined) {
+			// 	artifactIDIndex[id][char]
+			// }
+		} else if (weapDB[item] != undefined) {
+
+		} else {
+			console.error("[addItemToChar] The item, \""+item+"\" could not be found in artifactDB or weapDB. If you're using an artifact, the item should be the artifact set name such as \"Lucky Dog\". Items should not have quotation marks or apostrophes in their name.");
+			return;
+		}
+		console.log(lsItem);
+	}
 	</script>
 </html>

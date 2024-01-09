@@ -1,0 +1,595 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<title>Genshin Calculator - Debug Page</title>
+		<link rel="stylesheet" href="style.css">
+		<script type="text/javascript" src="loadData.js"></script>
+		<script type="text/javascript" src="scripts/prefs.js"></script>
+
+		<script type="text/javascript" src="ascdb.js"></script>
+		<script type="text/javascript" src="scripts.js"></script>
+		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+		<script type="text/javascript" src="scripts/inventory.js"></script>
+		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
+		<style>
+			h1,h2,h3,h4,h5,h6 {
+				margin-block-end: 0;
+			}
+			h2 + div h3 {
+				margin-block-start: 0;
+			}
+			:is(h2,h3):only-child::after {
+				content: " No issues!";
+			}
+			.includeFalse::before {
+				content: "⚠️ ";
+			}
+		</style>
+	</head>
+	<body>
+		<div id="prefsContainer"></div>
+		<h1>This is a debug page for testing.</h1>
+		<div id="characters"><h2>Characters:</h2></div>
+		<div id="items"><h2>Items:</h2></div>
+		<div id="itemGroups"><h2>Item Groups:</h2></div>
+		<div id="weapons"><h2>Weapons:</h2></div>
+		<div id="artifacts"><h2>Artifacts:</h2></div>
+		<div><h2>Include: false Images:</h2><div id="imageErrorsIncludeFalse"><h3>Errors:</h3></div><div id="imagesIncludeFalse" style="display:flex;flex-flow:row wrap"></div></div>
+		<div><h2>Other Images:</h2><div id="imageErrors"><h3>Errors:</h3></div><div id="images" style="display:flex;flex-flow:row wrap"></div></div>
+	</body>
+	<script>
+	"use strict";
+	pageType = "debug";
+	async function loadPage() {
+		await loadData();
+		await loadAllPrefs();
+		await insertPrefElements({include:["themeDropdown"]});
+
+		let itemGroupExtraImages = [];
+		let visions = [];
+		// Characters
+		for(let i in charDB) {
+			let c = charDB[i];
+			let issues = [];
+			let included = true;
+
+			if(c.rarity === undefined) {
+				issues.push(" rarity is not defined");
+			} else if(c.rarity === null) {
+				issues.push(" rarity is null");
+			} else if(typeof(c.rarity) !== "number") {
+				issues.push(" rarity is not a number");
+			} else if(!Number.isInteger(c.rarity)) {
+				issues.push(" rarity is not an integer");
+			} else if(c.rarity !== 5 && c.rarity !== 4) {
+				issues.push(" rarity is not 4 or 5");
+			}
+
+			if(c.weapon === undefined) {
+				issues.push(" weapon is not defined");
+			} else if(c.weapon === null) {
+				issues.push(" weapon is null");
+			} else if(typeof(c.weapon) !== "string") {
+				issues.push(" weapon is not a string")
+			} else if(allWeaponTypes.indexOf(c.weapon) === -1) {
+				issues.push(" weapon is not valid");
+			}
+
+			if(c.boss === undefined) {
+				issues.push(" boss is not defined");
+			} else if(i != "Traveler") {
+				if(c.boss === null) {
+				issues.push(" boss is null");
+				} else if (typeof(c.boss) !== "string") {
+					issues.push(" boss is not a string");
+				} else if (itemDB[c.boss] === undefined) {
+					issues.push(" boss is not a valid item");
+				}
+			}
+
+			if(c.gem === undefined) {
+				issues.push(" gem is not defined");
+			} else if (c.gem === null) {
+				issues.push(" gem is null")
+			} else if (typeof(c.gem) !== "string") {
+				issues.push(" gem is not a string");
+			} else if (itemGroupDB[c.gem] === undefined) {
+				issues.push(" gem is not a valid item group")
+			}
+
+			if (c.local === undefined) {
+				issues.push(" local is not defined");
+			} else if (c.local === null) {
+				issues.push(" local is null");
+			} else if (typeof (c.local) !== "string") {
+				issues.push(" local is not a string");
+			} else if (itemDB[c.local] === undefined) {
+				issues.push(" local is not a valid item");
+			}
+
+			if (c.common === undefined) {
+				issues.push(" common is not defined");
+			} else if (c.common === null) {
+				issues.push(" common is null")
+			} else if (typeof (c.common) !== "string") {
+				issues.push(" common is not a string");
+			} else if (itemGroupDB[c.common] === undefined) {
+				issues.push(" common is not a valid item group")
+			}
+
+			if(c.canRename !== true && c.canRename !== undefined) {
+				issues.push(" invalid canRename (must be true or undefined)");
+			}
+
+			if(c.include !== false && c.include !== undefined) {
+				issues.push(" include invalid (must be false or undefined)");
+				dimg("char/"+spaceToUnderscore(i)+".png","imagesIncludeFalse");
+				included = false;
+			} else if (c.include === false) {
+				issues.push(" include is false (remove it to allow usage)");
+				included = false;
+				dimg("char/"+spaceToUnderscore(i)+".png","imagesIncludeFalse");
+			} else {
+				dimg("char/"+spaceToUnderscore(i)+".png","images");
+			}
+
+			if(i != "Traveler") {
+
+				if(c.region === undefined) {
+					issues.push(" region  is not defined");
+				} else if (charRegions.indexOf(c.region) === -1) {
+					issues.push(" region is not valid");
+				}
+
+				if (c.weeklyBoss === undefined) {
+					issues.push(" weeklyBoss is not defined");
+				} else if (c.weeklyBoss === null) {
+					issues.push(" weeklyBoss is null");
+				} else if (typeof (c.weeklyBoss) !== "string") {
+					issues.push(" weeklyBoss is not a string");
+				} else if (itemDB[c.weeklyBoss] === undefined) {
+					issues.push(" weeklyBoss is not a valid item");
+				}
+
+				if (c.books === undefined) {
+					issues.push(" books is not defined");
+				} else if (c.books === null) {
+					issues.push(" books is null")
+				} else if (typeof (c.books) !== "string") {
+					issues.push(" books is not a string");
+				} else if (itemGroupDB[c.books] === undefined) {
+					issues.push(" books is not a valid item group")
+				}
+
+				if(c.hasCons !== false && c.hasCons !== undefined) {
+					issues.push(" invalid hasCons (must be false or undefined)");
+				}
+
+				if(c.hasCons === false && c.conBonus !== undefined) {
+					issues.push(" conBonus exists while hasCons is false");
+				} else if(c.hasCons === undefined) {
+					if(c.conBonus === undefined) {
+						issues.push(" conBonus is not defined");
+					} else if(c.conBonus === null) {
+						issues.push(" conBonus is null");
+					} else if(typeof(c.conBonus) !== "object") {
+						issues.push(" conBonus is not an object (js type)");
+					} else if(Array.isArray(c.conBonus) || c.conBonus instanceof Date) {
+						issues.push(" conBonus is not an object but rather an Array or Date");
+					} else if(Object.keys(c.conBonus).length > 2) {
+						issues.push(" conBonus keys length is more than 2");
+					}
+				}
+
+				if(c.type === undefined) {
+					issues.push(" type is not defined");
+				} else if (typeof(c.type) !== "string") {
+					issues.push(" type is not a string");
+				} else if (charTypes.indexOf(c.type) === -1) {
+					issues.push(" type is invalid");
+				}
+
+				if(c.vision !== undefined) {
+					if(visions.indexOf(c.vision) === -1) {
+						visions.push(c.vision);
+					}
+				}
+
+			} else {
+				let cr = c.regions;
+				for(let i in cr) {
+					let c = cr[i];
+
+					if (c.region === undefined) {
+						issues.push(" [regions/"+i+"] region missing");
+					} else if (charRegions.indexOf(c.region) === -1) {
+						issues.push(" [regions/"+i+"] region is not valid");
+					}
+
+					if (c.type === undefined) {
+						issues.push(" [regions/"+i+"] type is not defined");
+					} else if (typeof (c.type) !== "string") {
+						issues.push(" [regions/"+i+"] type is not a string");
+					} else if (charTypes.indexOf(c.type) === -1) {
+						issues.push(" [regions/"+i+"] type is invalid");
+					}
+
+					if (c.hasCons === false && c.conBonus !== undefined) {
+						issues.push(" [regions/"+i+"] conBonus exists while hasCons is false");
+					} else if (c.hasCons === undefined) {
+						if (c.conBonus === null) {
+							issues.push(" [regions/"+i+"] conBonus is null");
+						} else if (typeof (c.conBonus) !== "object") {
+							issues.push(" [regions/"+i+"] conBonus is not an object (js type)");
+						} else if (Array.isArray(c.conBonus) || c.conBonus instanceof Date) {
+							issues.push(" [regions/"+i+"] conBonus is not an object but rather an Array or Date");
+						} else if (Object.keys(c.conBonus).length > 2) {
+							issues.push(" [regions/"+i+"] conBonus keys length is more than 2");
+						}
+					}
+
+					if (c.weeklyBoss === undefined) {
+						issues.push(" [regions/"+i+"] weeklyBoss is not defined");
+					} else if (c.weeklyBoss === null) {
+						issues.push(" [regions/"+i+"] weeklyBoss is null");
+					} else if (typeof (c.weeklyBoss) !== "string") {
+						issues.push(" [regions/"+i+"] weeklyBoss is not a string");
+					} else if (itemDB[c.weeklyBoss] === undefined) {
+						issues.push(" [regions/"+i+"] weeklyBoss is not a valid item");
+					}
+
+					if(c.include !== false && c.include !== undefined) {
+						issues.push(" [regions/"+i+"] include invalid (must be false or undefined)");
+						included = false;
+					} else if (c.include === false) {
+						issues.push(" [regions/"+i+"] include set to false (remove to allow usage)");
+						included = false;
+					}
+				}
+			}
+
+			if(issues.length != 0) {
+				dp(i+" has the following issues: "+issues,"characters",included);
+			}
+		}
+		// Items
+		for(let i in itemDB) {
+			let c = itemDB[i];
+			let issues = [];
+
+			if(c.include !== undefined) {
+				issues.push(" \"include\" should not be added to items");
+			}
+
+			if (c.rarity !== undefined) {
+				if (typeof (c.rarity) !== "number") {
+					issues.push(" rarity is not a number");
+				} else if (!Number.isInteger(c.rarity)) {
+					issues.push(" rarity is not an integer");
+				} else if(c.rarity > 5 || c.rarity < 0) {
+					issues.push(" rarity above 5 or below 0");
+				}
+			}
+
+			if(c.type === undefined) {
+				issues.push(" type is not defined");
+			} else if (typeof (c.type) !== "string") {
+				issues.push(" type is not a string");
+			} else if (itemTypes.indexOf(c.type) === -1) {
+				issues.push(" type invalid");
+			}
+
+			// only for image directory stuff
+			if(c.type === "crown") {
+				c.type = "other";
+			}
+
+			if(c.type !== undefined) {
+				dimg(c.type+"/"+spaceToUnderscore(i)+".png","images");
+			}
+			if(issues.length != 0) {
+				dp(i+" has the following issues:"+issues,"items");
+			}
+		}
+		// Item groups
+		for(let i in itemGroupDB) {
+			let g = itemGroupDB[i];
+			let issues = [];
+
+			if(g.include !== undefined) {
+				issues.push(" \"include\" should not be added to item groups");
+			}
+
+			if(g.priority === undefined) {
+				issues.push(" priority is not defined");
+			} else if (typeof (g.priority) !== "number") {
+				issues.push(" priority is not a number");
+			} else if (!Number.isInteger(g.priority)) {
+				issues.push(" priority is not an integer");
+			}
+
+			if(g.craftUp !== undefined && g.craftUp !== false) {
+				issues.push(" craftUp must be false or undefined");
+			}
+
+			if(g.canConvertTo !== undefined && g.canConvertTo !== false) {
+				issues.push(" canConvertTo must be false or undefined");
+			}
+			if(g.convertType !== undefined && g.convertType !== "inter" && g.convertType !== "intra") {
+				issues.push(" convertType must be either undefined, \"inter\" or \"intra\"");
+			}
+			if(g.convertType === "inter") {
+				if(g.convertTo === undefined) {
+					issues.push(" convertType set to \"inter\" while convertTo is not defined");
+				} else if(itemTypes.indexOf[g.convertTo] === -1) {
+					issues.push(" convertType set to \"inter\" while convertTo is invalid");
+				}
+			} else if (g.convertType === "intra") {
+				if(g.convertTo !== undefined) {
+					issues.push(" convertType set to \"intra\" while convertTo is not undefined");
+				}
+			}
+
+			if(g.icon !== undefined) {
+				if(g.convertTo !== undefined) {
+					issues.push(" icon defined while convertType is not defined");
+				}
+				if(typeof(g.icon) === "string") {
+					if(g.iconUseSubgroups !== true) {
+						dimg("itemGroups/"+spaceToUnderscore(g.icon)+".png","images");
+					} else {
+						for(let j in g.items) {
+							let img = g.icon+j;
+							if(itemGroupExtraImages.indexOf(img) == -1) {
+								itemGroupExtraImages.push(img);
+							}
+						};
+					}
+				} else if(g.icon) {
+					dimg("itemGroups/"+spaceToUnderscore(i)+".png","images");
+				}
+			}
+
+			if(g.items === undefined) {
+				issues.push(" group items is undefined");
+			} else if(typeof(g.items) !== "object") {
+				issues.push(" group items is not an object (js type)");
+			} else if(!Array.isArray(g.items)) {
+				issues.push(" group items is not an array");
+			} else {
+				for(let j in g.items) {
+					let i = g.items[j];
+					if(itemDB[i] === undefined) {
+						issues.push(" item \""+i+"\" not found in itemDB");
+					}
+				}
+			}
+			
+			if(issues.length != 0) {
+				dp(i+" has the following issues:"+issues,"itemGroups");
+			}
+		}
+		// Weapons
+		for(let i in weapDB) {
+			let c = weapDB[i];
+			let issues = [];
+
+			if(c.include !== false && c.include !== undefined) {
+				issues.push(" include is invalid (must be false or invalid)");
+				dimg("weapon/"+spaceToUnderscore(i)+".png","imagesIncludeFalse");
+			} else if (c.include === false) {
+				issues.push(" include set to false (remove to allow usage)");
+				dimg("weapon/"+spaceToUnderscore(i)+".png","imagesIncludeFalse");
+			} else {
+				if (c.icons !== undefined) {
+					if(Array.isArray(c.icons)) {
+						for(let j in c.icons) {
+							dimg("weapon/"+spaceToUnderscore(i+"_"+c.icons[j])+".png","images");
+						}
+					} else {
+						issues.push(" icons is not an array");
+					}
+				} else {
+					dimg("weapon/"+spaceToUnderscore(i)+".png","images");
+				}
+			}
+
+			if(c.rarity === undefined) {
+				issues.push(" rarity missing");
+			} else if(c.rarity > 5 || c.rarity < 0) {
+				issues.push(" rarity above 5 or below 0");
+			}
+
+			if(c.type === undefined) {
+				issues.push(" type missing");
+			} else if (allWeaponTypes.indexOf(c.type) === -1) {
+				issues.push(" type invalid");
+			}
+			if(c.weapon === undefined) {
+				issues.push(" weapon ascension missing");
+			} else if (itemGroupDB[c.weapon] === undefined) {
+				issues.push(" weapon ascension invalid");
+				if(c.weapon != "Unknown") {
+					dp("\""+c.weapon+"\" does not exist (used by weapon "+i+")");
+				}
+			}
+
+			if(c.common === undefined) {
+				issues.push(" common missing");
+			} else if (itemGroupDB[c.common] === undefined) {
+				issues.push(" common invalid");
+				if(c.common != "Unknown") {
+					dp("\""+c.common+"\" does not exist (used by weapon "+i+")","items");
+				}
+			}
+
+			if(c.elite === undefined) {
+				issues.push(" elite missing");
+			} else if (itemGroupDB[c.elite] === undefined) {
+				issues.push(" elite invalid");
+				if(c.elite != "Unknown") {
+					dp("\""+c.elite+"\" does not exist (used by weapon "+i+")","items");
+				}
+			}
+
+			if(issues.length != 0) {
+				dp(i+" has the following issues:"+issues,"weapons");
+			}
+		}
+		// Artifacts
+		for(let i in artifactDB) {
+			let c = artifactDB[i];
+			let issues = [];
+			var minNum = false, maxNum = false;
+
+			if(c.include !== false && c.include !== undefined) {
+				issues.push(" include invalid (must be false or invalid)");
+				for(let j in c) {
+					if(artifactTypes.indexOf(j) !== -1) {
+						dimg("artifacts/"+j+"/"+spaceToUnderscore(removeQuotes(c[j]))+".png","imagesIncludeFalse");
+					}
+				}
+			} else if (c.include === false) {
+				issues.push(" include set to false (remove to allow usage)");
+				for(let j in c) {
+					if(artifactTypes.indexOf(j) !== -1) {
+						dimg("artifacts/"+j+"/"+spaceToUnderscore(removeQuotes(c[j]))+".png","imagesIncludeFalse");
+					}
+				}
+			} else {
+				for(let j in c) {
+					if(artifactTypes.indexOf(j) !== -1) {
+						dimg("artifacts/"+j+"/"+spaceToUnderscore(removeQuotes(c[j]))+".png","images");
+					}
+				}
+			}
+
+			if(c.rarityMin === undefined) {
+				issues.push(" rarityMin missing");
+			} else if (typeof(c.rarityMin) != "number") {
+				issues.push(" rarityMin is not a number");
+			} else {
+				minNum = true;
+			}
+			if(c.rarityMax === undefined) {
+				issues.push(" rarityMax missing");
+			} else if (typeof(c.rarityMax) != "number") {
+				issues.push(" rarityMax is not a number");
+			} else {
+				maxNum = true;
+			}
+			if(maxNum && minNum) {
+				if(c.rarityMax <= c.rarityMin) {
+					issues.push(" rarityMax larger or same value as rarityMin");
+				}
+			}
+
+			if(issues.length != 0) {
+				dp(i+" has the following issues:"+issues,"artifacts");
+			}
+		}
+
+		// other images
+		for(let i = 1; i < 6; i++) {
+			dimg("rarity/"+i+".png","images");
+			dimg("rarity/mini-"+i+".png","images");
+			dimg("icons/rarity/"+i+".png","images");
+		}
+		dimg("icons/elements/Physical.svg","images");
+		for(let i in charTypes) {
+			let t = charTypes[i];
+			visions.push("Traveler_"+t);
+			dimg("icons/elements/"+t+".svg","images");
+			if(t === "Unaligned") {
+				continue;
+			}
+			for(let j in charRegions) {
+				let r = charRegions[j];
+				if(r === null) {
+					continue;
+				}
+				if(r === "Fontaine") {
+					visions.push(r+"_"+t+"_Pneuma");
+					visions.push(r+"_"+t+"_Ousia");
+					continue;
+				}
+				visions.push(r+"_"+t);
+			}
+		}
+		for(let i in visions) {
+			let includeFalse = ["Traveler_Pyro","Traveler_Cryo", "Snezhnaya_Pyro", "Snezhnaya_Electro", "Snezhnaya_Cryo", "Snezhnaya_Dendro", "Snezhnaya_Anemo", "Snezhnaya_Geo"];
+			let v = removeQuotes(visions[i]);
+			if(includeFalse.indexOf(v) !== -1 || v.indexOf("Natlan") !== -1 || v.indexOf("Khaenriah") !== -1) {
+				dimg("icons/visions/"+v+".png","imagesIncludeFalse");
+			} else {
+				dimg("icons/visions/"+v+".png","images");
+			}
+		}
+		for(let i in allWeaponTypes) {
+			dimg("icons/weapon/"+allWeaponTypes[i]+".png","images");
+		}
+		for(let i in artifactTypes) {
+			let t = artifactTypes[i];
+			dimg("artifacts/"+t+"/fallback.png","images");
+		}
+		for(let i in itemGroupExtraImages) {
+			dimg("itemGroups/"+itemGroupExtraImages[i]+".png","images");
+		}
+		for(let i in artiValidSubstats) {
+			let k = artiValidSubstats[i].replace(/%/g,"_percent");
+			dimg("icons/attributes/"+k+".svg","images",undefined,true);
+		}
+		dimg("icons/attributes/HB.svg","images",undefined,true);
+
+		dimg("char/Unknown.png","images","Used for dropdowns");
+		dimg("weapon/Unknown.png","images","Used for dropdowns");
+		dimg("icons/addChar.svg","images","Used for party page");
+		dimg("icons/info.svg","images","Used for sources");
+		dimg("icons/itemFallback.png","images","Used for missing items");
+		dimg("icons/loading.svg","images","Generic loading icon")
+	};
+
+	function checkVar(issues=[],variableChecked,expectedTypes,allowNull=true) {
+		// issues is for existing issues with this variable being returned at the end
+
+		// variableChecked is the name of the variable within the main chardb object such as "gem" or "local"
+
+		// expectedTypes can be one (or more in an array) of the following:
+		// string, boolean, int, float, array, object
+		// int and float both check if it's typeof number with another check for respective types
+		// array checks if Array.isArray() is true as well as typeof object.
+		// object checks Array.isArray() with false being a pass
+		
+		// allowNull is a bool that checks if `null` is allowed as a value. a warning won't be thrown if "null" is the value
+
+		// min/max values or array/object format is not covered by this function.
+
+
+	};
+	function dp(text,placement,included=true) {
+		let elem = Object.assign(document.createElement("div"), {textContent: text});
+		if(!included) {
+			elem.classList.add("includeFalse");
+			elem.title = "\"include\" is set to false or undefined. Remove it to allow usage."
+		}
+		get(placement).appendChild(elem);
+	};
+	function dimg(src,placement,title=undefined,dropShadow=false) {
+		let elem = Object.assign(document.createElement("img"));
+		elem.height = 32;
+		elem.width = 32;
+		elem.src = "images/"+src;
+		elem.title = title !== undefined ? title+" | images/"+src : "images/"+src;
+		if(dropShadow) {
+			elem.setAttribute("style","filter:drop-shadow(0 0 3px black)");
+		}
+		if(placement == "imagesIncludeFalse") {
+			elem.setAttribute("onerror","dp(this.title+' has failed to load','imageErrorsIncludeFalse')");
+		} else {
+			elem.setAttribute("onerror","dp(this.title+' has failed to load','imageErrors')");
+		}
+		get(placement).appendChild(elem);
+	}
+	loadPage();
+	</script>
+</html>

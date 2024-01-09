@@ -1,0 +1,50 @@
+{
+	"title": "JSON Schema for GenshinCalc 'itemDB' object.",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Items Database. Various properties may be applied to individual items within. See itemGroups.json for more.",
+	"type": "object",
+	"definitions": {
+		"valid": {
+			"itemType": {
+				"enum": ["other","crown","boss","common","elite","weeklyBoss","books","gem","exp","weaponAsc","local"]
+			}
+		}
+	},
+	"patternProperties": {
+		"^([^\"$]+)$": {
+			"required": [
+				"type"
+			],
+			"$ref": "#"
+		}
+	},
+	"properties": {
+		"title": {
+			"description": "Used as a replacement name when displaying the name.",
+			"type": "string"
+		},
+		"rarity": {
+			"description": "The item's rarity. Affects background and star count. Leave unset for a rarity of 0.",
+			"type": "integer",
+			"maximum": 5,
+			"minimum": 0,
+			"default": 0
+		},
+		"type": {
+			"description": "The category the item will fall into.",
+			"oneOf": [
+				{
+					"$ref": "#/definitions/valid/itemType"
+				}
+			]
+		},
+		"source": {
+			"description": "Where you can get the item. This shows up in a tooltip if set.",
+			"type": ["string"]
+		},
+		"region": {
+			"description": "Which region the item can be found in. Currently does nothing.",
+			"type": ["string"]
+		}
+	}
+}

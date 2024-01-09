@@ -3,18 +3,21 @@
 	<head>
 		<title>Genshin Party Saver</title>
 		<link rel="stylesheet" href="style.css">
-		<script type="text/javascript" src="chardb.js"></script>
-		<script type="text/javascript" src="itemdb.js"></script>
-		<script type="text/javascript" src="weapdb.js"></script>
-		<script type="text/javascript" src="artifactdb.js"></script>
+		<script type="text/javascript" src="loadData.js"></script>
+
 		<script type="text/javascript" src="scripts.js"></script>
 		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+		<script type="text/javascript" src="scripts/prefs.js"></script>
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
 	<!-- Hi, thanks for reading the HTML file. The JS at the bottom of the page is an absolute fucking mess. If you want to clean it up, feel free to fork this repo (linked in the page's footer tag) and make a pull request. -->
 	<!--
 	TODO:
+	- MAKE SURE HIDE LIMITED IS WORKING AS INTENDED
+	- ALLOW HIDING RARITY STARS
 	- OPTIONAL VISIBILITY OF ARTIFACTS AND WEAPONS (visible by default right now, cannot hide)
+	- UNASSIGNED WEAPON TO USE images/icons/weapon/<type>.png (done?)
+	- ARTIFACTS SHOULD NOT BE STRINGS!!!
 	- PARTY PROPERTIES INCLUDE:
 		- CHARACTERS WITHIN PARTY HAVE THE FOLLOWING ADDITIONAL PROPERTIES:
 			- (maybe) VISIBLE TO USER; THE LEVEL, ASC, SKILL, BURST AND CON OF THE CHARACTER.
@@ -23,19 +26,103 @@
 	- ANY SORT OF REFINEMENT/LEVEL OR HP/DEF/ATK/CRIT/HEALING BONUS/$TYPE DMG/ER/EM STATS. NONE OF THEM. SOURCE OF WEAPON/ARTIFACT IS LIKELY FINE THOUGH
 	- NON-SOURCE RELATED WEAPON OR ARTIFACT DESCRIPTION. THESE WOULD TAKE UP TOO MUCH TIME AND BE UTTERLY POINTLESS. A LINK TO A GOOD WIKI MAYBE?
 	-->
-	<body>
+	<!-- 
+	PARTY FORMAT TO BE CHANGED
+
+	changeWeapon:
+		- new format supported (mostly done?)
+		- removing weapon shouldn't cock up
+		- allow granular editing of weapon outside of (proposed) weapon page
+
+	changeArtifact:
+		- new format must be supported
+		- removing artifact shouldn't cock up
+		- allow granular editing of arti outside of (i doubt ill make it) artifact page
+
+	addCharFromPopup:
+		- new format must be supported (done with quick change)
+		- allow chosing existing sets if any are found
+
+	--
+	
+	FROM
+
+	parties: [{id:$id,name:$name,?note:$note,chars:
+		[{name:$char,?type:$travType,weapon:$weapon,artifacts:(as str)[{},{},{},{},{set:$set}]}]
+	}]
+	
+	--
+	TO
+
+	parties: [{id:$id,name:$name,chars:
+		[{name:$char,set:$id}]
+	}]
+	partiesVersion: "0.02"
+
+	(saved within characters themselves (ie Ganyu.sets or Traveler.sets))
+	sets: [
+		{id:$id,weapon:$id,artifacts:[id:$id,null,null,null,null]}
+	]
+	
+	weapons: weaponIDIndex contains name of weapon which contains a list of ids. localStorage contains weapon info in name of weapon
+
+	artifacts:
+		artifactIDIndex:
+		{
+			$set: { // set being "Adventurer" or similar
+				"flower": [$id,$id,$id], (repeat 5 times per [flower,plume,etc], undefined/null for empty. No array for "Prayers..." sets.)
+			}
+		}
+		localStorage to contain:
+			(artifact) $set: [
+				"flower": {[
+					{
+						id:$id,
+						rarity:$rarity,
+						exp:$exp,
+						mainStat: $name, (skipped for flower and plume, must be valid in artiValidStats)
+						mainStatValue: $value, (might be possible to calculate this based on mainStat, rarity and exp)
+						substats:{$substat:$value,$substat:$value...} (each substat must be valid in artiValidSubstats and cannot match mainStat)
+					}
+				]}, (repeat per type of artifact -- for the prayers of _whatever_, they only have circlets and would instead use the below format)
+			]
+			"Prayers of" whatever: [
+				{
+					(same inner format as above. just no inner array)
+				}
+			]
+	-->
+	<!-- Exported party stuff for testing updating:
+	{"parties":"[{\"id\":\"LgToSGH\",\"name\":\"\\\"the kids were stolen\\\"\",\"chars\":[{\"name\":\"Alhaitham\",\"weapon\":\"Dull Blade\",\"artifacts\":\"[{\\\"set\\\":\\\"Adventurer\\\"},{\\\"set\\\":\\\"Viridescent Venerer\\\"},{\\\"set\\\":\\\"Adventurer\\\"},{\\\"set\\\":\\\"Adventurer\\\"},{\\\"set\\\":\\\"Lucky Dog\\\"}]\"},{\"name\":\"Bennett\",\"weapon\":\"Dull Blade\",\"artifacts\":\"[{},{},{},{},{}]\"}]}]"}
+	-->
+	<!-- Second exported party for general testing:
+		broken.
+	-->
+	<body class="hideLimited">
+		<span><span style="font-size:xx-large;font-weight:bolder">Parties are currently borked and do not save.</span> Feel free to mess around on this page though. Please report any issues in the repo linked in the footer.</span>
+		<div class="warning">
+			<strong>A whole lot of things in localStorage have been reworked. You may need to reload. Your data should hopefully be fine.</strong>
+		</div>
+
 		<div>
 			<a href="index.html">Home</a>
 			<a href="inv.html">Inventory</a>
-			<!-- <a href="characters.html">Characters</a> -->
+			<a href="characters.html">Characters</a>
 		</div>
 
-		<p style="font-family:monospace">css isn't anywhere close to done. most stuff works and there hopefully isn't anymore issues with this.
+		<p style="font-family:monospace">css isn't anywhere close to done. most stuff "works" and there hopefully isn't anymore issues with this.
 		<br>if you want to clear all your parties, paste the following command in the console:
 		<br>localStorage.removeItem("parties")</p>
 
+		<div class="vertFlex inputs">
+			<span title="Limited-Timed items include Aloy and Flagship Event Weapons.">
+				<label for="toggleLimited">Hide Limited-Timed Items</label>
+				<input type="checkbox" class="defaultInput" key="prefs" pref="hideLimited" onchange="prefs.hideLimited = this.checked;updatePrefs();toggleLimitedItems()" id="toggleLimited" name="toggleLimited" checked>
+			</span>
+		</div>
+
 		<div class="topFlex">
-			<div class="notes">You can change Traveler's element, artifacts and held weapon by clicking on their respective icon. Ignoring names and notes, the same party restrictions that apply in-game also apply here. Due to limitations, names and notes cannot contain quotation marks (")</div>
+			<div class="notes">You can change Traveler's element, artifacts and held weapon by clicking on the respective icon. Ignoring names and notes, the same party restrictions that apply in-game also apply here.</div>
 			<button class="newPartyButton" onclick="newParty(true)">Add New Party</button>
 		</div>
 
@@ -47,41 +134,55 @@
 	</body>
 	<script>
 	'use strict';
-	var foundParties = [], foundPartiesIndex = [], allPartiesCharIndex = {};
-	const allTravTypes = [];
-	for (let i in chars["Traveler"].regions) {
-		allTravTypes.push(chars["Traveler"].regions[i].type);
+	var parties = [], partyIndex = [], partiesCharsIndex = {};
+	const partiesVersion = "0.02";
+	pageType = "party";
+	var hideWarning = () => {
+		if(getLSItem("partiesVersion")==partiesVersion) get("warning","class")[0].style = "display:none";
 	}
 	window.addEventListener("load", () => {
+		hideWarning();
+		if(!prefs.hideLimited) document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
 		// check if preexisting parties are found and add them to html tree
 		if(getLSItem("parties") != undefined && getLSItem("parties") != "[]") {
-			console.log(getLSItem("parties"))
-			try {
-				foundParties = JSON.parse(getLSItem("parties"));
-			}
-			catch {
-				console.error("Previously saved party data was corrupted. Not resetting it lol");
-				foundParties = [];
-			}
-			if(JSON.stringify(foundParties) != "[]") {
-				console.log(foundParties)
-				foundPartiesIndex = foundParties.map(i => i.id);
-				for (let i in foundPartiesIndex) {
-					allPartiesCharIndex[foundPartiesIndex[i]] = foundParties[foundPartiesIndex.indexOf(foundPartiesIndex[i])].chars.map(i => i.name);
+			// console.log(getLSItem("parties"))
+			parties = parseLSItem("parties",[]);
+			if(typeof(parties) == "string") {
+				console.log("Parties needed another parse.")
+				try {
+					parties = JSON.parse(parties);
+					setLSItem("parties",JSON.stringify(parties));
 				}
-				// foundParties = JSON.parse(foundParties);
-				for(let i in foundParties) {
-					console.log(foundParties[i])
-					if(foundParties[i].name == undefined) foundParties[i].name=undefined;
-					if(foundParties[i].notes == undefined) foundParties[i].notes=undefined;
-					newParty(false,foundParties[i].id,foundParties[i].chars,foundParties[i].name,foundParties[i].notes);
+				catch {
+					console.error("Either localStorage is full or JSON.parse didn't work. Parties have been reset.");
+					parties = [];
+				}
+			}
+
+			if(getLSItem("partiesVersion") !== partiesVersion) parties = updateParties();
+
+			if(JSON.stringify(parties) != "[]") {
+				console.log(parties)
+				partyIndex = parties.map(i => i.id);
+				for (let i in partyIndex) {
+					ids[partyIndex[i]] = "party";
+					idIndex.push(partyIndex[i]);
+					partiesCharsIndex[partyIndex[i]] = parties[partyIndex.indexOf(partyIndex[i])].chars.map(i => i.name);
+				}
+				// parties = JSON.parse(parties);
+				for(let i in parties) {
+					// console.log(parties[i])
+					if(parties[i].name == undefined) parties[i].name=undefined;
+					if(parties[i].notes == undefined) parties[i].notes=undefined;
+					// console.log("before newParty()",parties[i].id,parties[i].chars,parties[i].name,parties[i].notes,parties[i]);
+					newParty(false,parties[i].id,parties[i].chars,parties[i].name,parties[i].notes);
 				}
 			}
 		} else {
-			newParty(true);
+			// newParty(true);
 		}
 
-		// test add new party
+		// test add new party OLD FORMAT
 		// newParty(true,"asdfghj",`{"chars":[{"name":"Ganyu","weapon":"Dull Blade"},{"name":"Traveler","type":"Dendro","rarity":2,"weapon":"Song of Stillness"},{"name":"Shenhe","type":"Hydro","rarity":3}]}`)
 		// newParty(true,"asdhaea",`{"chars":[{"name":"Ganyu","artifacts":[{"set":"Adventurer"},{"set":"Golden Troupe"},{},{},{}]}]}`)
 
@@ -97,25 +198,25 @@
 		// get("artis").innerHTML = html;
 
 
-		if(foundParties!=undefined) {
-			foundPartiesIndex = foundParties.map(i => i.id);
-			for(let i in foundPartiesIndex) {
-				allPartiesCharIndex[foundPartiesIndex[i]] = foundParties[foundPartiesIndex.indexOf(foundPartiesIndex[i])].chars.map(i => i.name);
+		if(parties!=undefined) {
+			partyIndex = parties.map(i => i.id);
+			for(let i in partyIndex) {
+				partiesCharsIndex[partyIndex[i]] = parties[partyIndex.indexOf(partyIndex[i])].chars.map(i => i.name);
 			}
 		}
 	});
 
-	var newParty = (saveParty=false,forcedID="",forcedChars="",forcedName="",forcedNotes="") => {
-		// forced chars needs to be in the format of: [{"name":"char1","type":"Hydro","weapon":"Dull Blade","artifacts":[{},{},{},{},{}]},{},{},{}]
-		var partyID = "";
-		var partyData = "";
+	var newParty = (saveParty=false,forcedID="",forcedChars=[],forcedName="",forcedNotes="") => {
+		// forcedChars needs to be in the format of [{char:$char,?set:$setID}] (max length 4)
+		var partyID = "", partyData = "";
 		var partyCount = 0, partyCharsCount = 0;
 		var contents = {};
 		var isLSPartyDataEmpty = true;
 		var partyName = "", partyNotes = "";
-		if(forcedNotes != undefined && forcedNotes != "") {
-			partyNotes = forcedNotes;
-		}
+
+		console.info(saveParty,forcedID,forcedChars,forcedName,forcedNotes);
+
+		// check if localStorage exists. If it does and saveParty is true, the new party will be added to it.
 		if (getLSItem("parties") != null && getLSItem("parties") != "[]") {
 			try {
 				partyCount = Object.keys(JSON.parse(getLSItem("parties"))).length;
@@ -125,34 +226,24 @@
 				}
 			}
 			catch {
-				console.error("Parties were corrupted. Below is the raw JSON.");
+				console.error("Parties were corrupted. Below is the raw string.");
 				console.log(getLSItem("parties"));
 			}
 		}
-		if (forcedChars != "" && typeof(forcedChars) == "string") {
-			try {
-				contents = JSON.parse(forcedChars);
-				partyCharsCount = contents.chars.length;
-				if(partyCharsCount > 3) {
-					console.error("forced contents contains more than 4 characters. An empty party will be used instead.");
-					contents = {};
-					partyCharsCount = 0;
-				}
-			}
-			catch {
-				console.log("forcedChars not jsonifyable fml");
-				contents = {};
-				partyCharsCount = 0;
-			}
-		} else {
+
+		// variable check stuff
+		if(forcedNotes != undefined && forcedNotes != "") {
+			partyNotes = forcedNotes;
+		}
+		if (JSON.stringify(forcedChars) != "[]") {
 			contents.chars = forcedChars;
 			partyCharsCount = contents.chars.length;
 		}
 		if (forcedID != "") {
-			saveParty = false;
+			saveParty = false; // enforce saveParty=false
 			partyID = forcedID;
 		} else {
-			partyID = createId("party");
+			partyID = createID("party");
 		}
 		if(forcedName != undefined && forcedName != "" && forcedName != '""') {
 			try {partyName = JSON.parse(forcedName);}
@@ -160,59 +251,93 @@
 		} else {
 			partyName = "Party "+partyID;
 		}
+
 		if(saveParty)partyData += "{\"id\":\"" + partyID + "\",";
 		// party init
 		var html = "<div class=\"party\" id=\""+partyID+"\">";
+		// var el_partyContainer = Object.assign(document.createElement("div"), {id:partyID,classList:"party"});
+		// console.log(el_partyContainer);
 
 		// party meta; includes name, element combos and the delete button
 		html += "<div class=\"partyMeta topFlex\">";
+		
+		// var el_partyMeta = Object.assign(document.createElement("div"), {classList:"partyMeta topFlex"});
+		// // console.log(el_partyMeta);
+		// // partyContainer.appendChild(partyMeta);
+		// // name + combo group
+		// var el_partyNameCombo = Object.assign(document.createElement("div"));
+		// var el_partyNameContainer = Object.assign(document.createElement("div"));
+		// // name
+		// var el_partyNameLabel = Object.assign(document.createElement("label"), {for:partyID+"-name",textContent:"Party Name: "});
+		// var el_partyName = Object.assign(document.createElement("input"), {classList:"partyName",type:"text",name:partyID+"-name",id:partyID+"-name",size:"25",maxlength:"50",value:partyName,placeholder:"Party Name"});
+		// el_partyNameContainer.appendChild(el_partyNameLabel);
+		// el_partyNameContainer.appendChild(el_partyName);
+
 		// name + combo group
 		html += "<div>";
 		// name
-		html += "<div><label for=\""+partyID+"-name\">Party Name: </label>";
-		html += "<input class=\"partyName\" type=\"text\" id=\""+partyID+"-name\" name=\""+partyID+"-name\" size=\"25\" maxlength=\"50\" value=\""+partyName+"\" placeholder=\"Party Name\" oninput=\"updatePartyName(&quot;"+partyID+"&quot;,this)\"></div>";
-		if(saveParty)partyData+="\"name\":\"Party "+partyID+"\",";
+		html += "<div>";
+		html += "<label for=\""+partyID+"-name\">Party Name: </label>";
+		html += "<input class=\"partyName\" type=\"text\" id=\""+partyID+"-name\" name=\""+partyID+"-name\" size=\"25\" maxlength=\"50\" value=\""+partyName+"\" placeholder=\"Party Name\" oninput=\"updatePartyName(&quot;"+partyID+"&quot;,this)\">";
+		html += "</div>";
+
+		if(saveParty) partyData+="\"name\":\"Party "+partyID+"\",";
+
+		// // element combos if applicable
+		// var el_partyCombos = Object.assign(document.createElement("div"), {classList:"partyCombos",id:partyID+"-combos"});
+		// el_partyNameCombo.appendChild(el_partyNameContainer);
+		// el_partyNameCombo.appendChild(el_partyCombos);
+		// el_partyMeta.appendChild(el_partyNameCombo);
+
 		// element combos if applicable - js would be needed for updating this.
 		html += "<div class=\"partyCombos\" id=\""+partyID+"-combos\"></div>";
 		// close name+combo group
 		html += "</div>";
+		
+		// var el_partyDeleteButton = Object.assign(document.createElement("div"), {classList:"removeButton",id:partyID+"-remove"});
+		// el_partyMeta.appendChild(el_partyDeleteButton);
+		// el_partyContainer.appendChild(el_partyMeta);
+
 		// delete button
 		html += "<button id=\""+partyID+"-remove\" class=\"removeButton\" onclick=\"removeParty(&quot;"+partyID+"&quot;)\">Remove</button>";
 		// close meta tag
 		html += "</div>";
 
+		// var el_partyChars = Object.assign(document.createElement("div"), {classList:"removeButton",id:partyID+"-party"});
 		// party chars start
 		html += "<div id=\""+partyID+"-party\" class=\"partyChars\">";
 
 		if(saveParty)partyData += "\"chars\":[,"; // open character list
 		for(var i = 0; i < partyCharsCount; i++) {
+			// let el_partyChar = Object.assign(document.createElement("div"), {classList:"partyChar normal"});
+			// let el_partyCharNameIconContainer = Object.assign(document.createElement("div"));
+
 			var char = contents.chars[i].name;
+			var setID = contents.chars[i].set; // this may turn up undefined. this is kinda normal and will be skipped.
 			var rarity, type, artifacts, weapon, note = undefined;
 			if(saveParty)partyData = partyData.splice(0,-1)+"{\"name\":\""+char+"\","; // open character
-			if(contents.chars[i].artifacts != undefined) {
-				artifacts = contents.chars[i].artifacts;
-				if(saveParty)partyData += "\"artifacts\":\""+JSON.stringify(artifacts)+"\",";
-			} else {
-				artifacts = "[{},{},{},{},{}]";
-			}
-			if(contents.chars[i].weapon != undefined) {
-				weapon = contents.chars[i].weapon;
-				if(saveParty)partyData += "\"weapon\":\""+weapon+"\",";
-			} else {
-				weapon = defaultWeapons[chars[char].weapon];
-			}
+			// if(setID != undefined) {
+			// 	let charSet = parseLSItem(char,{}).sets[setsIDIndex[char].indexOf(setID)];
+			// 	artifacts = charSet.artifacts;
+			// 	weapon = charSet.weapon;
+			// 	// if(saveParty)partyData += "\"artifacts\":"+JSON.stringify(artifacts)+",";
+			// 	// if(saveParty)partyData += "\"weapon\":\""+weapon+"\",";
+			// } else {
+			// 	artifacts = [null,null,null,null,null];
+			// 	weapon = defaultWeapons[charDB[char].weapon];
+			// }
 			if(contents.chars[i].type == undefined) {
 				if(char == "Traveler") {
 					type = "Anemo";
 				} else {
-					type = chars[char].type;
+					type = charDB[char].type;
 				}
 			} else {
 				type = contents.chars[i].type;
 				if(char == "Traveler"&&saveParty) partyData += "\"type\": \""+type+"\",";
 			}
 			if(contents.chars[i].rarity == undefined) {
-				rarity = chars[char].rarity;
+				rarity = charDB[char].rarity;
 			} else {
 				rarity = contents.chars[i].rarity;
 				if(saveParty)partyData += "\"rarity\":\""+rarity+"\",";
@@ -222,7 +347,10 @@
 			}
 			if(saveParty)partyData = partyData.slice(0,-1)+"},"; // close character
 
-			html += partyAddChar(partyID,char,type,rarity,weapon,artifacts,false,undefined,note);
+			// var charHTML = partyAddChar(partyID,char,type,rarity,weapon,artifacts,false,undefined,note);
+			var charHTML = partyAddChar(partyID,char,type,rarity,setID,false,undefined,note);
+			html += charHTML;
+			// el_partyChar.innerHTML = charHTML;
 		}
 		if(saveParty)partyData = partyData.slice(0,-1)+"],"; // close character list
 
@@ -237,20 +365,29 @@
 
 		// close outermost tag
 		html+="</div>"
-
+		console.log("partyData",partyData)
 		if(saveParty){
 			partyData = partyData.slice(0,-1)+"}"; // remove ending comma and close party
-			console.log(partyData,isLSPartyDataEmpty)
-			if(!isLSPartyDataEmpty) {
-				setLSItem("parties",getLSItem("parties").slice(0,-1)+","+partyData+"]");
-			} else {
-				setLSItem("parties","["+partyData+"]");
-				console.log(getLSItem("parties"))
-			}
-			foundParties.push(JSON.parse(partyData));
+			// console.log(partyData,isLSPartyDataEmpty)
+			console.log("attempted to save party data. parties:",parties,"partyData:",partyData)
+			// if(!isLSPartyDataEmpty) {
+			// 	setLSItem("parties",getLSItem("parties").slice(0,-1)+","+partyData+"]");
+			// } else {
+			// 	setLSItem("parties","["+partyData+"]");
+			// 	// console.log(getLSItem("parties"))
+			// }
+			parties.push(JSON.parse(partyData));
 			savePartyData();
 		}
 		get("partyGroups").innerHTML += html;
+
+		// add partyContainer to partyGroups
+		// get("partyGroups").appendChild(el_partyContainer);
+		
+		// // add events to items
+		// get(partyID+"-name").addEventListener("input",function(){updatePartyName('"'+partyID+'"',this);});
+		// get(partyID+"-remove").addEventListener("input",function(){removeParty('"'+partyID+'"')});
+
 	};
 
 	var clearPartyDoConfirm = "", wasPartyCleared = false;
@@ -262,16 +399,16 @@
 		} else {
 			wasPartyCleared = true;
 			clearPartyDoConfirm = "";
-			foundParties.splice(foundPartiesIndex.indexOf(partyID),1);
+			parties.splice(partyIndex.indexOf(partyID),1);
 			savePartyData();
 			get(partyID).outerHTML = "";
-			ids.splice(idNameIndex.indexOf(partyID),1);
-			idNameIndex = ids.map(i => i.id);
+			removeID(partyID);
 			window.setTimeout(function(){wasPartyCleared = false},5000);
 		}
 	}
 
-	var partyAddChar = (partyID="",char="Ganyu",type="Anemo",rarity="1",weapon="Dull Blade",artifacts="[{},{},{},{},{}]",addToTree=true,element=undefined,charNote=undefined) => {
+	var partyAddChar = (partyID="",char="Ganyu",type="Anemo",rarity="1",setID=null,addToTree=true,element=undefined,charNote=undefined) => {
+		console.log(partyID,char,type,rarity,setID,addToTree,element,charNote)
 		var forceReturnHTML = true;
 		if(partyID == "") {
 			console.warn("No Party ID was included. This may not work fully.");
@@ -282,8 +419,24 @@
 		} else if (addToTree) {
 			forceReturnHTML = false;
 		}
+		var artifacts, weapon;
+		if(setID != null && setID != "") {
+			if(JSON.stringify(setsIDIndex) == "{}") { // basically just after data update
+
+			}
+			let charSet = parseLSItem(char,{}).sets[setsIDIndex[char].indexOf(setID)];
+			artifacts = charSet.artifacts;
+			console.log(artifacts)
+			weapon = charSet.weapon != undefined ? getID(charSet.weapon,1) : defaultWeapons[charDB[char].weapon];
+			console.log(weapon)
+			// weapon = parseLSItem() // charSet.weapon;
+		} else {
+			artifacts = [null,null,null,null,null];
+			weapon = defaultWeapons[charDB[char].weapon];
+		}
 		var html = "";
 		// start character
+		// let el_char = Object.assign(document.createElement("div"), {classList:"partyChar normal"});
 		html += "<div class=\"partyChar normal\">";
 
 		html += makeCharIcon(char,type,rarity,partyID);
@@ -307,30 +460,28 @@
 
 		// start artifacts group
 		html += "<div class=\"partyArtifacts\">";
-		try {
-			artifacts = JSON.parse(artifacts);
-		} catch {
-			console.error("The artifacts belonging to "+char+" from party "+partyID+" appear to be corrupted. Here's what they were:",artifacts);
-			artifacts = [{},{},{},{},{}];
+		if(typeof(artifacts) == "string") {
+			try {
+				artifacts = JSON.parse(artifacts);
+			} catch {
+				console.error("The artifacts belonging to "+char+" from party "+partyID+" appear to be corrupted. Here's what they were:",artifacts);
+				artifacts = [null,null,null,null,null];
+			}
 		}
 		for (var j = 0; j < artifacts.length; j++) {
+			if(artifacts[j])
 			var artifact = artifacts[j];
 			var artifactIcon = undefined;
 			html += "<div class=\"partyArtifact\">";
-			if(artifact.set != undefined) {
-				artifactIcon = artifactDB[artifact.set][artifactTypes[j]];
-			} else if(typeof(artifact) == "string") {
-				artifactIcon = artifact;
+			// THIS PART NEEDS REWRITE FOR NEW FORMAT
+			if(artifact != null) {
+				var artifactSet = ids[artifact].split("--")[1];
+				artifactIcon = artifactDB[artifactSet][artifactTypes[j]];
 			} else {
-				if(artifact.set == undefined) {
-					console.info("Artifact type was undefined, assuming empty and returning fallback.");
-				} else {
-					console.error("Artifact data corrupted somehow. Below's the data. Using fallback.");
-					console.log(artifact);
-				}
 				artifactIcon = "fallback";
 			}
-			html += "<img draggable=\"false\" class=\"partyArtifactImage\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/artifacts/"+artifactTypes[j]+"/"+spaceToUnderscore(removeQuotes(artifactIcon))+".png\" onclick=\"changeArtifactStart(this)\">";
+			//
+			html += "<img draggable=\"false\" class=\"partyArtifactImage partyIntractable\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/artifacts/"+artifactTypes[j]+"/"+spaceToUnderscore(removeQuotes(artifactIcon))+".png\" onclick=\"changeArtifactStart(this)\">";
 			html += "</div>";
 		}
 		// close artifact group
@@ -359,32 +510,48 @@
 		}
 	}
 	// make a character icon in a similar way to item icons
-	var makeCharIcon = (char="Ganyu",type="Anemo",rarity="1",partyID="") => {
-		var html = "";
-		html += "<div>";
-		html += "<div class=\"partyCharName\">"+char+"</div>";
-		// get char type icon, image, rarity and throw them into a nice box
-		html += "<div class=\"partyCharIcon rarity-"+rarity+"\">";
-		html += "<img draggable=\"false\" loading=\"lazy\" class=\"partyCharImage\" src=\"images/char/"+spaceToUnderscore(char)+".png\">";
+	var makeCharIcon = (char="Ganyu",type="Anemo",rarity="1",partyID="",returnHTML=true) => {
+		if(returnHTML) {
+			var html = "";
+			html += "<div>";
+			html += "<div class=\"partyCharName\">"+char+"</div>";
+			// get char type icon, image, rarity and throw them into a nice box
+			html += "<div class=\"partyCharIcon rarity-"+rarity+"\">";
+			html += "<img draggable=\"false\" loading=\"lazy\" class=\"partyCharImage\" src=\"images/char/"+spaceToUnderscore(char)+".png\">";
 
-		// type
-		html += "<img draggable=\"false\" loading=\"lazy\" class=\"partyCharType";
-		if(char == "Traveler" && partyID != "") html += " partyTravType partyIntractable\" id=\""+partyID+"-travType\" onclick=\"changeTravTypeStart(this);";
-		html += "\" height=\"32\" width=\"32\" src=\"images/icons/elements/"+type+".svg\">";
+			// type
+			html += "<img draggable=\"false\" loading=\"lazy\" class=\"partyCharType";
+			if(char == "Traveler" && partyID != "") html += " partyTravType partyIntractable\" id=\""+partyID+"-travType\" onclick=\"changeTravTypeStart(this);";
+			html += "\" height=\"32\" width=\"32\" src=\"images/icons/elements/"+type+".svg\">";
 
-		html += "<img draggable=\"false\" loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">";
-		// close icon group
-		html += "</div>";
-		html += "</div>";
-
-		return html;
+			html += "<img draggable=\"false\" loading=\"lazy\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">";
+			// close icon group
+			html += "</div>";
+			html += "</div>";
+			return html;
+		} else {
+			var el_charNameIconContainer = Object.assign(document.createElement("div"));
+			var el_charName = Object.assign(document.createElement("div"), {classList:"partyCharName",textContent:char});
+			var el_charIconContainer = Object.assign(document.createElement("div"), {classList:"partyCharIcon rarity"+rarity});
+			var el_charImage = Object.assign(document.createElement("img"), {classList:"partyCharImage",draggable:false,loading:"lazy",src:"images/char/"+spaceToUnderscore(char)+".png"});
+			var el_charType = Object.assign(document.createElement("img"), {classList:"partyCharType",height:32,width:32,draggable:false,loading:"lazy",src:"images/icons/elements/"+type+".svg"});
+			var el_charRarityIcon = Object.assign(document.createElement("img"), {classList:"rarityIcon extraIcon",draggable:false,loading:"lazy",src:"images/icons/rarity/"+rarity+".png"});
+			el_charIconContainer.appendChild(el_charImage);
+			el_charIconContainer.appendChild(el_charType);
+			el_charIconContainer.appendChild(el_charRarityIcon);
+			el_charNameIconContainer.appendChild(el_charName);
+			el_charNameIconContainer.appendChild(el_charIconContainer);
+			console.log("need to check for trav and add event to el_charType");
+			return el_charNameIconContainer;
+		}
 	}
 
 	var checkCombos = (partyID) => {
 		/*
 			Hi important notes:
 
-			Unaligned does not activate Protective Canopy for some reason.
+			All code within this comment block is psudo-code and not representative of actual game code.
+			Unaligned Traveler does not activate Protective Canopy (4 unique types in party) for some reason.
 			Unaligned Traveler **MIGHT** work with Nilou's bloom despite only specifying Hydro and Dendro
 
 			This may mean that the Unaligned "element" is the the same as an empty slot; a Null or Undefined.
@@ -396,17 +563,17 @@
 			These notes may be updated at a later date with more correct info.
 		*/
 		var partyTypes = [];
-		var partyChars = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		var partyChars = parties[partyIndex.indexOf(partyID)].chars;
 		var html = "";
 		for (let i in partyChars) {
 			if (partyChars[i].type != undefined) {
 				partyTypes.push(partyChars[i].type)
 			} else if(partyChars[i].name != "Traveler") {
-				partyTypes.push(chars[partyChars[i].name].type);
+				partyTypes.push(charDB[partyChars[i].name].type);
 			} else {
 				console.warn("Traveler should ALWAYS have an associated type when in a party. An unaligned type will be used instead and Traveler's type will be reset to Anemo.");
 				partyTypes.push("Unaligned");
-				foundParties[foundPartiesIndex.indexOf(partyID)].chars[i].type = "Anemo";
+				parties[partyIndex.indexOf(partyID)].chars[i].type = "Anemo";
 			}
 		}
 
@@ -455,14 +622,12 @@
 
 	var addCharFromPopup = (element) => {
 		var char = element.childNodes[0].innerText;
-		var weapon = defaultWeapons[chars[char].weapon];
-		var artifacts = "[{},{},{},{},{}]";
 		var partyID = getPartyID(element);
-		partyAddChar(getPartyID(element),char,chars[char].type,chars[char].rarity,weapon,artifacts,true,get(partyID+'-addChar'));
-		foundParties[foundPartiesIndex.indexOf(partyID)].chars.push(JSON.parse("{\"name\":\""+char+"\",\"weapon\":\""+weapon+"\",\"artifacts\":\""+artifacts+"\"}"));
+		partyAddChar(getPartyID(element),char,charDB[char].type,charDB[char].rarity,null,true,get(partyID+'-addChar'));
+		parties[partyIndex.indexOf(partyID)].chars.push({name:char});
 		savePartyData();
 		get(partyID+"-addChar").classList.remove("open");
-		if(foundParties[foundPartiesIndex.indexOf(partyID)].chars.length > 3) {
+		if(parties[partyIndex.indexOf(partyID)].chars.length > 3) {
 			get(partyID+"-addChar").classList.add("partyFull");
 			checkCombos(partyID);
 		}
@@ -493,9 +658,8 @@
 		// data is an array of what'll be within the popup. each point in the data MUST be strings.
 		// title is an optional string for a title, it's also used to determine what kind of data is being used.
 		// search and noTitle are bools for if a search bar should be present or if the title shouldn't be added to html
-		if(data == undefined) {
-			console.error("Do not call makePopup with undefined data.");
-			return;
+		if(data === undefined) {
+			throw new Error("Do not call makePopup with undefined data.");
 		}
 		var html = "<div class=\"partyPopup\">";
 		if(title != "" && !noTitle) html += "<div class=\"partyPopupHeader\"><div class=\"partyPopupTitle\">"+title+"</div>";
@@ -517,18 +681,31 @@
 		if(title.toLowerCase().indexOf("character") != -1) {
 			html += " mini\">";
 			for (var i in data) {
-				if(chars[data[i]].include == false) continue;
-				var charString = makeCharIcon(data[i],chars[data[i]].type,chars[data[i]].rarity);
-				charString = charString.replace("<div>","<div onclick=\"addCharFromPopup(this)\">");
-				if(data[i] == "Aloy") charString = charString.replace("class=\"","class=\"limited ");
+				if(charDB[data[i]].include == false) continue;
+				var charString = makeCharIcon(data[i],charDB[data[i]].type,charDB[data[i]].rarity);
+				charString = charString.replace("<div>","<div "+(data[i] == "Aloy"?"class=\"limited\" ":"")+"onclick=\"addCharFromPopup(this)\">");
 				html += charString;	
 			}
 		} else if (title.toLowerCase().indexOf("weapon") != -1) {
 			html += " weaponSelection\">";
 			for (var i in data) {
+				if(allWeaponTypes.indexOf(data[i]) != -1) {
+					html+="<div onclick=\"changeWeapon(this,&quot;remove&quot;)\" class=\"partyIntractable partyPopupWeapon\">";
+					html+="<img draggable=\"false\" loading=\"lazy\" height=\"32\" width=\"32\" src=\"images/icons/weapon/"+data[i]+".png\">";
+					html+="<span>Remove</span></div>";
+					continue;
+				}
 				html += "<div onclick=\"changeWeapon(this,&quot;"+data[i]+"&quot;)\" class=\"partyIntractable partyPopupWeapon rarity-"+weapDB[data[i]].rarity;
 				if(weapDB[data[i]].source == "event") html += " limited";
-				html += "\"><img draggable=\"false\" height=\"32\" width=\"32\" src=\"images/weapon/"+spaceToUnderscore(data[i])+".png\"><span>";
+				html += "\">";
+				if(weapDB[data[i]].icons !== undefined && Array.isArray(weapDB[data[i]].icons)) {
+					for(var j in weapDB[data[i]].icons) {
+						html += makeImg("images/weapon/"+spaceToUnderscore(data[i]+"_"+weapDB[data[i]].icons[j])+".png",32,32,["dropdownWeaponImg"]);
+					}
+				} else {
+					html += makeImg("images/weapon/"+spaceToUnderscore(data[i])+".png",32,32,["dropdownWeaponImg"]);
+				}
+				html+="<span>";
 				if(weapDB[data[i]].title != undefined) {html += weapDB[data[i]].title} else {html += data[i]}
 				html += "</span></div>";
 			}
@@ -566,31 +743,38 @@
 
 	var savePartyData = () => {
 		// ran fairly often to save the party data.
-		foundPartiesIndex = foundParties.map(i => i.id);
-		for(var i in foundPartiesIndex) {
-			allPartiesCharIndex[foundPartiesIndex[i]] = foundParties[foundPartiesIndex.indexOf(foundPartiesIndex[i])].chars.map(i => i.name);
+		partyIndex = parties.map(i => i.id);
+		for(var i in partyIndex) {
+			partiesCharsIndex[partyIndex[i]] = parties[partyIndex.indexOf(partyIndex[i])].chars.map(i => i.name);
 		}
-		if (Array.isArray(foundParties)) {
-			setLSItem("parties", JSON.stringify(foundParties));
-		} else {
-			setLSItem("parties", "["+JSON.stringify(foundParties)+"]");
-		}
+		console.log("attempted to save party data. parties:",parties)
+		console.trace(parties);
+
+		// if(JSON.stringify(parties) == "[]") {
+		// 	clearLSItem("parties");
+		// } else {
+		// 	if (Array.isArray(parties)) {
+		// 		setLSItem("parties", JSON.stringify(parties));
+		// 	} else {
+		// 		setLSItem("parties", "["+JSON.stringify(parties)+"]");
+		// 	}
+		// }
 	}
 
 	var updatePartyName = (partyID, element) => {
-		var newName = val(element,true).trim().replace(/["]+/g, "");
+		var newName = parseHTMLSafe(val(element,true).trim());
 		if(newName != "") {
-			foundParties[foundPartiesIndex.indexOf(partyID)].name = JSON.stringify(newName);
+			parties[partyIndex.indexOf(partyID)].name = JSON.stringify(newName);
 			savePartyData();
 		}
 	}
 	var updateCharNotes = (partyID, charName, element) => {
-		var newNote = element.value.trim().replace(/["]+/g, "");
+		var newNote = parseHTMLSafe(element.value.trim());
 		if(newNote != "") {
-			foundParties[foundPartiesIndex.indexOf(partyID)].chars[allPartiesCharIndex[partyID].indexOf(charName)].note = JSON.stringify(newNote);
+			parties[partyIndex.indexOf(partyID)].chars[partiesCharsIndex[partyID].indexOf(charName)].note = JSON.stringify(newNote);
 			savePartyData();
 		} else {
-			delete foundParties[foundPartiesIndex.indexOf(partyID)].chars[allPartiesCharIndex[partyID].indexOf(charName)].note;
+			delete parties[partyIndex.indexOf(partyID)].chars[partiesCharsIndex[partyID].indexOf(charName)].note;
 			savePartyData();
 		}
 	}
@@ -604,18 +788,16 @@
 		// this popup will disappear upon character selection
 		// element should be the $partyID-addChar element.
 		if (get(partyID).getAttribute("popupdisabled") != null) {
-			console.warn("One popup per party please thank you");
-			return;
+			throw new Error("One popup per party please thank you~ this should really close instead.");
 		}
 		get(partyID+"-addChar").classList.add("open");
 		get(partyID+"-addChar").removeAttribute("onclick");
 		var allowedChars = [];
-		for(let i in chars) {allowedChars.push(i)}
+		for(let i in charDB) {allowedChars.push(i)}
 		element.parentNode.attributes.onclick = "";
-		var partyChars = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		var partyChars = parties[partyIndex.indexOf(partyID)].chars;
 		if(partyChars.length > 4) {
-			console.warn("You cannot add more than 4 characters to a party.");
-			return;
+			throw new Error("You cannot add more than 4 characters to a party.");
 		}
 
 		// reduce valid characters down from all possible to not-in-party
@@ -635,8 +817,8 @@
 		var char = getCharElement(element).firstChild.firstChild.innerText;
 		var partyID = getPartyID(element);
 		get(partyID+"-travType").setAttribute("src","images/icons/elements/"+type+".svg");
-		foundParties[foundPartiesIndex.indexOf(partyID)].chars[allPartiesCharIndex[partyID].indexOf(char)].type = type;
-		if(allPartiesCharIndex[partyID].length == 4) checkCombos(partyID);
+		parties[partyIndex.indexOf(partyID)].chars[partiesCharsIndex[partyID].indexOf(char)].type = type;
+		if(partiesCharsIndex[partyID].length == 4) checkCombos(partyID);
 		removePopup(element,"trav");
 		savePartyData();
 	}
@@ -644,15 +826,14 @@
 		// have popup with (current) types as well as unaligned (likely hidden without show event only or something)
 		// only changes the source image. seriously, that's it.
 		if (get(getPartyID(element)).getAttribute("popupdisabled") != null) {
-			console.warn("One popup per party please thank you");
-			return;
+			throw new Error("One popup per party please thank you~ this should really close instead.");
 		}
 		element.removeAttribute("onclick");
 		var currentElement = element.getAttribute("src").substr(22).slice(0, -4);
 		var allValidTravTypes = [];
-		for (var i in allTravTypes) {
-			if(allTravTypes[i] != currentElement) {
-				allValidTravTypes.push(allTravTypes[i]);
+		for (var i in travTypeOrder) {
+			if(travTypeOrder[i] != currentElement) {
+				allValidTravTypes.push(travTypeOrder[i]);
 			}
 		}
 		getCharElement(element).insertAdjacentHTML("beforeend",makePopup(allValidTravTypes,"Change Traveler's element"));
@@ -662,25 +843,99 @@
 	// change weapon
 	var changeWeapon = (element,newWeapon) => {
 		// first it gets the character's name from the image then gets a list of valid weapons to choose from. also swaps alt text
-		var char = getCharElement(element).firstChild.firstChild.innerText;
+		var charName = getCharElement(element).firstChild.firstChild.innerText;
 		var partyID = getPartyID(element);
-		getCharElement(element).childNodes[1].childNodes[1].childNodes[0].childNodes[0].setAttribute("src","images/weapon/"+spaceToUnderscore(newWeapon)+".png");
-		foundParties[foundPartiesIndex.indexOf(partyID)].chars[allPartiesCharIndex[partyID].indexOf(char)].weapon = newWeapon;
+		var party = getID(partyID);
+		var partyChar = party.chars[partiesCharsIndex[partyID].indexOf(charName)];
+		var wasSetUnknown = false;
+		// console.log(partyChar)
+
+		// check if allWeaponTypes.indexOf(newWeapon) != -1 for removal
+
+		var set = {};
+		var setID;
+		if(partyChar.set == undefined) {
+			// creating a new set
+			setID = createID("set--"+charName);
+			set.id = setID;
+			wasSetUnknown = true;
+		} else {
+			set = getID(partyChar.set);
+		}
+		console.log(set);
+
+		// assumption is not removing the weapon
+		if(set.weapon == undefined) {
+			var weapID = createID("weap--"+newWeapon);
+			var weapObj = {id:weapID,usedIn:{}}
+			set.weapon = weapID;
+			weapObj.usedIn[charName] = [set.id];
+			if(weaponIDIndex[newWeapon] == undefined) weaponIDIndex[newWeapon] = [];
+			weaponIDIndex[newWeapon].push(weapID);
+			if(weaponInfoIndex[newWeapon] == undefined) weaponInfoIndex[newWeapon] = [];
+			weaponInfoIndex[newWeapon].push(weapObj);
+			// setLSItem(newWeapon,JSON.stringify(weaponInfoIndex[newWeapon]));
+		} else {
+			// a check needs to be in place for checking if the only thing in the set is the weapon.
+			var oldWeap = getID(set.weapon);
+			console.log(oldWeap);
+
+			// line appears to nuke the set regardless. this'll want fixing.
+			// oldWeap.usedIn[charName].splice([setsIDIndex[charName].indexOf(set.id)],1);
+
+			if(oldWeap.usedIn[charName].length == 0) delete oldWeap.usedIn[charName];
+			if(JSON.stringify(oldWeap.usedIn) == "{}") delete oldWeap.usedIn;
+			if(JSON.stringify(oldWeap) == "{\"id\":\""+oldWeap.id+"\"}") {
+				// TODO: delete weapon info entirely if this part is triggered
+				console.log("IT'S NULL");
+			}
+			// lines appear to nuke the set regardless. this'll want fixing.
+			// setsIDIndex[charName].splice(setsIDIndex[charName].indexOf(set.id),1);
+			// if(setsIDIndex[charName].length == 0) delete setsIDIndex[charName];
+		}
+
+		// add new set to character
+		if(wasSetUnknown && newWeapon != "remove") {
+			if(charInfoIndex[charName] == undefined) charInfoIndex[charName] = {};
+			if(charInfoIndex[charName].sets == undefined) charInfoIndex[charName].sets = [];
+			charInfoIndex[charName].sets.push(set);
+			if(setsIDIndex[charName] == undefined) setsIDIndex[charName] = [];
+			setsIDIndex[charName].push(setID);
+			partyChar.set = setID;
+		}
+
+		let iconElem = getCharElement(element).childNodes[1].childNodes[1].childNodes[0].childNodes[0];
+		if(newWeapon == "remove") {
+			iconElem.setAttribute("src","images/icons/weapon/"+charDB[charName].weapon+".png");
+		} else {
+			iconElem.setAttribute("src","images/weapon/"+spaceToUnderscore(newWeapon)+".png");
+		}
+		// if(charInfoIndex[char] == undefined) charInfoIndex[char] = {};
+		// if(setsIDIndex[char] == undefined) {
+		// 	// no set? we're making one!
+		// 	charInfoIndex[char].sets.push
+		// }
+		// parties[partyIndex.indexOf(partyID)].chars[partiesCharsIndex[partyID].indexOf(char)].weapon = newWeapon;
+		// setLSItem(charName,JSON.stringify(charInfoIndex[charName]));
 		removePopup(element,"weapon");
 		savePartyData();
 	}
 	var changeWeaponStart = (element) => {
 		// first it gets the character's name from the image then gets a list of valid weapons to choose from. also swaps alt text
 		if (get(getPartyID(element)).getAttribute("popupdisabled") != null) {
-			console.warn("One popup per party please thank you");
-			return;
+			throw new Error("One popup per party please thank you~ this should really close instead.");
 		}
 		element.removeAttribute("onclick");
 		var char = getCharElement(element).firstChild.firstChild.innerText;
 		var currentWeapon = underscoreToSpace(element.getAttribute("src").substr(14).slice(0,-4));
 		var allowedWeapons = [];
-		for (var i in allWeapons[allWeaponTypes.indexOf(chars[char].weapon)]) {
-			if(allWeapons[allWeaponTypes.indexOf(chars[char].weapon)][i] != currentWeapon) {allowedWeapons.push(allWeapons[allWeaponTypes.indexOf(chars[char].weapon)][i])}
+		
+		// TODO: add check for adding "fallback"
+		allowedWeapons.push(charDB[char].weapon);
+
+		if(allWeaponTypes.indexOf(currentWeapon) != -1) allowedWeapons.push(currentWeapon);
+		for (var i in allWeapons[allWeaponTypes.indexOf(charDB[char].weapon)]) {
+			if(allWeapons[allWeaponTypes.indexOf(charDB[char].weapon)][i] != currentWeapon) {allowedWeapons.push(allWeapons[allWeaponTypes.indexOf(charDB[char].weapon)][i])}
 		}
 		if(char.substr(-1,1) == "s") {char += "'"} else {char += "'s"}
 		var html = makePopup(allowedWeapons,"Change "+char+" weapon");
@@ -689,31 +944,102 @@
 	}
 
 	// change artifact
-	var changeArtifact = (element,artifactType,newArtifact) => {
-		// swap out an artifact image for another
+	var changeArtifact = (element,artifactType,newArtifact,artifactID=null) => {
+		// swap out an artifact for another
 		var char = getCharElement(element).firstChild.firstChild.innerText;
 		var partyID = getPartyID(element);
+		var partyChar = parties[partyIndex.indexOf(partyID)].chars[partiesCharsIndex[partyID].indexOf(char)];
 		var charArtifacts;
+		var setID, wasSetUnknown = false, artiSetHasOneType = false;
 		var artifactIcon = "fallback";
-		if(newArtifact != "fallback") {artifactIcon = spaceToUnderscore(removeQuotes(artifactDB[newArtifact][artifactType]))}
-		try {
-			charArtifacts = JSON.parse(foundParties[foundPartiesIndex.indexOf(partyID)].chars[allPartiesCharIndex[partyID].indexOf(char)].artifacts);
-		} catch {
-			console.error("Couldn't parse JSON when changing artifact. Below is what it was. This will reset the character's artifacts.");
-			console.log(foundParties[foundPartiesIndex.indexOf(partyID)].chars[allPartiesCharIndex[partyID].indexOf(char)].artifacts);
-			charArtifacts = [{},{},{},{},{}];
+
+		// create artifact id just in case -- needs check for existing artifacts
+		if(artifactID === null) {
+			// console.log(allArtifactGroupsWithOneType,newArtifact, allArtifactGroupsWithOneType.indexOf(newArtifact))
+			if(allArtifactGroupsWithOneType.indexOf(newArtifact) == -1) {
+				artifactID = createID("arti--"+newArtifact+"--"+artifactType,7,artifactID);
+			} else {
+				artiSetHasOneType = true;
+				artifactID = createID("arti--"+newArtifact,7,artifactID);
+			}
 		}
-		charArtifacts[artifactTypes.indexOf(artifactType)].set = newArtifact;
-		foundParties[foundPartiesIndex.indexOf(partyID)].chars[allPartiesCharIndex[partyID].indexOf(char)].artifacts = JSON.stringify(charArtifacts);
+
+		// console.log("artiType",artifactType,"newArti",newArtifact)
+
+		// get set id for updating
+		var set = {};
+		if(partyChar.set !== undefined) {
+			setID = partyChar.set;
+			set = charInfoIndex[char].sets[setsIDIndex[char].indexOf(setID)];
+		} else {
+			setID = createID("set--"+char);
+			set.id = setID;
+			wasSetUnknown = true;
+		}
+
+		if(newArtifact != "fallback") {
+			artifactIcon = spaceToUnderscore(removeQuotes(artifactDB[newArtifact][artifactType]));
+		}
+		if(partyChar.artifacts !== undefined) {
+			// more legacy stuff. it shouldn't be placed there anymore.
+			try {
+				charArtifacts = JSON.parse(partyChar.artifacts);
+			}
+			catch {
+				console.error("Couldn't parse JSON when changing artifact. Below is what it was. This will reset the character's artifacts.");
+				console.log(partyChar.artifacts);
+				charArtifacts = [null,null,null,null,null];
+			}
+		} else if(set.artifacts !== undefined) {
+			charArtifacts = set.artifacts;
+		} else {
+			charArtifacts = [null,null,null,null,null];
+		}
+
+		if(artifactIcon != "fallback") {
+			charArtifacts[artifactTypes.indexOf(artifactType)] = artifactID;
+			var artiObj = {id:artifactID,usedIn:{}}
+			artiObj.usedIn[char] = [set.id];
+			if(artiSetHasOneType) {
+				if (artifactIDIndex[newArtifact] == undefined) artifactIDIndex[newArtifact] = [];
+				artifactIDIndex[newArtifact].push(artiObj);
+				if (artifactInfoIndex[newArtifact] == undefined) artifactInfoIndex[newArtifact] = [];
+				artifactInfoIndex[newArtifact].push(artiObj);
+			} else {
+				if (artifactIDIndex[newArtifact] == undefined) artifactIDIndex[newArtifact] = {};
+				if (artifactIDIndex[newArtifact][artifactType] == undefined) artifactIDIndex[newArtifact][artifactType] = [];
+				artifactIDIndex[newArtifact][artifactType].push(artiObj);
+				if (artifactInfoIndex[newArtifact] == undefined) artifactInfoIndex[newArtifact] = {};
+				if (artifactInfoIndex[newArtifact][artifactType] == undefined) artifactInfoIndex[newArtifact][artifactType] = [];
+				artifactInfoIndex[newArtifact][artifactType].push(artiObj);
+			}
+			// setLSItem(newArtifact,JSON.stringify(artifactInfoIndex[newArtifact]));
+		} else {
+			charArtifacts[artifactTypes.indexOf(artifactType)] = null;
+		}
+		// console.log(charArtifacts,artifactTypes,artifactType,artifactID)
+
+		set.artifacts = charArtifacts;
+
+		// add new set to character
+		if (wasSetUnknown && newArtifact != "remove") {
+			if (charInfoIndex[char] == undefined) charInfoIndex[char] = {};
+			if (charInfoIndex[char].sets == undefined) charInfoIndex[char].sets = [];
+			charInfoIndex[char].sets.push(set);
+			if (setsIDIndex[char] == undefined) setsIDIndex[char] = [];
+			setsIDIndex[char].push(setID);
+			partyChar.set = setID;
+		}
+
 		getPopupElement(element).previousElementSibling.setAttribute("src","images/artifacts/"+artifactType+"/"+artifactIcon+".png");
+		// setLSItem(char, JSON.stringify(charInfoIndex[char]));
 		removePopup(element, "artifact");
 		savePartyData();
 	}
 	var changeArtifactStart = (element) => {
 		// swap out an artifact image for another
 		if (get(getPartyID(element)).getAttribute("popupdisabled") != null) {
-			console.warn("One popup per party please thank you");
-			return;
+			throw new Error("One popup per party please thank you~ this should really close instead.");
 		}
 		element.removeAttribute("onclick");
 		var allowedArtifacts = [];
@@ -731,7 +1057,7 @@
 				if(artifactDB[allArtifactGroups[i]][artifactType] != undefined && removeQuotes(artifactDB[allArtifactGroups[i]][artifactType]) != artifactName) allowedArtifacts.push(allArtifactGroups[i]);
 			}
 		}
-		console.log(allowedArtifacts)
+		// console.log(allowedArtifacts)
 		var html = makePopup(allowedArtifacts,"Change the artifact to what?");
 		element.insertAdjacentHTML("afterend",html);
 		get(getPartyID(element)).setAttribute("popupdisabled","");
@@ -739,7 +1065,7 @@
 
 	// get char html element
 	var getCharElement = (element) => {
-		do {element = element.parentNode} while (element.classList.contains("partyChar") == false); return element;
+		do {element = element.parentNode} while (!element.classList.contains("partyChar")); return element;
 	}
 	var getPartyID = (element) => {
 		while (element.id == "" && (element.tagName != "HTML"||element.tagName == undefined)) {element = element.parentNode}
@@ -751,8 +1077,7 @@
 				return element.id.slice(0,7);
 			}
 		} else {
-			console.error("The tested element was not part of a party.");
-			return;
+			throw new Error("The tested element was not part of a party.");
 		}
 	}
 	// move chars around
@@ -764,9 +1089,9 @@
 		while ( (char = char.previousElementSibling) != null ) {
 			i++;
 		}
-		var j = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		var j = parties[partyIndex.indexOf(partyID)].chars;
 		j.splice(i, 0, j.splice(i + 1, 1)[0]);
-		if(allPartiesCharIndex[partyID].length == 4) checkCombos(partyID);
+		if(partiesCharsIndex[partyID].length == 4) checkCombos(partyID);
 		savePartyData();
 	}
 	var moveCharRight = (char) => {
@@ -777,9 +1102,9 @@
 		while ((char = char.nextElementSibling) != null) {
 			i--;
 		}
-		var j = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		var j = parties[partyIndex.indexOf(partyID)].chars;
 		j.splice(i, 0, j.splice(i - 1, 1)[0]);
-		if(allPartiesCharIndex[partyID].length == 4) checkCombos(partyID);
+		if(partiesCharsIndex[partyID].length == 4) checkCombos(partyID);
 		savePartyData();
 	}
 	// remove character
@@ -795,10 +1120,150 @@
 		for (i; i < parentChildNodes.length; i++) {
 			if(char === parentChildNodes[i]) break;
 		}
-		var j = foundParties[foundPartiesIndex.indexOf(partyID)].chars;
+		var j = parties[partyIndex.indexOf(partyID)].chars;
 		j.splice(i,1);
 		char.outerHTML = "";
 		savePartyData();
+	}
+	
+	// update party format
+	var updateParties = () => {
+		console.warn("Party Data does not match current version.");
+		var newPartyFormat = [];
+		// Convert from sets within party to sets within chars, usedIn within weapons and artifacts. Default weapons will be skipped.
+		if(getLSItem("partiesVersion") == undefined) {
+			// Previous data format is as follows
+			// [ {id: $partyID, name: $partyName, ?note: $partyNote, chars: [ {name: $charName, note: $note, ?type: $travType, weapon: $weaponName, artifacts:[ {set: $artifactSet} (repeat per artifact, index is artifactType) ]} (repeat per character) ]} (repeat per party) ]
+			
+			// console.log("PreviousData",parties);
+			for (var i in parties) {
+				let party = parties[i];
+				let partyID = createID("party",7,(party.id!=undefined?party.id:null));
+				let partyName = party.name != undefined ? party.name : "Party "+partyID;
+				let partyNote = party.note != undefined ? party.note : undefined;
+				if(party.chars == undefined || !Array.isArray(party.chars) || (Array.isArray(party.chars) && party.chars.length == 0) ) continue; // skip empty parties
+				let partyObj = {};
+				partyObj.id = partyID;
+				partyObj.name = partyName;
+				if(partyNote != undefined) partyObj.note = partyNote;
+
+				// go through each character
+				partyObj.chars = [];
+				for(let i in party.chars) {
+					let char = party.chars[i];
+					if(char.name == undefined) continue; // an empty character is not good. Skip it~
+					let charName = char.name;
+					let charObj = {name: charName};
+					if(char.note != undefined) charObj.note = char.note;
+					if(charName == "Traveler" && char.type != undefined) charObj.type = char.type; // "Anemo" is default type.
+					var isWeaponDefault = true, emptyArtis = true;
+					var setObj = {};
+					var setID = "";
+					// create weapon stuff - skip default weapons
+					if(char.weapon != defaultWeapons[charDB[charName].weapon]) {
+						isWeaponDefault = false;
+						setID = createID("set--"+charName);
+						var lsItem = parseLSItem(char.weapon,[]);
+						
+						var weapObj = {};
+						var weapID = createID("weap--"+char.weapon);
+						// since no information about exp or refinement was previously stored, they'll not be set.
+						weapObj.id = weapID;
+						setObj.weapon = weapID;
+						if(weapObj.usedIn == undefined) weapObj.usedIn = {};
+						weapObj.usedIn[charName] = [setID];
+						lsItem.push(weapObj);
+						setLSItem(char.weapon,JSON.stringify(lsItem));
+						// console.info("weapObj for",charName,"is",weapObj,". lsitem is",lsItem);
+					}
+					// create artifact stuffs - skip empty stuff
+					if(!(JSON.stringify(char.artifacts) == "[{},{},{},{},{}]" || char.artifacts == "[{},{},{},{},{}]")) {
+						var artis;
+						// for some reason i decided it would be a good idea to store artifacts as a stringified array.
+						if(typeof(char.artifacts) == "string") {
+							try {
+								artis = JSON.parse(char.artifacts);
+								emptyArtis = false;
+							}
+							catch {
+								console.error("Artifacts for "+charName+" could not be parsed. Below is the string for them. Aborting.");
+								// console.info(char.artifacts);
+							}
+						} else {
+							artis = char.artifacts;
+							emptyArtis = false;
+						}
+						if(!emptyArtis) {
+							if(setID == "") setID = createID("set--"+charName);
+							setObj.artifacts = [];
+							// {set:$set} => $id or null for empty
+							for(let j = 0; j < artis.length; j++) {
+								// much like weapons, no stat info was declared with parties. best assume minimum stuff and no main stat or substats.
+								let arti = artis[j];
+								// check if empty or unknown set; if so push null and skip
+								if(JSON.stringify(arti) == "{}" || artifactDB[arti.set] == undefined) {
+									setObj.artifacts.push(null);
+									continue;
+								}
+								if(allArtifactGroupsWithOneType.indexOf(arti.set) == -1) {
+									// most sets would fall under this
+									let artiType = artifactTypes[j];
+									var lsItem = parseLSItem(arti.set,{});
+									
+									if(lsItem[artiType] == undefined) lsItem[artiType] = [];
+									var artiObj = {};
+									var artiID = createID("arti--"+arti.set+"--"+artiType);
+									artiObj.id = artiID;
+									artiObj.rarity = artifactDB[arti.set].rarityMin;
+									if(artiObj.usedIn==undefined) artiObj.usedIn = {};
+									artiObj.usedIn[charName] = setID;
+									setObj.artifacts.push(artiID);
+									lsItem[artiType].push(artiObj);
+									setLSItem(arti.set,JSON.stringify(lsItem));
+									// console.info("artiObj [", j, "] for", charName, "is", artiObj, ". lsitem is", lsItem);
+								} else {
+									// usually just the "Prayers..." sets
+									var lsItem = parseLSItem(arti.set,[]);
+
+									var artiObj = {};
+									var artiID = createID("arti--"+arti.set);
+									artiObj.id = artiID;
+									artiObj.rarity = artifactDB[arti.set].rarityMin;
+									if(artiObj.usedIn==undefined) artiObj.usedIn = {};
+									artiObj.usedIn[charName] = setID;
+									setObj.artifacts.push(artiID);
+									lsItem.push(artiObj);
+									setLSItem(arti.set,JSON.stringify(lsItem));
+									// console.info("artiObj [",j,"] for", charName, "is", artiObj, ". lsitem is", lsItem);
+								}
+							}
+						}
+					}
+					// apply set to character
+					if(JSON.stringify(setObj) != "{}" && setID != "") {
+						charObj.set = setID;
+						setObj.id = setID;
+						lsItem = parseLSItem(charName,{});
+
+						if(lsItem.sets == undefined) lsItem.sets = [];
+						lsItem.sets.push(setObj);
+						setLSItem(charName,JSON.stringify(lsItem));
+						// console.info("setObj for",charName,"is",setObj,". lsItem is",lsItem);
+					}
+					// add character to party
+					partyObj.chars.push(charObj);
+				}
+
+				newPartyFormat.push(partyObj);
+				// console.info("parsed data is",partyObj);
+			}
+			setLSItem("parties",JSON.stringify(newPartyFormat));
+			// console.info(newPartyFormat)
+		}
+		setLSItem("partiesVersion",partiesVersion);
+		loadCharacterIDs();
+		hideWarning();
+		return newPartyFormat;
 	}
 	</script>
 </html>

@@ -1,0 +1,64 @@
+{
+	"title": "JSON Schema for GenshinCalc 'itemGroupDB' object.",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "Item Groups Database. Various properties will be applied to the individual items in each group.",
+	"type": "object",
+	"patternProperties": {
+		"^([^\"$]+)$": {
+			"required": [
+				"items"
+			],
+			"$ref": "#"
+		}
+	},
+	"properties": {
+		"title": {
+			"description": "Used as a replacement name when displaying the name.",
+			"type": "string"
+		},
+		"priority": {
+			"description": "The 'priority' the item groups will be sorted into within the same item-sort type.",
+			"type": "integer",
+			"minimum": 0
+		},
+		"icon": {
+			"description": "String: What Icon should be shown when item converting is enabled.\nBool: \"true\" to use the group name.\nThe image must exist in /images/itemGroups/ as a PNG (spaces get converted to underscores). \"convertType\" must be set.",
+			"type": ["string", "boolean"]
+		},
+		"iconUseSubgroups": {
+			"description": "Bool for grouping each item within the group as an icon instead of the main group. Appends a number (starting at 0) to the file name. Icon must be a string.",
+			"type": ["boolean"]
+		},
+		"items": {
+			"description": "The list of (unique) items within the group. An item can only be part of a single group. Items should be listed in ascending rarity.",
+			"type": "array",
+			"items": {
+				"type": "string",
+				"minItems": 1,
+				"uniqueItems": true
+			}
+		},
+		"source": {
+			"description": "Where you can get the item(s). This shows up in a tooltip if set.",
+			"type": ["string"]
+		},
+		"craftUp": {
+			"description": "A boolean if the items within the group can be crafted into the next one. Default true.",
+			"type": ["boolean"],
+			"default": true
+		},
+		"canConvertTo": {
+			"description": "A boolean if the items within the group can be converted between same-rarity items of the same item kind. i.e. \"Varunada Lazurite Sliver\" can be converted to \"Agnidus Agate Sliver\". Default true.",
+			"type": ["boolean"],
+			"default": true
+		},
+		"convertTo": {
+			"description": "The kinds of items the group can be converted to. Must be used with \"convertType\" set to \"inter\".",
+			"type": ["string","null"]
+		},
+		"convertType": {
+			"description": "How conversion works with items in the group. \"inter\" being cross-groups and \"intra\" being only within the group. Setting this to \"intra\" does not disable crafting up into next item.",
+			"enum": ["inter","intra"]
+		}
+	}
+}

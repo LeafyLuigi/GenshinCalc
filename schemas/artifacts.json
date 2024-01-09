@@ -1,0 +1,53 @@
+{
+	"title": "JSON Schema for GenshinCalc 'artifactDB' object.",
+	"$schema": "http://json-schema.org/draft-04/schema#",
+	"description": "An Artifact set.",
+	"type": "object",
+	"patternProperties": {
+		"^([^\"'$]+)$": {
+			"required": [
+				"rarityMin",
+				"rarityMax"
+			],
+			"$ref": "#"
+		}
+	},
+	"properties": {
+		"title": {
+			"description": "Used as a replacement name when displaying the set's name.",
+			"type": "string"
+		},
+		"rarityMin": {
+			"description": "The minimum rarity the set can be. Must be smaller than or equal to rarityMax.",
+			"type": "integer",
+			"maximum": 5,
+			"minimum": 1
+		},
+		"rarityMax": {
+			"description": "The maximum rarity the set can be. Must be larger than or equal to rarityMin.",
+			"type": "integer",
+			"maximum": 5,
+			"minimum": 1
+		},
+		"flower": {
+			"description": "The name of the flower within the set.",
+			"type": "string"
+		},
+		"plume": {
+			"description": "The name of the plume within the set.",
+			"type": "string"
+		},
+		"sands": {
+			"description": "The name of the sands within the set.",
+			"type": "string"
+		},
+		"goblet": {
+			"description": "The name of the goblet within the set.",
+			"type": "string"
+		},
+		"circlet": {
+			"description": "The name of the circlet within the set.",
+			"type": "string"
+		}
+	}
+}

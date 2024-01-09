@@ -1,6 +1,114 @@
+/*"Theme" Fallbacks*/
 body {
+  --page-background: #fff;
+  --text-color: #000;
+  --text-alt-color: #222;
+  --exp-color: #00f;
+  --exp-text-color: #00f;
+  --invalid: #f00;
+  --links: #0066cc;
+  --button: #e9e9ed;
+  --button-border: 2px outset #8f8f9d;
+  --button-hover: #d0d0d7;
+  --button-hover-border: 2px outset #676774;
+  --text-alt-color-2: #495366;
+  --box-border-color: #495366;
+  --text-on-light-color: #222;
+  --tooltip: #e9e5dc;
+  --tooltip-text: #000;
+  --tooltip-border: 2px solid currentcolor;
+}
+
+.theme-white {
+  background-color: #fff;
+}
+
+.theme-dark {
+  --page-background: #1c1c22;
+  --text-color: #f4e5c6;
+  --text-alt-color: #968056;
+  --text-alt-color-2: #e0aa45;
+  --exp-color: #9f9fff;
+  --exp-text-color: #9f9fff;
+  --links: #3a9dff;
+  --button: #484851;
+  --button-border: 2px solid #86868f;
+  --button-hover: #16161b;
+  --tooltip: #16161b;
+  --tooltip-text: #f4e5c6;
+  --tooltip-border: 2px solid currentcolor;
+}
+
+.theme-light {
+  background-color: #fff;
+  color: #8599a8;
+}
+
+.theme-knave {
+  --page-background: #1c1c22;
+  --text-color: #FBFAFF;
+  --text-alt-color: #9A95A5;
+  --text-alt-color-2: #9A95A5;
+  --exp-color: #8E1F22;
+  --exp-text-color: #da0e15;
+  --links: #da0e15;
+  --button: #272439;
+  --button-border: 2px solid #8E1F22;
+  --button-hover: #131318;
+  --tooltip: #131318;
+  --tooltip-text: #FBFAFF;
+  --tooltip-border: 2px solid #8E1F22;
+}
+
+body {
+  background-color: var(--page-background);
+  color: var(--text-color);
   line-height: 1.6;
   font-family: sans-serif;
+}
+
+a {
+  color: var(--links);
+}
+
+.capitalize {
+  text-transform: capitalize;
+}
+
+.loading {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  width: 100%;
+}
+
+.loadingSpin {
+  filter: drop-shadow(0 0 3px var(--text-color));
+}
+
+.loadingText {
+  display: none;
+}
+
+@media (prefers-reduced-motion) {
+  .loadingSpin {
+    display: none;
+  }
+  .loadingText {
+    display: block;
+  }
+}
+@media not (prefers-reduced-motion) {
+  body.noAnimation .loadingText {
+    display: block;
+  }
+  body.noAnimation .loadingSpin {
+    display: none;
+  }
+}
+body:not(.showConverts) #converts,
+body:not(.showConverts) #convertsTotal {
+  display: none !important;
 }
 
 .hideLimited .limited {
@@ -33,6 +141,14 @@ body {
   margin-bottom: 8px;
 }
 
+.defaultInput {
+  margin-inline: 2px;
+}
+
+.alignEnd {
+  align-items: end;
+}
+
 .invBlock {
   margin-top: 8px;
 }
@@ -40,15 +156,15 @@ body {
   display: none;
 }
 
-.fakeTextbox, .weaponBlock, .charBlock, .invBlock {
-  border: 1px solid #495366;
+.fakeTextbox, .charBlock, .invBlock {
+  border: 1px solid var(--box-border-color);
   border-radius: 8px;
   padding: 8px;
   margin-bottom: 8px;
 }
 
 .charWeapInputs input:invalid {
-  outline: 2px solid #ff0000;
+  outline: 2px solid var(--invalid);
   outline-offset: 1px;
 }
 
@@ -108,6 +224,23 @@ body {
   display: block;
 }
 
+.weaponDropdown.unusedFound:hover .dropdownContent, .weaponDropdown.unusedFound .dropdownContent {
+  display: none;
+}
+.weaponDropdown.unusedFound .unusedWeaponsDropdown {
+  display: block;
+}
+
+.unusedWeaponsDropdown {
+  display: none;
+  position: absolute;
+  z-index: 1;
+  max-height: 250px;
+  overflow-y: scroll;
+  min-width: inherit;
+  scrollbar-width: thin;
+}
+
 .dropdownContent {
   display: none;
   position: absolute;
@@ -128,7 +261,7 @@ body {
   align-items: center;
 }
 .dropdownContent > .fauxButton > span:not([class]) > img:not([src*=icons]) {
-  margin-right: 8px;
+  margin-right: 10px;
 }
 .dropdownContent > .fauxButton[disabled], .dropdownContent > .fauxButton:disabled {
   display: none;
@@ -142,10 +275,17 @@ body {
   float: right;
 }
 
-.testButton {
+#inputs:not(:empty) {
+  margin-top: 8px;
+}
+
+:is(.testButton, .submitButton) {
+  white-space: unset;
+  display: inline-block;
   height: -moz-fit-content;
   height: fit-content;
   margin-right: 4px;
+  margin-block: 4px;
 }
 
 .itemIconContainer {
@@ -162,13 +302,17 @@ body {
   flex-flow: column nowrap;
   align-items: center;
   justify-content: center;
-  color: #495366;
+  color: var(--icon-color);
   height: calc(var(--size) * 1.2142857143);
   width: var(--size);
   line-height: 1;
   font-size: calc(var(--size) * 0.2142857143);
   border-radius: calc(var(--size) / 10);
   background: top/cover no-repeat;
+}
+
+.itemCount {
+  color: var(--text-on-light-color);
 }
 
 .partyCharIcon {
@@ -235,10 +379,11 @@ body {
 .itemIconImg {
   height: var(--size);
   width: var(--size);
+  border-radius: calc(var(--size) / 10);
 }
 
 .itemName {
-  color: #495366;
+  color: var(--text-alt-color-2);
   line-height: 1;
   font-size: calc(var(--size) * 0.2142857143);
   text-align: center;
@@ -253,21 +398,13 @@ body {
   border: 0;
   margin: 0;
   background-color: transparent;
-  color: #495366;
+  color: var(--text-on-light-color);
   max-height: calc(var(--size) * 0.2142857143);
   line-height: 1;
   max-width: var(--size);
   box-sizing: border-box;
   padding-block: 0;
   padding-inline: 2px;
-}
-
-:is(.inputs, .charWeapInputs) input[type=number] {
-  padding-inline: 2px;
-  padding-block: 2px;
-  border: 1px solid #495366;
-  border-radius: 4px;
-  background-color: transparent;
 }
 
 .rarity-0, .rarity-1 {
@@ -311,14 +448,15 @@ body {
   position: absolute;
   top: 0;
   right: 0;
-  background: url(images/info.svg);
+  background: url(images/icons/info.svg);
 }
 
 .itemSourceTooltip {
   display: inline-block;
   visibility: hidden;
-  background: #e9e5dc;
-  border: 2px solid currentColor;
+  color: var(--tooltip-text);
+  background: var(--tooltip);
+  border: var(--tooltip-border);
   border-radius: 8px;
   padding: 4px;
   position: absolute;
@@ -344,8 +482,9 @@ body {
 }
 
 .fauxButton {
-  border: 2px outset #8f8f9d;
-  background-color: #e9e9ed;
+  border: var(--button-border);
+  background-color: var(--button);
+  color: var(--text-color);
   padding-block: 1px;
   padding-inline: 4px;
   cursor: default;
@@ -353,8 +492,14 @@ body {
   border-radius: 8px;
 }
 .fauxButton:hover {
-  border-color: #676774;
-  background-color: #d0d0d7;
+  color: var(--text-color);
+  border: var(--button-hover-border);
+  background-color: var(--button-hover);
+}
+.fauxButton.disabled {
+  cursor: unset;
+  pointer-events: none;
+  opacity: 0.6;
 }
 
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon) {
@@ -445,7 +590,7 @@ body {
   flex-direction: column;
   align-items: center;
 }
-:is(.partyPopupContent, .partyChar) > div:not([class]) {
+:is(.partyPopupContent, .partyChar) > .limited:not(.partyIntractable), :is(.partyPopupContent, .partyChar) > div:not([class]) {
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -464,8 +609,11 @@ body {
 }
 
 .partyAddChar {
-  background: url("images/addChar.svg") center/30% no-repeat;
+  background: url(images/icons/addChar.svg) center/30% no-repeat;
   filter: drop-shadow(0 0 5px #88f3ff);
+}
+.party:not([popupdisabled]) .partyAddChar:hover {
+  filter: drop-shadow(0 0 5px #88f3ff) drop-shadow(0 0 5px #88f3ff);
 }
 .partyAddChar.open {
   filter: none;
@@ -551,7 +699,7 @@ body {
 .partyPopup .partyPopupContent {
   overflow-y: scroll;
 }
-.partyPopup .partyPopupContent div:not([class]) {
+.partyPopup .partyPopupContent > .limited:not(.partyIntractable), .partyPopup .partyPopupContent > div:not([class]) {
   min-height: 120px;
   max-height: 120px;
   min-width: 105px;
@@ -620,4 +768,59 @@ body {
 }
 .partyComboIcon.elementTypeUnaligned {
   --elementColor: #13131e;
+}
+
+.collapse:is(.charInfo, .charTravInfo),
+.collapse :is(.charInfo, .charTravInfo) {
+  display: none;
+}
+.collapse.charBlock {
+  padding: 4px 8px;
+}
+.collapse.charBlock .boxName {
+  font-size: 18px;
+  row-gap: 0;
+}
+.collapse.charBlock .boxName > img {
+  width: 24px;
+  height: 24px;
+}
+.collapse.charBlock .boxName > img:not([src*="/icons/"]) {
+  width: 32px;
+  height: 32px;
+}
+.collapse.charBlock .alignEnd {
+  padding: 4px 0 0;
+  flex-flow: row-reverse nowrap;
+}
+
+.realName {
+  font-size: smaller;
+}
+
+.conBonus {
+  color: var(--exp-text-color);
+  border-color: var(--exp-color);
+}
+
+.expMaxLevel {
+  color: var(--text-alt-color);
+}
+
+.expBar {
+  background: linear-gradient(to right, var(--exp-color) 0% var(--fill, 0%), transparent var(--fill, 0%) 100%);
+  width: 300px;
+  height: 5px;
+  border: 1px solid #444;
+}
+
+.expTotal {
+  color: var(--exp-text-color);
+}
+
+.hiddenDiv {
+  display: none;
+}
+.toggleNextVisible:checked + .hiddenDiv {
+  display: block;
 }

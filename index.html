@@ -3,77 +3,38 @@
 	<head>
 		<title>Genshin Calculator</title>
 		<link rel="stylesheet" href="style.css">
-		<script type="text/javascript" src="chardb.js"></script>
-		<script type="text/javascript" src="itemdb.js"></script>
-		<script type="text/javascript" src="weapdb.js"></script>
+		<script type="text/javascript" src="loadData.js"></script>
+
 		<script type="text/javascript" src="ascdb.js"></script>
 		<script type="text/javascript" src="scripts.js"></script>
 		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
+		<script type="text/javascript" src="scripts/prefs.js"></script>
 		<script type="text/javascript" src="scripts/inventory.js"></script>
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
-	<body class="hideLimited">
-		<!-- TODO:save options? -->
-		<!-- Options: not sure what else that hasn't been added yet would be. -->
-		<!-- TODO: char levels (for char exp mats), add weapon exp mats? -->
-		<!-- TODO: add converting as an option. "using [all your|the maximum needed] dust of azoth, you can use x 'wildcard' gems" and "using [all|max] dream solvents, you can use x 'wildcard' weeklyBoss drops". -->
-		<!-- Minor bugs: clearing search doesn't clear icon, icon stays "unknown" when exact 1:1 match exists -->
-		<!-- 
-			make character page soon:tm:?
-			for weapons, maybe add a "Owned by" thing?
-
-			Ferminet's icon
-			Maybe convert rarity stars to svg?
-		-->
-		<div id="warning">
-			<strong>The way inventories are saved in localStorage have been altered and may have been wiped. Please check your inventory is working correctly. This warning will persist until the next update.</strong>
-		</div>
-		<div>
-			<a href="inv.html">Inventory</a>
-			<!-- <a href="characters.html">Characters</a> -->
-			<a href="party.html">Party Saver</a>
-		</div>
-		<div class="vertFlex inputs">
-			<div>
-				<span>Default <strong>target</strong> values for <label for="defaultTargetCharLvl">Character Level</label>, <label for="defaultTargetAsc">Character Ascension</label>, <label for="defaultTargetTal1">Normal Attack</label>, <label for="defaultTargetTal2">Skill</label> and <label for="defaultTargetTal3">Burst</label>:</span>
-				<input type="number" class="defaultInput" id="defaultTargetCharLvl" size="3" max="90" min="1" value="90">
-				<input type="number" class="defaultInput" id="defaultTargetAsc" size="3" max="6" min="0" value="6">
-				<input type="number" class="defaultInput" id="defaultTargetTal1" size="3" max="10" min="1" value="9">
-				<input type="number" class="defaultInput" id="defaultTargetTal2" size="3" max="10" min="1" value="9">
-				<input type="number" class="defaultInput" id="defaultTargetTal3" size="3" max="10" min="1" value="9">
-			</div>
-			<div>
-				<span>Default <strong>target</strong> value for <label for="defaultWeaponAsc">Weapon Ascension</label></span>
-				<input type="number" class="defaultInput" id="defaultWeaponAsc" size="3" max="6" min="0" value="6">
-				<span> | </span>
-				<input type="checkbox" class="defaultInput" onclick="toggleLimitedItems()" id="toggleLimited" name="toggleLimited" checked title="Limited-Timed items include Aloy and Flagship Event Weapons."><label for="toggleLimited" title="Limited-Timed items include Aloy and Flagship Event Weapons.">Hide Limited-Timed Items</label>
-				<span> | </span>
-				<input type="checkbox" class="defaultInput" onclick="toggleExtraIcons()" id="toggleExtraIcons" name="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars."><label for="toggleExtraIcons" title="Icons that would be toggled are visions, weapon used and rarity stars.">Hide Extra Icons</label>
-			</div>
-		</div>
+	<body>
+		<div id="links"></div>
+		<div id="prefsContainer"></div>
 		<div class="addButtons">
-			<div class="charDropdown">
+			<div class="charDropdown" id="charDropdown">
 				<div class="fauxButton">
 					<img draggable="false" loading="lazy" id="dropdownCharIcon" class="dropdownCharImg" src="images/char/Unknown.png">
 					<input id="dropdownCharName" placeholder="Character" type="text" onfocusout="dropdownLoseFocus('charDropdown')" onfocusin="dropdownFocus('charDropdown')" oninput="searchDropdown(this.value,'charDropdownButton')">
 				</div>
-				<div class="dropdownContent" id="dropdownCharContent"></div>
 			</div>
 			<div class="fauxButton" onclick="addCharacter(get('dropdownCharName').value);searchDropdown('','charDropdownButton')">Add Character</div>
-			
-			<div class="weaponDropdown">
+			<div class="weaponDropdown" id="weaponDropdown">
 				<div class="fauxButton">
 					<img draggable="false" loading="lazy" id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
-					<input id="dropdownWeaponName" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="searchDropdown(this.value,'weaponDropdownButton')">
+					<input id="dropdownWeaponName" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="showExistingWeapons(this.value);searchDropdown(this.value,'weaponDropdownButton')">
 				</div>
-				<div class="dropdownContent" id="dropdownWeaponContent"></div>
 			</div>
-			<div class="fauxButton" onclick="addWeapon(get('dropdownWeaponName').value);searchDropdown('','weaponDropdownButton')">Add Weapon</div>
-			
+			<div class="fauxButton" onclick="get('weaponDropdown','class')[0].classList.remove('unusedFound');addWeapon(allWeaponsLowerCase[removeQuotes(get('dropdownWeaponName').value.toLowerCase())]);searchDropdown('','weaponDropdownButton')">Add Weapon</div>
 		</div>
-		<div class="notes">Do note that only the first Traveler's Ascension gets counted</div>
+		<em style="display:block">Do note that ascension is not tied to level and vice versa. You can completely remove specific weapons by setting all current stats to their minimum values.</em>
+		<div><strong>Known bug where changing a stats and adding a new char/weap reverts the changes. This is mostly visual with calculations prior to a reload using the pre-change numbers.</strong> <span>It should be fixed if I stop using innerHTML.</span></div>
 		<div id="inputs"></div>
-		<button class="testButton" onclick="test()">Click to calculate</button>
+		<div id="testButton" class="fauxButton testButton">Click to calculate</div>
 		<div class="invBlock empty">
 			<div id="totalOutput"></div>
 			<div id="whatDoYouHave"></div>
@@ -88,55 +49,95 @@
 	</body>
 	
 	<script>
-	'use strict';
-	window.addEventListener("load", () => {
-		if (getLSItem("invNotURIDecoded") == null) {
-			fixInv();
-		} else {
-			get("warning").style = "display:none";
+	"use strict";
+	// set vars
+	var travelerAscensionDone = false;
+	pageType = "index";
+
+	async function loadPage() {
+		await loadAllPrefs();
+		if (get("prefsContainer") !== undefined) {
+			await insertPrefElements();
+			toggleAdvancedWeaponInputs();
 		}
-		// Generate Dropdown HTML
-		var html = "";
-		for (var i in chars) {
+		await loadData();
+
+		// Add Events
+		get("testButton").addEventListener("click",e=>test());
+
+		// Generate Dropdowns
+		// Character
+		var dropdown = makeElem("div",undefined,"dropdownContent");
+		dropdown.id = "dropdownCharContent";
+
+		for (var i in charDB) {
 			var charName = i;
 			var img = spaceToUnderscore(charName);
-			var rarity = chars[i].rarity;
+			var rarity = charDB[i].rarity;
 			if (charName != "Traveler") {
-				if(chars[charName].include === false) continue;
-				if(chars[charName].visionType != null) vision += "_"+chars[charName].visionType;
-				html += "<div class=\"charDropdownButton fauxButton rarity-"+rarity;
-				if(charName == "Aloy") html += " limited";
-				html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;))\" name=\""+charName+"\">";
-				html += "<span>";
-				html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+charName+"</span>";
-				html += "<span class=\"iconsGroup\">";
-				// html += "<img loading="lazy" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/elements/"+chars[charName].type+".svg\">";
-				if(chars[charName].region != undefined) {
-					var vision = chars[charName].region+"_"+chars[charName].type;
-					if(chars[charName].visionType != undefined && chars[charName].visionType != "") vision = vision+"_"+chars[charName].visionType;
-					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+vision+".png\">";
+				if(charDB[charName].include === false) continue;
+				if(charDB[charName].visionType != null) vision += "_"+charDB[charName].visionType;
+
+				var charOuter = makeElem("div",undefined,["charDropdownButton","fauxButton","rarity-"+rarity]);
+				if(charName == "Aloy") {
+					charOuter.classList.add("limited");
 				}
-				if(chars[charName].vision != undefined) html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/"+chars[charName].vision+".png\">";
-				if(chars[charName].weapon != undefined) html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars[charName].weapon+".png\">";
-				html += "</span>";
-				html += "</div>";
+				charOuter.addEventListener("click",function(e) {
+					pickChar(e.currentTarget.getAttribute("name"));
+				});
+				charOuter.setAttribute("name",charName);
+
+				var charNameImg = makeElem("span");
+				var charImg = makeImg("images/char/"+img+".png",32,32,["dropdownCharImg"]);
+				charNameImg.appendChild(charImg);
+				charNameImg.appendChild(makeElem("span",charName));
+				charOuter.appendChild(charNameImg);
+
+				var charIconsGroup = makeElem("span",undefined,"iconsGroup");
+				if(charDB[charName].vision != undefined) {
+					charIconsGroup.appendChild(makeImg("images/icons/visions/"+charDB[charName].vision+".png",48,48,["dropdownType","extraIcon","vision"]));
+				} else if(charDB[charName].region != undefined) {
+					var vision = charDB[charName].region+"_"+charDB[charName].type;
+					if(charDB[charName].visionType != undefined && charDB[charName].visionType != "") vision = vision+"_"+charDB[charName].visionType;
+					charIconsGroup.appendChild(makeImg("images/icons/visions/"+vision+".png",48,48,["dropdrownType","extraIcon","vision"]));
+				}
+				if(charDB[charName].weapon != undefined) {
+					charIconsGroup.appendChild(makeImg("images/icons/weapon/"+charDB[charName].weapon+".png",32,32,["dropdownType","extraIcon"]));
+				}
+
+				charOuter.appendChild(charIconsGroup);
+				dropdown.appendChild(charOuter);
 			} else {
-				for (var j = 0; j < chars[i].regions.length; j++) {
-					if (chars[i].regions[j].include === false) continue;
-					var travVariant = chars[i].regions[j];
-					html += "<div class=\"charDropdownButton fauxButton rarity-"+rarity;
-					if(travVariant.type == "Unaligned") html+=" limited";
-					html += "\" onclick=\"pickChar(this.getAttribute(&quot;name&quot;),this.getAttribute(&quot;num&quot;))\" name=\""+travVariant.type+" "+charName+"\" num=\""+j+"\"><span><img loading=\"lazy\" class=\"dropdownCharImg\" width=\"32\" height=\"32\" src=\"images/char/"+img+".png\">"+travVariant.type+" "+charName+"</span>";
-					html += "<span class=\"iconsGroup\">"
-					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon vision\" width=\"48\" height=\"48\" src=\"images/icons/visions/Traveler_"+travVariant.type+".png\">";
-					html += "<img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/"+chars["Traveler"].weapon+".png\">";
-					html += "</span>";
-					html += "</div>";
+				for (var j = 0; j < charDB[i].regions.length; j++) {
+					if (charDB[i].regions[j].include === false) continue;
+					var travVariant = charDB[i].regions[j];
+
+					var charOuter = makeElem("div",undefined,["charDropdownButton","fauxButton","rarity-"+rarity]);
+
+					if(travVariant.type == "Unaligned") {
+						charOuter.classList.add("limited");
+					}
+					charOuter.addEventListener("click", function(e) {
+						pickChar(e.currentTarget.getAttribute("name"),e.currentTarget.getAttribute("data-num"));
+					});
+					charOuter.setAttribute("name",travVariant.type+" "+charName);
+					charOuter.setAttribute("data-num",j);
+
+					charOuter.appendChild(makeImg("images/char/"+img+".png",32,32,["dropdownCharImg"]));
+					charOuter.appendChild(makeElem("span",travVariant.type+" "+charName));
+					var charIconsGroup = makeElem("span",undefined,"iconsGroup");
+					charIconsGroup.appendChild(makeImg("images/icons/visions/Traveler_"+travVariant.type+".png",48,48,["dropdownType","extraIcon","vision"]));
+					charIconsGroup.appendChild(makeImg("images/icons/weapon/"+charDB["Traveler"].weapon+".png",32,32,["dropdownType","extraIcon"]));
+					charOuter.appendChild(charIconsGroup);
+					dropdown.appendChild(charOuter);
 				}
 			}
 		}
-		get("dropdownCharContent").innerHTML = html;
-		html = "";
+		get("charDropdown").appendChild(dropdown);
+
+		// Weapon
+		dropdown = makeElem("div",undefined,"dropdownContent");
+		dropdown.id = "dropdownWeaponContent";
 		for (var i in weapDB) {
 			var weapName = i;
 			if(weapDB[weapName].include === false) continue;
@@ -144,37 +145,131 @@
 			var rarity = weapDB[i].rarity;
 			var img = spaceToUnderscore(weapName);
 			if (weapDB[i].title != undefined) title = weapDB[i].title;
-			html += "<div class=\"weaponDropdownButton fauxButton rarity-"+rarity;
-			if(weapDB[i].source != undefined && weapDB[i].source == "event") html+=" limited";
-			html += "\" onclick=\"pickWeapon(this.children[0].children[1].innerText,this.getAttribute(&quot;rarity&quot;))\" rarity=\"" + rarity + "\" name=\"" + weapName + "\"><span><img draggable=\"false\" loading=\"lazy\" class=\"dropdownWeaponImg\" src=\"images/weapon/" + img + ".png\"><span>" + title + "</span></span><img draggable=\"false\" loading=\"lazy\" class=\"dropdownType extraIcon\" width=\"32\" height=\"32\" src=\"images/icons/weapon/" + weapDB[weapName].type +".png\"></div>";
+
+			var weapOuter = makeElem("div",undefined,["weaponDropdownButton","fauxButton","rarity-"+rarity]);
+			if(weapDB[i].source != undefined && weapDB[i].source == "event") {
+				weapOuter.classList.add("limited");
+			}
+			weapOuter.addEventListener("click",function(e) {
+				showExistingWeapons(e.currentTarget.children[0].children[1].innerText);
+				pickWeapon(e.currentTarget.children[0].children[1].innerText,e.currentTarget.getAttribute("data-rarity"));
+			});
+			weapOuter.setAttribute("data-rarity",rarity);
+			weapOuter.setAttribute("name",weapName);
+			var weapNameImg = makeElem("span");
+			if(weapDB[i].icons !== undefined && Array.isArray(weapDB[i].icons)) {
+				for(var j in weapDB[i].icons) {
+					weapNameImg.appendChild(makeImg("images/weapon/"+img+"_"+weapDB[i].icons[j]+".png",32,32,["dropdownWeaponImg"]));
+				}
+			} else {
+				weapNameImg.appendChild(makeImg("images/weapon/"+img+".png",32,32,["dropdownWeaponImg"]));
+			}
+			weapNameImg.appendChild(makeElem("span",title));
+			weapOuter.appendChild(weapNameImg);
+			weapOuter.appendChild(makeImg("images/icons/weapon/"+weapDB[weapName].type+".png",32,32,["dropdownType","extraIcon"]))
+			dropdown.appendChild(weapOuter);
 		}
-		get("dropdownWeaponContent").innerHTML = html;
-		html = "";
+		get("weaponDropdown").appendChild(dropdown);
+		var unusedWeaponsDropdown = makeElem("div",undefined,"unusedWeaponsDropdown");
+		unusedWeaponsDropdown.id = "unusedWeaponsDropdown";
+		get("weaponDropdown").appendChild(unusedWeaponsDropdown)
+		
 		selectedChars = getSelectedChars();
 		if(selectedChars != null) {
-			for(var i = 0; i < selectedChars.length; i++) {
-				selectedCharsIndex = selectedChars.map(i => i.id);
-				if(typeof(selectedChars[i].current) != "number") {
-					addCharacter(selectedChars[i].name,true,selectedChars[i].id);
+			selectedCharsIndex = selectedChars.map(i => {
+				if (i.id != undefined) { return i.id }
+				if (i.useTravElement != undefined && i.name == undefined) { return i.useTravElement }
+				return i.name;
+			});
+			let travPosition = selectedCharsIndex.indexOf("Traveler") != -1 ? selectedCharsIndex.indexOf("Traveler") : null;
+			for(let i = 0; i < selectedChars.length; i++) {
+				let item = selectedChars[i]; 
+				if(travPosition !== null && item.name == "Traveler") {
+					// Initial Traveler of any type
+					addCharacter("Traveler",true,item.useTravElement,item.targetExp,item.byElement[item.useTravElement].targetTalents,item.ascension);
+				} else if(travPosition !== null && item.name == undefined) {
+					// More Travelers of other types
+					addCharacter(null,true,item.useTravElement,null,selectedChars[travPosition].byElement[item.useTravElement].targetTalents,undefined);
+				} else if(charDB[item.name] != undefined) {
+					// other Characters
+					addCharacter(item.name,true);
 				} else {
-					addWeapon(selectedChars[i].name,true,selectedChars[i].id);
+					console.log(item)
+					addWeapon(item.name,true,item.id,item.targetExp,item.ascension)
+					// addWeapon(item.name,true,item.id,item.targetExp,item.ascension));
 				}
 			}
 		} else {
 			selectedChars = [];
 		}
-		var prefs = JSON.parse(getLSItem("prefs"));
-		for(var i = 0; i < defaultInputs.length; i++) {
-			if(prefs != null) setVal(defaultInputs[i],prefs[i],true);
-			defaultInputs[i].setAttribute("onChange","forceValue(this.id,this.value,this.min,this.max);updateDefaultTargetPrefs();");
+	};
+
+	var showExistingWeapons = (weaponName) => {
+		// trigger on #dropdownWeaponName matches a weapon [done]
+		// go through weaponIDIndex[<weaponName>]
+		// ids not in selectedCharsIndex should be displayed with current stats and who they're used by
+		// this wont be fun
+		if(weaponName === "") return; // skip empty strings
+		weaponName = removeQuotes(weaponName.toLowerCase());
+		if(allWeaponsLowerCase[weaponName] === undefined) return; // skip not-found weapons
+		if(weapDB[allWeaponsLowerCase[weaponName]].include === false) return; // skip include false
+		let weapon = allWeaponsLowerCase[weaponName];
+		if(weaponIDIndex[weapon] === undefined) return; // skip when no weapons are found
+		console.log(weapon)
+		let rarity = weapDB[weapon].rarity;
+		const unusedWeapons = []; // "unused" being exists in LS but not in selectedChars
+
+		let lsItem = parseLSItem(weapon,[]);
+		if(JSON.stringify(lsItem) === "[]") return; // Abort on broken weapon.
+
+		for(let i in weaponIDIndex[weapon]) {
+			let item = weaponIDIndex[weapon][i];
+			if(selectedCharsIndex.indexOf(item) === -1) unusedWeapons.push(item);
 		}
-		if(!val("toggleLimited")) document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
-		if(val("toggleExtraIcons")) document.getElementsByTagName("body")[0].classList.toggle("hideExtraIcons");
-	});
-	const defaultInputs = getByClass("defaultInput");
+		if(unusedWeapons.length === 0) return; // if no unused weapons are found this shouldn't be ran anymore.
+
+		get("addButtons","class")[0].children[3].classList.add("disabled");
+		get("weaponDropdown","class")[0].classList.add("unusedFound");
+		console.log(unusedWeapons)
+		var html = "";
+		for(let i in unusedWeapons) {
+			let item = lsItem[weaponIDIndex[weapon].indexOf(unusedWeapons[i])]; // info about the weapon
+			if(item==undefined) continue;
+			// console.log(item);
+			html += "<div class=\"fauxButton\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"',false,'"+item.id+"')\">";
+			// exp stuff
+			let exp = getLevelFromExp("weap",item.exp,rarity);
+			console.log(exp)
+			html+="Level "+exp[0]+"/"+(weapLevelValues[rarity-1].length+1);
+			if(exp[0] != (weapLevelValues[rarity-1].length+1)) {
+				// TODO add small bar for fun
+				html+=", "+exp[1]+"/"+weapLevelValues[rarity-1][exp[0]-1];
+			}
+			// ascension
+			html+=" | Ascension "+(item.ascension != undefined ? item.ascension : 0);
+			// refinement
+			if(rarity > 2 && weapDB[weapon].canRefine != false) {
+				html+=" | Refinement "+(item.refinement != undefined ? item.refinement : 1);
+			}
+			html+="</div>";
+		}
+		html += "<div style=\"display:flex\">";
+		html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"')\">Add New</div>";
+		html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons()\">Cancel</div>";
+		html += "</div>";
+		get("unusedWeaponsDropdown").innerHTML = html;
+	}
+	var clearExistingWeapons = () => {
+		get("unusedFound","class")[0].classList.remove("unusedFound");
+		get("addButtons","class")[0].children[3].classList.remove("disabled");
+		get("dropdownWeaponName").value="";
+		get("dropdownWeaponIcon").src="images/weapon/Unknown.png";
+		searchDropdown("","weaponDropdownButton");
+	}
+
 	var searchDropdown = (string,className) => {
 		// TODO? - Sort by closest match? ie searching "zh" should bring Zhongli first then Baizhu.
-		var buttons = getByClass(className);
+		var buttons = get(className,"class");
 		if(string != "") {
 				for(var i = 0; i < buttons.length; i++) {
 				if(buttons[i].getAttribute("name").toLowerCase().indexOf(string.toLowerCase()) == -1) {
@@ -190,48 +285,47 @@
 		}
 	}
 	var dropdownFocus = (parentClass) => {
-		getByClass(parentClass)[0].classList.add("active");
+		get(parentClass,"class")[0].classList.add("active");
 	}
 	var dropdownLoseFocus = (parentClass) => {
-		getByClass(parentClass)[0].classList.remove("active");
-	}
-	var updateDefaultTargetPrefs = () => {
-		var prefs = [];
-		for(var i = 0; i < defaultInputs.length; i++) {
-			prefs[i] = val(defaultInputs[i],true);
-		}
-
-		if(JSON.stringify(prefs) === "[90,6,9,9,9,6,true,false]" ) {
-			clearLSItem("prefs");
-		} else {
-			setLSItem("prefs",JSON.stringify(prefs));
-		}
+		get(parentClass,"class")[0].classList.remove("active");
 	}
 
 	var test = () => {
-		if (ids.length == 0) return;
+		var neededItems;
+		if (selectedCharsIndex.length == 0) return;
 		resetItemLists();
-		for (var perID in ids) {
+		var convertedGroups = [];
+		var skipConvertItems = [];
+		for (let i in selectedCharsIndex) {
+			let item = selectedChars[i];
+			let id = item.id != undefined ? item.id : null;
+			let name = item.name != undefined ? item.name : null;
+			var outputElem = makeElem("div");
 			var html = "";
-			var id = ids[perID].id;
-			var boxType = ids[perID].type;
-			if (boxType == "char") {
-				var selectedCharacter = "";
-				selectedCharacter = get(id).children[0].children[0].innerText;
-				var charName = selectedCharacter;
-				var travelerType = undefined
-				if (get(id).hasAttribute("travtype")) {
-					selectedCharacter = "Traveler";
-					travelerType = get(id).getAttribute("travtype")
+			if(id === null) {
+				var charData, charSet = false;
+				let travType = null;
+				if(name == "Traveler") {
+					travType = item.useTravElement;
+					name+=travType;
+					charData = charDB["Traveler"];
+				} else if (name == undefined) {
+					travType = item.useTravElement;
+					name = "Traveler"+travType;
+					charData = charDB["Traveler"];
 				}
-				var charStats = [val(id + "-charLvl"), val(id + "-asc"), val(id + "-tal1"), val(id + "-tal2"), val(id + "-tal3")];
-				var targets = [val(id + "-targetCharLvl"), val(id + "-targetAsc"), val(id + "-targetTal1"), val(id + "-targetTal2"), val(id + "-targetTal3")];
+				var charStats = [getExpFromLevel("char",val(name+"-lvl")) + val(name+"-expRemainder"), val(name + "-asc")];
+				for (let i in charTalentSuffix) {
+					charStats.push(val(name+charTalentSuffix[i]));
+				}
+				var targets = [getExpFromLevel("char",val(name+"-targLvl")),val(name+"-targAsc"),val(name+"-targTal1"),val(name+"-targTal2"), val(name + "-targTal3")];
 				if (JSON.stringify(charStats) == JSON.stringify(targets)) {
-					get(id + "-charOutput").innerHTML = "<div class=\"boxTitle\">You don't need anything for " + selectedCharacter + ".</div>"
+					// get(name + "-output").innerHTML = "<div class=\"boxTitle\">You don't need anything for " + name + ".</div>"
+					get(name + "-output").appendChild(makeElem("div","You don't need anything for "+name+"."),"boxTitle");
 					continue;
 				}
 				const order = [charLevelValues, ascValues, talValues, talValues, talValues];
-				var charData, charSet = false;
 				var skip;
 				var charItems = {};
 				var offset = 0;
@@ -241,48 +335,137 @@
 				const gemSuffix = [" Sliver", " Fragment", " Chunk", " Gemstone"];
 				const booksPrefix = ["Teachings of ", "Guide to ", "Philosophies of "];
 
-
-				for (var i = 0; i < 5; i++) {
-					skip = false;
-					if (i < 2 && travelerAscensionDone && selectedCharacter == "Traveler") continue;
+				// console.log(name,travType,charSet)
+				for (let i = 0; i < 5; i++) {
+					if (i < 2 && travelerAscensionDone && name == "Traveler") continue; // skip already done traveler ascension
 					if (charStats[i] >= targets[i]) continue;
+					skip = false;
 					if (i > 2 && charStats[i] == charStats[i - 1] && targets[i] == targets[i - 1]) skip = true;
 					if (!charSet) {
-						if (i == 0 || selectedCharacter != "Traveler") {
-							charData = chars[selectedCharacter];
-							if (selectedCharacter != "Traveler") charSet = true;
-						} else {
-							charData = chars[selectedCharacter].regions[travelerType];
-							charData["gem"] = chars[selectedCharacter].gem; // something was throwing errors :)
+						if (i > 1 && name.indexOf("Traveler") != -1) {
+							// is trav and is talents
+							charData = charDB["Traveler"].regions[travType];
+							charData["gem"] = charDB["Traveler"].gem; // something was throwing errors :)
 							charSet = true;
+						} else if(name.indexOf("Traveler") == -1) {
+							// is not trav
+							charSet = true;
+							charData = charDB[name];
+						} else {
+							// is trav and ascension / exp	
+							charData = charDB["Traveler"];
 						}
 					}
 					if (i != 1) { offset = 1 } else { offset = 0 }
-					if (!skip) neededItemsForAscTal = {};
+					if (!skip) neededItems = {};
 					if (i == 0) {
-						// var expHave = 0;
-						// var totalExpNeeded = 0;
-						// var level = 0;
-						// for(var j = 0; j < charStats[i] - 1; j++) {
-						// 	expHave += charLevelValues[j];
-						// }
-						// for(var j = charStats[i] - 1; j < targets[i] - 1; j++) {
-						// 	totalExpNeeded += charLevelValues[j];
-						// }
-						// console.log([expHave,totalExpNeeded, (totalExpNeeded / charExpItems[0])])
+						// html+="<div>";
+
+						var showExpLabel = makeElem("label","Show Exp Requirements?");
+						showExpLabel.setAttribute("for",name+"-toggleExpVisibility");
+						outputElem.appendChild(showExpLabel);
+						// html+="<label for=\""+name+"-toggleExpVisibility\">Show Exp Requirements?</label>";
+
+						var showExpCheckbox = makeElem("input",undefined,"toggleNextVisible");
+						showExpCheckbox.id = name+"-toggleExpVisibility";
+						showExpCheckbox.type = "checkbox";
+						showExpCheckbox.setAttribute("name",showExpCheckbox.id);
+						outputElem.appendChild(showExpCheckbox);
+						// html+="<input id=\""+name+"-toggleExpVisibility\" type=\"checkbox\" class=\"toggleNextVisible\">";
+						
+						var requiredExpItemsDiv = makeElem("div",undefined,"hiddenDiv");
+						// html+="<div class=\"hiddenDiv\">";
+
+						let exp = charStats[0] != undefined ? charStats[0] : 0;
+						let expTarget = targets[0] != undefined ? targets[0] : 0;
+						let level = getLevelFromExp("char",exp)[0];
+						// get ascension band
+						var ascBand = undefined;
+						for(let j = 0; j < charAscAtLevels.length; j++) {
+							if(ascBand != undefined) continue;
+							if(level < charAscAtLevels[j]) {
+								ascBand = j;
+								continue;
+							}
+						}
+						if(ascBand === undefined) {
+							// console.error("fuckin undefined")
+							ascBand = 0;
+						}
+						// console.log("ascBand",ascBand);
+						let arr = [];
+						for(let i = 0; i < charAscAtExp.length && arr[(i-1)] != expTarget; i++) {
+							if(charAscAtExp[i] < expTarget) {
+								arr.push(charAscAtExp[i]);
+							} else {
+								arr.push(expTarget);
+							}
+						}
+						if(JSON.stringify(charAscAtExp) == JSON.stringify(arr) && charAscAtExp[charAscAtExp.length - 1] < expTarget) {
+							arr.push(expTarget);
+						}
+
+						for(let i = ascBand; i < arr.length; i++) {
+							neededItems = {};
+							var remainingExpInBand = i == ascBand ? arr[i] - exp : arr[i] - arr[i-1];
+							while(remainingExpInBand >= 0) {
+								if(remainingExpInBand - charExpItems[0] >= 0) {
+									neededItems = addItem(itemGroupDB.charExp.items[0],1,neededItems);
+									remainingExpInBand -= charExpItems[0];
+								} else if(remainingExpInBand - charExpItems[1] >= 0) {
+									neededItems = addItem(itemGroupDB.charExp.items[1],1,neededItems);
+									remainingExpInBand -= charExpItems[1];
+								} else {
+									neededItems = addItem(itemGroupDB.charExp.items[2], 1, neededItems);
+									remainingExpInBand -= charExpItems[2];
+								}
+							}
+							if(neededItems[itemGroupDB.charExp.items[2]] >= 5) {
+								if(neededItems[itemGroupDB.charExp.items[1]] == undefined) neededItems[itemGroupDB.charExp.items[1]] = 0;
+								neededItems[itemGroupDB.charExp.items[1]] += Math.floor(neededItems[itemGroupDB.charExp.items[2]] / 5);
+								neededItems[itemGroupDB.charExp.items[2]] = neededItems[itemGroupDB.charExp.items[2]] % 5;
+							}
+							if(neededItems[itemGroupDB.charExp.items[1]] >= 4) {
+								if(neededItems[itemGroupDB.charExp.items[0]] == undefined) neededItems[itemGroupDB.charExp.items[0]] = 0;
+								neededItems[itemGroupDB.charExp.items[0]] += Math.floor(neededItems[itemGroupDB.charExp.items[1]] / 4);
+								neededItems[itemGroupDB.charExp.items[1]] = neededItems[itemGroupDB.charExp.items[1]] % 4;
+							}
+
+							requiredExpItemsDiv.appendChild(makeElem("span","Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",charStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+":"));
+							// html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",charStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
+
+							if(remainingExpInBand != 0) {
+								// html+=" A total of "+(-remainingExpInBand)+" Exp is wasted.";
+								requiredExpItemsDiv.appendChild(makeElem("em"," A total of "+(-remainingExpInBand)+" Exp is wasted."));
+							}
+							// html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+							requiredExpItemsDiv.appendChild(getItemsNeeded(neededItems, "tiny"));
+							charItems = mergeItems(neededItems, charItems)
+						}
+						outputElem.appendChild(requiredExpItemsDiv);
+						outputElem.appendChild(makeElem("br"))
+						// html+="</div>";
+						// html+="</div>";
 						continue;
 					}
-					for (var j = charStats[i] - offset; j < targets[i] - offset; j++) {
+					// Ascension and Talents
+					for (let j = charStats[i] - offset; j < targets[i] - offset; j++) {
 						if (skip) continue; // don't need to recalculate if it's the exact same
-						for (var k in order[i][j]) {
+						for (let k in order[i][j]) {
+							if (charData[k] == undefined) continue; // skip undefined
 							if (k == "cost") {
-								neededItemsForAscTal = addItem("Mora", order[i][j][k], neededItemsForAscTal);
+								neededItems = addItem("Mora", order[i][j][k], neededItems);
 							} else if (k == "crown") {
-								neededItemsForAscTal = addItem("Crown of Insight", order[i][j][k], neededItemsForAscTal);
+								neededItems = addItem("Crown of Insight", order[i][j][k], neededItems);
 							} else if (k == "local" || k == "weeklyBoss" || k == "boss") {
-								if (charData[k] == null) continue;
-								neededItemsForAscTal = addItem(charData[k], order[i][j][k], neededItemsForAscTal);
+								if (charData[k] === undefined) continue;
+								if(k == "weeklyBoss" && itemDB[charData[k]].group != undefined) {
+									if(skipConvertItems.indexOf(charData[k]) == -1) skipConvertItems.push(charData[k]);
+									if(convertedGroups.indexOf(itemDB[charData[k]].group) == -1) convertedGroups.push(itemDB[charData[k]].group);
+								}
+								neededItems = addItem(charData[k], order[i][j][k], neededItems);
 							} else if (k == "gem" || k == "books") {
+								if (k == "gem" && itemGroupDB[charData[k]] != undefined && itemGroupDB[charData[k]].canConvertTo != false && convertedGroups.indexOf(charData[k]) == -1) convertedGroups.push(charData[k]);
 								var rank = order[i][j][k].rank;
 								var itemName = "";
 								if (typeof (charData[k]) == "string") {
@@ -294,81 +477,266 @@
 								}
 								if (k == "gem") itemName = itemName + gemSuffix[rank];
 								if (k == "books") itemName = booksPrefix[rank] + itemName;
-								neededItemsForAscTal = addItem(itemName, order[i][j][k].count, neededItemsForAscTal);
+								neededItems = addItem(itemName, order[i][j][k].count, neededItems);
 							} else if (k == "common") {
 								if (charData[k] == null) continue;
 								var rank = order[i][j][k].rank;
 								var group = itemGroupDB[charData[k]].items;
-								neededItemsForAscTal = addItem(group[rank], order[i][j][k].count, neededItemsForAscTal);
+								neededItems = addItem(group[rank], order[i][j][k].count, neededItems);
 							}
 						}
 					}
-					charItems = mergeItems(neededItemsForAscTal, charItems);
-					html += "The required materials for leveling ";
-					html += valueNames[i];
-					html += " from " + charStats[i] + " to " + targets[i] + " are:";
-					// orderItems(neededItemsForAscTal);
-					html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItemsForAscTal, "tiny") + "</div>";
-					if (selectedCharacter == "Traveler" && i == 1) travelerAscensionDone = true;
+					charItems = mergeItems(neededItems, charItems);
+					outputElem.appendChild(makeElem("span","The required materials for leveling "+valueNames[i]+" from "+charStats[i]+" to "+targets[i]+" are:"));
+					// html += "The required materials for leveling ";
+					// html += valueNames[i];
+					// html += " from " + charStats[i] + " to " + targets[i] + " are:";
+					// orderItems(neededItems);
+					outputElem.appendChild(getItemsNeeded(neededItems, "tiny"));
+					// html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+					if (name == "Traveler" && i == 1) travelerAscensionDone = true;
 				}
-				html += "<br><div class=\"boxTitle\">The total for " + charName + " is:</div>";
+				outputElem.appendChild(makeElem("br"));
+				outputElem.appendChild(makeElem("span","The total for "+(name.indexOf("Traveler") == -1 ? name : charDB["Traveler"].regions[travType].type + " Traveler")+" is:","boxTitle"))
+				// html += "<br><div class=\"boxTitle\">The total for ";
+				// if(name.indexOf("Traveler") == -1) {
+				// 	html += name
+				// } else {
+				// 	html += charDB["Traveler"].regions[travType].type + " Traveler";
+				// }
+				// html+=" is:</div>";
 				// orderItems(charItems);
-				html += "<div class=\"outputRequired\">" + getItemsNeeded(charItems, "mini") + "</div>";
-				get(id + "-charOutput").innerHTML = html;
+				outputElem.appendChild(getItemsNeeded(charItems, "mini"));
+				// html += "<div class=\"outputRequired\">" + getItemsNeeded(charItems, "mini") + "</div>";
+				// get(name + "-output").innerHTML = html;
+				get(name+"-output").appendChild(outputElem);
 				items = mergeItems(charItems, items);
 			} else {
-				var weapAsc = val(id + "-asc");
-				var target = val(id + "-targetAsc");
-				if (weapAsc >= target) continue;
-
-				var selectedWeapon = selectedChars[idNameIndex.indexOf(id)].name;
+				var selectedWeapon = item.name;
 				var weapData = weapDB[selectedWeapon];
-				var weaponAscOfRarirty = weapAscValues[Math.floor(weapData.rarity - 1)];
-				var weapItems = [];
+				var rarity = weapData.rarity;
+				var weaponAscOfRarirty = weapAscValues[Math.floor(rarity-1)];
+				var weapStats = [getExpFromLevel("weap",val(id+"-lvl"),rarity) + val(id+"-expRemainder"), val(id+"-asc")]
+				var targets = [getExpFromLevel("weap",val(id+"-targLvl"),rarity),val(id+"-targAsc")];
+				
+				neededItems = {};
+				for(let i = 0; i < 2; i++) {
 
-				neededItemsForAscTal = {};
-				for (var j = weapAsc; j < target; j++) {
-					for (var k in weaponAscOfRarirty[j]) {
-						if (k == "cost") {
-							weapItems = addItem("Mora", weaponAscOfRarirty[j][k], weapItems);
-						} else {
-							var rank = weaponAscOfRarirty[j][k].rank;
-							var group = itemGroupDB[weapData[k]].items;
-							weapItems = addItem(group[rank], weaponAscOfRarirty[j][k].count, weapItems);
+					if (weapStats[i] >= targets[i]) continue;
+
+					let weapItems = [];
+					if(i == 0) { // level and exp
+						// console.log("weapon level/exp calculations not correctly implemented")
+						// continue;
+						html+="<div><label for=\""+id+"-toggleExpVisibility\">Show Exp Requirements?</label>";
+						html+="<input id=\""+id+"-toggleExpVisibility\" type=\"checkbox\" class=\"toggleNextVisible\">";
+						html+="<div class=\"hiddenDiv\">";
+						let exp = weapStats[0] != undefined ? weapStats[0] : 0;
+						let expTarget = targets[0] != undefined ? targets[0] : 0;
+						let level = getLevelFromExp("weap",exp,rarity)[0];
+						// get ascension band
+						var ascBand = undefined;
+						for(let j = 0; j < charAscAtLevels.length; j++) {
+							if(ascBand != undefined) continue;
+							if(level < charAscAtLevels[j]) {
+								ascBand = j;
+								continue;
+							}
 						}
+						if(ascBand === undefined) {
+							// console.error("fuckin undefined")
+							ascBand = 0;
+						}
+						// console.log("ascBand",ascBand,"expCurrent",weapStats[0],"expTarget",targets[0]);
+						let arr = [];
+						for(let i = 0; i < charAscAtExp.length && arr[(i-1)] != expTarget; i++) {
+							if(charAscAtExp[i] < expTarget) {
+								arr.push(charAscAtExp[i]);
+							} else {
+								arr.push(expTarget);
+							}
+						}
+						if(JSON.stringify(charAscAtExp) == JSON.stringify(arr) && charAscAtExp[charAscAtExp.length - 1] < expTarget) {
+							arr.push(expTarget);
+						}
+
+						for(let i = ascBand; i < arr.length; i++) {
+							let neededItems = {};
+							var remainingExpInBand = i == ascBand ? arr[i] - exp : arr[i] - arr[i-1];
+							while(remainingExpInBand >= 0) {
+								if(remainingExpInBand - weapExpItems[0] >= 0) {
+									neededItems = addItem(itemGroupDB.weapExp.items[0],1,neededItems);
+									remainingExpInBand -= weapExpItems[0];
+								} else if(remainingExpInBand - weapExpItems[1] >= 0) {
+									neededItems = addItem(itemGroupDB.weapExp.items[1],1,neededItems);
+									remainingExpInBand -= weapExpItems[1];
+								} else {
+									neededItems = addItem(itemGroupDB.weapExp.items[2],1,neededItems);
+									remainingExpInBand -= weapExpItems[2];
+								}
+							}
+							if(neededItems[itemGroupDB.weapExp.items[2]] >= 5) {
+								if(neededItems[itemGroupDB.weapExp.items[1]] == undefined) neededItems[itemGroupDB.weapExp.items[1]] = 0;
+								neededItems[itemGroupDB.weapExp.items[1]] += Math.floor(neededItems[itemGroupDB.weapExp.items[2]] / 5);
+								neededItems[itemGroupDB.weapExp.items[2]] = neededItems[itemGroupDB.weapExp.items[2]] % 5;
+							}
+
+							if(neededItems[itemGroupDB.weapExp.items[1]] >= 5) {
+								if(neededItems[itemGroupDB.weapExp.items[0]] == undefined) neededItems[itemGroupDB.weapExp.items[0]] = 0;
+								neededItems[itemGroupDB.weapExp.items[0]] += Math.floor(neededItems[itemGroupDB.weapExp.items[1]] / 5);
+								neededItems[itemGroupDB.weapExp.items[1]] = neededItems[itemGroupDB.weapExp.items[1]] % 5;
+							}
+
+							html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",weapStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
+							if(remainingExpInBand != 0) html+=" A total of "+(-remainingExpInBand)+" Exp is wasted."
+							html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+							weapItems = mergeItems(neededItems, weapItems)
+						}
+						html+="</div></div>";
+						neededItems = mergeItems(weapItems,neededItems);
+						continue;
 					}
+					if(i == 1) { // ascension
+						if (weapStats[1] >= targets[1]) continue;
+						for (let j = weapStats[1]; j < targets[1]; j++) {
+							for (let k in weaponAscOfRarirty[j]) {
+								if (k == "cost") {
+									weapItems = addItem("Mora", weaponAscOfRarirty[j][k], weapItems);
+								} else {
+									var rank = weaponAscOfRarirty[j][k].rank;
+									var group = itemGroupDB[weapData[k]].items;
+									weapItems = addItem(group[rank], weaponAscOfRarirty[j][k].count, weapItems);
+								}
+							}
+						}
+						html += "The required materials for leveling ascension from "+weapStats[1]+" to "+targets[1]+" are:";
+						html += "<div class=\"outputRequired\">"+getItemsNeeded(weapItems, "mini")+"</div>";
+					}
+					items = mergeItems(weapItems, items);
 				}
-				html += "The required materials for leveling ascension from " + weapAsc + " to " + target + " are:";
-				html += "<div class=\"outputRequired\">" + getItemsNeeded(weapItems, "mini") + "</div>";
-				get(id + "-weapOutput").innerHTML = html;
-				items = mergeItems(weapItems, items);
+				get(id+"-output").innerHTML = html;
 			}
 
 		}
-		getByClass("invBlock")[0].classList.remove("empty");
-		get("totalOutput").innerHTML = "<div class=\"boxTitle\">These are the items you need.</div><div class=\"outputRequired\">" + getItemsNeeded(items, "mini", false, true) + "</div>";
-		get("whatDoYouHave").innerHTML = askUserForItems(items);
+		get("invBlock","class")[0].classList.remove("empty");
+		// get("totalOutput").innerHTML = "<div class=\"boxTitle\">These are the items you need.</div><div class=\"outputRequired\">" + getItemsNeeded(items, "mini", false, true) + "</div>";
+		
+		get("totalOutput").appendChild(makeElem("div","These are the items you need.","boxTitle"));
+		get("totalOutput").appendChild(getItemsNeeded(items, "mini", false, true));
+		// get("whatDoYouHave").appendChild(askUserForItems(items));
+
+		get("whatDoYouHave").appendChild(makeElem("div","How many items do you have?","boxTitle"));
+		// get("whatDoYouHave").appendChild();
+		var adjustNote = makeElem("em","You can hold Shift to adjust by 10 or CTRL (CMD on Mac) to adjust by 100.");
+		adjustNote.style = "display:block";
+		get("whatDoYouHave").appendChild(adjustNote);
+		get("whatDoYouHave").appendChild(askUserForItems(items));
+
+		// Convert Elements
+		var showConvertsElem = makeElem("div");
+		showConvertsElem.id = "converts";
+		// Hide it if showConverts is false
+		if(!getPref("prefs","showConverts")) {
+			showConvertsElem.style = "display:none";
+		}
+		// we still make the html elements tho
+		requiredToggleItems = {};
+		console.log("allItems",items);
+		for(let i in items) {
+			// console.log("i",i,items[i]);
+			if(itemDB[i].group === undefined) continue; // skip items without groups
+			if(itemGroupDB[itemDB[i].group].convertType === undefined) continue; // skip groups that cannot convert
+			var itemGroup = itemGroupDB[itemDB[i].group];
+			if(itemGroup.convertType === "intra") {
+				for(let j = 0; j < itemGroup.items.length; j++) {
+					if(requiredToggleItems[itemDB[i].group] !== undefined) {
+						continue;
+					}
+					requiredToggleItems[itemDB[i].group] = 0;
+				}
+				requiredToggleItems[itemDB[i].group] += items[i];
+			}
+			if(itemGroup.convertType === "inter" && itemGroup.icon !== undefined) {
+				var placementInGroup = itemGroup.items.indexOf(i);
+				for(let j = 0; j < itemGroup.items.length; j++) {
+					if(requiredToggleItems[itemGroup.icon+j] !== undefined) {
+						continue;
+					}
+					requiredToggleItems[itemGroup.icon+j] = 0;
+				}
+				requiredToggleItems[itemGroup.icon+placementInGroup] += items[i];
+			}
+		}
+		var convertedItemsNeeded = {};
+		const gemGroups = ["Agnidus Agate","Varunada Lazurite","Vayuda Turquoise","Vajrada Amethyst","Nagadus Emerald","Shivada Jade","Prithiva Topaz"];
+		for(let i = 0; i < convertedGroups.length; i++) {
+			let g = convertedGroups[i];
+			if(gemGroups.indexOf(g) == -1) {
+				if(convertedItemsNeeded["Dream Solvent"] == undefined) convertedItemsNeeded["Dream Solvent"] = 0;
+				console.log("NOT A GEM:",g);
+				for(var itm in itemGroupDB[g].items) {
+					if(skipConvertItems.indexOf(itemGroupDB[g].items[itm]) != -1) continue;
+					convertedItemsNeeded[itemGroupDB[g].items[itm]] = 0;
+				}
+			}
+		}
+		for(let i = 0; i < gemGroups.length; i++) {
+			if(convertedGroups.indexOf(gemGroups[i]) != -1) continue;
+			if(convertedItemsNeeded["Dust of Azoth"] == undefined) convertedItemsNeeded["Dust of Azoth"] = 0;
+			for(let j = 0; j < itemGroupDB[gemGroups[i]].items.length; j++) {
+				convertedItemsNeeded[itemGroupDB[gemGroups[i]].items[j]] = 0;
+			}
+			// console.log("missing?",gemGroups[i])
+		}
+		
+		console.log("reqTogItems", requiredToggleItems)
+		// add other (non-gem) items here that aren't in allItems:
+		// ie Stormterror items Plume, Claw, Sigh.
+		// if sigh is in allItems but other two aren't, add them to here including one dream solvent
+
+		// gems on the other hand
+		// if only a Prithiva Topaz (geo gem) was in allItems,
+		// all other gem types (not brilliant of course) should be added
+		// (do not add any gem types not in allItems)
+		// add dust of azoth after
+		console.log("convertedGroups",convertedGroups,"skipConvItems",skipConvertItems,"convItemsNeeded",convertedItemsNeeded);
+		showConvertsElem.appendChild(askUserForConvertItems(convertedItemsNeeded))
+
+		
+
+
+		get("whatDoYouHave").appendChild(showConvertsElem)
+
+		get("whatDoYouHave").appendChild(makeElem("br"));
+
+		var submitButton = makeElem("div","Submit",["submitButton","fauxButton"]);
+		submitButton.addEventListener("click",function(e){
+			getItemsRemaining()
+		});
+		get("whatDoYouHave").appendChild(submitButton)
 	}
 
 	// loop MakeItemIcon (above) with defaults (sans size) for needed items
-	var getItemsNeeded = (items, size = "mini", hideBelowZero = true, showSource = false) => {
-		var html = "";
+	function getItemsNeeded (items, size = "mini", hideBelowZero = true, showSource = false) {
+		var elem = makeElem("div",undefined,"outputRequired");
 		var itemKeys = [];
-		for (var i in items) {
+		// console.log(items)
+		for (let i in items) {
+			if(i == null || i == undefined) continue;
 			itemKeys[itemKeys.length] = i;
 		}
 		orderItems(itemKeys)
-		for (var i in itemKeys) {
+		for (let i in itemKeys) {
 			if (items[itemKeys[i]] == undefined) continue;
 			if (hideBelowZero && items[itemKeys[i]] < 1) continue;
-			html += makeItemIcon(itemKeys[i], items[itemKeys[i]], -1, size, showSource);
+			elem.appendChild(makeItemIcon(itemKeys[i], items[itemKeys[i]].toString(), -1, size, showSource));
 		}
-		return html;
+		return elem;
 	}
 
 	// ask what user has
-	var askUserForItems = (items) => {
-		var html = "";
+	function askUserForItems (items) {
+		var elem = makeElem("div",undefined,"outputRequired");
 		var groups = [];
 		var groupItems = [];
 		for (var i in items) {
@@ -380,105 +748,144 @@
 			}
 		}
 		items = mergeItems(groupItems, items);
-		var itemKeys = [];
-		for (var i in items) {
-			itemKeys[itemKeys.length] = i;
-		}
+		var itemKeys = Object.keys(items);
 		orderItems(itemKeys);
 		var inv = loadInventory();
 		var value = 0;
-		// html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div><button id=\"toggleConverts\" class=\"removeButton\" onclick=\"toggleConverts()\">Show Converts?</button></div><div class=\"outputRequired\">";
-		html += "<div class=\"topFlex\"><div class=\"boxTitle\">How many items do you have?</div></div><div class=\"outputRequired\">";
+
 		for (var i = 0; i < itemKeys.length; i++) {
-			if (inv != null && inv[itemKeys[i]] != undefined) { value = inv[itemKeys[i]] } else { value = 0 }
-			html += "<div class=\"askForItem\">" + makeItemIcon(itemKeys[i], "<input class=\"userInvInput\" type=\"number\" min=\"0\" value=\"" + value + "\" id=\"userItemCount" + itemKeys[i] + "\">", -1, "mini", true) + "</div>";
+			if (inv != null && inv[itemKeys[i]] != undefined) {
+				value = inv[itemKeys[i]];
+			} else {
+				value = 0;
+			}
+			var askForItemElem = makeElem("div",undefined,"askForItem");
+			var inputElem = makeElem("input",undefined,"userInvInput");
+			inputElem.type = "number";
+			inputElem.min = "0";
+			inputElem.valueAsNumber = value;
+			inputElem.id = "userItemCount"+itemKeys[i];
+			inputElem.addEventListener("wheel",function(e){
+				adjustStep(e.currentTarget.id,true);
+			});
+			inputElem.addEventListener("keydown",function(e){
+				adjustStep(e.currentTarget.id);
+			});
+			askForItemElem.appendChild(makeItemIcon(itemKeys[i],inputElem,-1,"mini",true));
+			elem.appendChild(askForItemElem);
 		}
-		html += "</div><div id=\"converts\"></div><br><button onclick=\"getItemsRemaining()\">Submit</button>";
-		showConvertsBool = false;
-		return html;
+		return elem;
 	}
-	var toggleConverts = () => {
-		if (!showConvertsBool) {
-			get("toggleConverts").innerText = "Hide Converts?";
-			showConvertsBool = true;
-			var html = "<br><div class=\"outputRequired\">";
-			var inv = loadInventory();
-			var groups = [];
-			var intraGroups = [];
-			var gems = false;
-			for (var i in items) {
-				if (itemDB[i].group != undefined) {
-					var groupName = itemDB[i].group
-					if (groups.indexOf(groupName) != -1) continue;
-					groups[groups.length] = groupName;
-					if (itemGroupDB[groupName].convertType != undefined) {
-						if (itemGroupDB[groupName].convertType == "intra") {
-							intraGroups[intraGroups.length] = groupName;
-						} else {
-							gems = true;
-						}
-					}
-				}
+	// convert items need extra input stuff
+	function askUserForConvertItems (items) {
+		var elem = makeElem("div", undefined, "outputRequired");
+		var itemKeys = Object.keys(items);
+		orderItems(itemKeys);
+		var inv = loadInventory();
+		var value = 0;
+
+		for (var i = 0; i < itemKeys.length; i++) {
+			if (inv != null && inv[itemKeys[i]] != undefined) {
+				value = inv[itemKeys[i]];
+			} else {
+				value = 0;
 			}
-			if (gems) {
-				var itemDBGems = [];
-				for (var i in itemDB) {
-					if (itemDB[i].group != undefined) {
-						if (itemDB[i].type == "gem" && itemGroupDB[itemDB[i].group].canConvertTo != false) {
-							if (itemDBGems.indexOf(itemDB[i].group) != -1) continue;
-							itemDBGems[itemDBGems.length] = itemDB[i].group;
-						}
-					}
-				}
-				for (var i in groups) {
-					if (itemDBGems.indexOf(groups[i]) != -1) itemDBGems.splice(itemDBGems.indexOf(groups[i]), 1)
-				}
-			}
-			var itemKeys = [];
-			var value;
-			for (var group in intraGroups) {
-				for (var i in itemGroupDB[intraGroups[group]].items) {
-					itemKeys[itemKeys.length] = itemGroupDB[intraGroups[group]].items[i];
-				}
-			}
-			itemKeys[itemKeys.length] = "Dream Solvent";
-			orderItems(itemKeys)
-			for (var i = 0; i < itemKeys.length; i++) {
-				if (items[itemKeys[i]]) { continue } // skip items already in list
-				if (inv != null && inv[itemKeys[i]] != undefined) { value = inv[itemKeys[i]] } else { value = 0 }
-				html += "<div class=\"askForItem\">" + makeItemIcon(itemKeys[i], "<input class=\"userInvInput userConvertInput convertIntra\" type=\"number\" size=\"3\" min=\"0\" value=\"" + value + "\" id=\"userItemCount" + itemKeys[i] + "\">", -1, "tiny") + "</div>";
-			}
-			// console.log(html)
-			html += "</div><br><div class=\"outputRequired\">"
-			itemKeys = [];
-			for (var group in itemDBGems) {
-				for (var i in itemGroupDB[itemDBGems[group]].items) {
-					itemKeys[itemKeys.length] = itemGroupDB[itemDBGems[group]].items[i];
-				}
-			}
-			itemKeys[itemKeys.length] = "Dust of Azoth";
-			orderItems(itemKeys)
-			for (var i = 0; i < itemKeys.length; i++) {
-				if (items[itemKeys[i]]) { continue } // skip items already in list
-				if (inv != null && inv[itemKeys[i]] != undefined) { value = inv[itemKeys[i]] } else { value = 0 }
-				html += "<div class=\"askForItem\">" + makeItemIcon(itemKeys[i], "<input class=\"userInvInput userConvertInput convertInter\" type=\"number\" size=\"3\" min=\"0\" value=\"" + value + "\" id=\"userItemCount" + itemKeys[i] + "\">", -1, "tiny") + "</div>";
-			}
-			html += "</div>"
-			get("converts").innerHTML = html;
-		} else {
-			showConvertsBool = false;
-			get("toggleConverts").innerText = "Show Converts?";
-			get("converts").innerHTML = "";
+			var askForItemElem = makeElem("div", undefined, "askForItem");
+			var inputElem = makeElem("input", undefined, "userInvInput");
+			inputElem.type = "number";
+			inputElem.min = "0";
+			inputElem.valueAsNumber = value;
+			inputElem.id = "userItemCount" + itemKeys[i];
+			inputElem.addEventListener("wheel", function (e) {
+				adjustStep(e.currentTarget.id, true);
+			});
+			inputElem.addEventListener("keydown", function (e) {
+				adjustStep(e.currentTarget.id);
+			});
+			askForItemElem.appendChild(makeItemIcon(itemKeys[i], inputElem, -1, "mini", true));
+			elem.appendChild(askForItemElem);
 		}
+		return elem;
 	}
+
+	// var toggleConverts = (state=false) => {
+	// 	get("toggleConverts").innerText = "Hide Converts?";
+	// 	prefs.showConverts = true;
+	// 	var html = "<br><div class=\"outputRequired\">";
+	// 	var inv = loadInventory();
+	// 	var groups = [];
+	// 	var intraGroups = [];
+	// 	var gems = false;
+	// 	for (var i in items) {
+	// 		if (itemDB[i].group != undefined) {
+	// 			var groupName = itemDB[i].group
+	// 			if (groups.indexOf(groupName) != -1) continue;
+	// 			groups[groups.length] = groupName;
+	// 			if (itemGroupDB[groupName].convertType != undefined) {
+	// 				if (itemGroupDB[groupName].convertType == "intra") {
+	// 					intraGroups[intraGroups.length] = groupName;
+	// 				} else {
+	// 					gems = true;
+	// 				}
+	// 			}
+	// 		}
+	// 	}
+	// 	if (gems) {
+	// 		var itemDBGems = [];
+	// 		for (var i in itemDB) {
+	// 			if (itemDB[i].group != undefined) {
+	// 				if (itemDB[i].type == "gem" && itemGroupDB[itemDB[i].group].canConvertTo != false) {
+	// 					if (itemDBGems.indexOf(itemDB[i].group) != -1) continue;
+	// 					itemDBGems[itemDBGems.length] = itemDB[i].group;
+	// 				}
+	// 			}
+	// 		}
+	// 		for (var i in groups) {
+	// 			if (itemDBGems.indexOf(groups[i]) != -1) itemDBGems.splice(itemDBGems.indexOf(groups[i]), 1)
+	// 		}
+	// 	}
+	// 	var itemKeys = [];
+	// 	var value;
+	// 	for (var group in intraGroups) {
+	// 		for (var i in itemGroupDB[intraGroups[group]].items) {
+	// 			itemKeys[itemKeys.length] = itemGroupDB[intraGroups[group]].items[i];
+	// 		}
+	// 	}
+	// 	itemKeys[itemKeys.length] = "Dream Solvent";
+	// 	orderItems(itemKeys)
+	// 	for (var i = 0; i < itemKeys.length; i++) {
+	// 		if (items[itemKeys[i]]) { continue } // skip items already in list
+	// 		if (inv != null && inv[itemKeys[i]] != undefined) { value = inv[itemKeys[i]] } else { value = 0 }
+	// 		html += "<div class=\"askForItem\">" + makeItemIcon(itemKeys[i], "<input class=\"userInvInput userConvertInput convertIntra\" type=\"number\" size=\"3\" min=\"0\" value=\"" + value + "\" id=\"userItemCount" + itemKeys[i] + "\">", -1, "tiny") + "</div>";
+	// 	}
+	// 	// console.log(html)
+	// 	html += "</div><br><div class=\"outputRequired\">"
+	// 	itemKeys = [];
+	// 	for (var group in itemDBGems) {
+	// 		for (var i in itemGroupDB[itemDBGems[group]].items) {
+	// 			itemKeys[itemKeys.length] = itemGroupDB[itemDBGems[group]].items[i];
+	// 		}
+	// 	}
+	// 	itemKeys[itemKeys.length] = "Dust of Azoth";
+	// 	orderItems(itemKeys)
+	// 	for (var i = 0; i < itemKeys.length; i++) {
+	// 		if (items[itemKeys[i]]) { continue } // skip items already in list
+	// 		if (inv != null && inv[itemKeys[i]] != undefined) { value = inv[itemKeys[i]] } else { value = 0 }
+	// 		html += "<div class=\"askForItem\">" + makeItemIcon(itemKeys[i], "<input class=\"userInvInput userConvertInput convertInter\" type=\"number\" size=\"3\" min=\"0\" value=\"" + value + "\" id=\"userItemCount" + itemKeys[i] + "\">", -1, "tiny") + "</div>";
+	// 	}
+	// 	html += "</div>"
+	// 	get("converts").innerHTML = html;
+	// }
+
 	// calc what's needed minus has
 	var getItemsRemaining = () => {
 		get("whatToObtain").innerHTML = "";
 		get("textOutput").innerText = "";
 		var userItemsLeft = {};
 		saveInventory();
-		var userInvInputs = getOnlyClass("userInvInput");
-		var html = "";
+		var userInvInputs = get("userInvInput","onlyClass");
+		var elem = makeElem("div");
+		// var html = "";
 		for (var i = 0; i < userInvInputs.length; i++) {
 			var itemName = underscoreToSpace(userInvInputs[i].id.slice(13));
 			var count = -1 * val(userInvInputs[i], true);
@@ -493,12 +900,13 @@
 			userItemsLeftKeys[userItemsLeftKeys.length] = i;
 		}
 		if (userItemsLeftKeys.length != 0) {
-			html += "<div class=\"boxTitle\">You need to obtain the following:</div><div><em></em></div><div class=\"outputRequired\">";
+			elem.appendChild(makeElem("div", "You need to obtain the following:", "boxTitle"));
+			var youNeedThese = makeElem("div",undefined,"outputRequired");
 			for (var i in userItemsLeft) {
 				if (userItemsLeft[i] < 1) continue;
-				html += makeItemIcon(i, userItemsLeft[i], -1, "small", true);
+				youNeedThese.appendChild(makeItemIcon(i, userItemsLeft[i].toString(), -1, "mini", true));
 			}
-			html += "</div>";
+			elem.appendChild(youNeedThese);
 		}
 
 		var remainder = {};
@@ -506,16 +914,46 @@
 		var nonGrouped = {};
 		var neededGrouped = {};
 
+		console.log("userItemsLeft",userItemsLeft)
+		// Here we attempt to get the total lowest-quality item in the group.
 		for (var i in userItemsLeft) {
+			// skip items without a group
 			if (itemDB[i].group == undefined) {
 				nonGrouped = addItem(i, userItemsLeft[i], nonGrouped);
-				continue; // skip items without a group
+				continue;
 			}
-			if (itemGroupDB[itemDB[i].group].craftUp == false) continue; // skip non-craft-up groups ("Brilliant Diamond" cannot be crafted up for example)
-			var name = i;
-			var group = itemDB[name].group;
-			if (testedGroups.indexOf(group) != -1) continue;
-			testedGroups[testedGroups.length] = group;
+
+			// skip non-can-convert-to groups ("Brilliant Diamond" cannot be converted to for example)
+			if (itemGroupDB[itemDB[i].group].canConvertTo == false) {
+				continue;
+			}
+			
+			var group = itemDB[i].group;
+
+			// check for non-craft up groups
+			// TODO: ADD "CONVERT" STUFF HERE?
+			// not really sure how to do this... add non-group items to "convert from these" or something idfk
+			if(itemGroupDB[group].craftUp == false) {
+				if(group === "charExp") {
+					// console.log("charExp");
+					// // get pos in group
+					// var pos = itemGroupDB[group].items.indexOf(i);
+					// console.log("exp given for item is...",i,charExpItems[pos])
+				} else {
+					// console.log(group)
+				}
+				nonGrouped = addItem(i, userItemsLeft[i], nonGrouped);
+				continue;
+			}
+
+			// skip already tested groups
+			if (testedGroups.indexOf(group) != -1) {
+				continue;
+			}
+			testedGroups.push(group);
+
+			
+			
 			var groupItems = [];
 			var groupDBItems = itemGroupDB[group].items;
 
@@ -544,6 +982,7 @@
 			}
 		}
 
+		// console.log("nonGrouped",nonGrouped,"neededGrouped",neededGrouped);
 		userItemsLeft = mergeItems(nonGrouped, neededGrouped);
 		userItemsLeftKeys = []
 		for (var i in userItemsLeft) {
@@ -552,80 +991,104 @@
 		orderItems(userItemsLeftKeys);
 
 		if (userItemsLeftKeys.length != 0) {
-			html += "<div class=\"boxTitle\">You need to further obtain the following items to craft or match the above items:</div><div><em>This assumes no crafting bonuses.</em></div><div class=\"outputRequired\">";
+			elem.appendChild(makeElem("div","You need to further obtain the following items to craft or match the above items:","boxTitle"));
+			var unassumeCraftBonus = makeElem("em","This assumes no crafting bonuses.");
+			unassumeCraftBonus.style = "display:block";
+			elem.appendChild(unassumeCraftBonus);
+			var craftUpElem = makeElem("div",undefined,"outputRequired");
 			for (var i in userItemsLeftKeys) {
 				if (userItemsLeft[userItemsLeftKeys[i]] < 1) continue;
-				html += makeItemIcon(userItemsLeftKeys[i], userItemsLeft[userItemsLeftKeys[i]], -1, "small", true);
+				craftUpElem.appendChild(makeItemIcon(userItemsLeftKeys[i], userItemsLeft[userItemsLeftKeys[i]].toString(), -1, "small", true));
+				// html += makeItemIcon(userItemsLeftKeys[i], userItemsLeft[userItemsLeftKeys[i]], -1, "small", true);
 			}
-			html += "</div>";
-			// if(showConvertsBool) {
-			// 	var convertInputs = getByClass("userConvertInput");
-			// 	var convertItemsByType = [0,0,0,0];
-			// 	var types = ["Sliver", "Fragment", "Chunk", "Gemstone"];
-			// 	for(var i = 0; i < convertInputs.length; i++) {
-			// 		var itemName = convertInputs[i].id.slice(13)
-			// 		var value = val(convertInputs[i],true)
-			// 		for (var j = 0; j < types.length; j++) {
-			// 			if(itemName.indexOf(types[j]) != -1) convertItemsByType[j] += value;
-			// 		}
-			// 	}
-			// 	// console.log(convertItemsByType);
-			// 	if(JSON.stringify(convertItemsByType) != "[0,0,0,0]") {
-			// 		html += "<div id=\"whatToConvert\"><div><em>You could also convert the following:</em></div><div class=\"outputRequired\">";
-			// 		var neededTypes = [0,0,0,0];
-			// 		for(var i = 0; i < userItemsLeftKeys.length; i++) {
-			// 			for(var j = 0; j < types.length; j++) {
-			// 				if(userItemsLeftKeys[i].indexOf(types[j]) != -1) {
-			// 					neededTypes[j] += userItemsLeft[userItemsLeftKeys[i]]
-			// 				}
-			// 			}
-			// 		}
-			// 		console.log(neededTypes)
-			// 		html += "</div></div>"
-			// 	}
+			elem.appendChild(craftUpElem);
+
+			var convertedItems = makeElem("div");
+			convertedItems.id = "convertsTotal";
+			if(!getPref("prefs","showConverts")) {
+				convertedItems.style = "display:none";
+			}
+			convertedItems.appendChild(makeElem("div","The following items are converted.","boxTitle"));
+			var convertedItemsList = makeElem("div",undefined,"outputRequired");
+			for (var i in requiredToggleItems) {
+				if (requiredToggleItems[i] < 1) continue;
+				convertedItemsList.appendChild(makeItemIcon(i, requiredToggleItems[i].toString(), -1, "small", false, true));
+			}
+			convertedItems.appendChild(convertedItemsList);
+			elem.appendChild(convertedItems)
+
+			// var textOutput = "You need to obtain the following lowest-tier equivalents:";
+			// for (var i in userItemsLeftKeys) {
+			// 	if (userItemsLeft[userItemsLeftKeys[i]] < 1) continue;
+			// 	textOutput += "<br>" + userItemsLeftKeys[i] + " x " + userItemsLeft[userItemsLeftKeys[i]];
 			// }
-			var textOutput = "You need to obtain the following lowest-tier equivalents:";
-			for (var i in userItemsLeftKeys) {
-				if (userItemsLeft[userItemsLeftKeys[i]] < 1) continue;
-				textOutput += "<br>" + userItemsLeftKeys[i] + " x " + userItemsLeft[userItemsLeftKeys[i]];
-			}
-			get("textOutput").innerHTML = textOutput;
+			// get("textOutput").innerHTML = textOutput;
+
 			for (var i in userItemsLeftKeys) {
 				if (userItemsLeft[userItemsLeftKeys[i]] >= 0) continue;
 				remainder[userItemsLeftKeys[i]] = -1 * userItemsLeft[userItemsLeftKeys[i]]
 			}
 			if (remainder.length != 0) {
-				html += "<div class=\"boxSubtitle\">You will be left with the following items:<br><small><em>(assuming all higher rarity items are used first)</em></small></div><div class=\"outputRequired\">";
+				elem.appendChild(makeElem("div","You will be left with the following items:","boxSubtitle"));
+				var highQualityUsedNote = makeElem("em","(assuming all higher rarity items are used first)");
+				highQualityUsedNote.style= "display:block;font-size:13.3333px";
+				elem.appendChild(highQualityUsedNote);
+				var leftoverItemsElem = makeElem("div",undefined,"outputRequired");
 				for (var i in remainder) {
-					html += makeItemIcon(i, remainder[i], -1, "tiny");
+					leftoverItemsElem.appendChild(makeItemIcon(i, remainder[i], -1, "tiny"));
 				}
-				html += "</div>";
+				elem.appendChild(leftoverItemsElem);
 			}
 		} else {
-			html += "<div>You already have all the required items. All you need to do now is craft the above items.</div>"
+			elem.appendChild(makeElem("div","You already have all the required items. All you need to do now is craft the above items."));
 		}
-		getByClass("invBlock")[1].classList.remove("empty");
-		get("whatToObtain").innerHTML = html;
+		get("invBlock","class")[1].classList.remove("empty");
+		get("whatToObtain").appendChild(elem);
 	}
 
 	var resetItemLists = () => {
 		travelerAscensionDone = false;
 		items = {};
-		getByClass("invBlock")[0].classList.add("empty");
-		getByClass("invBlock")[1].classList.add("empty");
+		get("invBlock","class")[0].classList.add("empty");
+		get("invBlock","class")[1].classList.add("empty");
 		get("totalOutput").innerHTML = "";
 		get("whatDoYouHave").innerHTML = "";
 		get("whatToObtain").innerHTML = "";
 		get("textOutput").innerHTML = "";
-		for (var perID in ids) {
-			var id = ids[perID].id;
-			var boxType = ids[perID].type;
-			if (boxType == "char") {
-				get(id + "-charOutput").innerHTML = "";
+
+		for (let i in selectedCharsIndex) {
+			let item = selectedCharsIndex[i];
+			var id;
+			// console.log(item)
+			if(!isNaN(Math.floor(item))) {
+				// non-initial traveler
+				get("Traveler"+item+"-output").innerHTML = "";
+				continue;
+			} else if(item == "Traveler") {
+				// initial traveler
+				var useTravElement = selectedChars[selectedCharsIndex.indexOf("Traveler")].useTravElement;
+				if(useTravElement === undefined) {
+					console.error("How the fuck did an undefined traveler type happen");
+					continue;
+				}
+				get("Traveler"+useTravElement+"-output").innerHTML = "";
+				continue;
 			} else {
-				get(id + "-weapOutput").innerHTML = "";
+				// weapons + non-trav chars
+				get(item+"-output").innerHTML = "";
 			}
 		}
+
+		// for (let i in selectedChars) {
+		// 	let id = selectedChars[i].id != undefined ? selectedChars[i].id : selectedChars[i].name != undefined && selectedChars[i].name != "Traveler" ? selectedChars[i].name : "Traveler"+selectedChars[i].useTravElement;
+		// 	if (get(id+"-output") != null) {
+		// 		get(id + "-output").innerHTML = "";
+		// 	} else {
+		// 		get(id + "-output").innerHTML = "";
+		// 	}
+		// }
 	}
+
+	loadPage();
 	</script>
 </html>
