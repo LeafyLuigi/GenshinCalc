@@ -793,28 +793,11 @@
 		items = mergeItems(groupItems, items);
 		var itemKeys = Object.keys(items);
 		orderItems(itemKeys);
-		var inv = loadInventory();
+		var inv = parseLSItem("inv","");
 		var value = 0;
 
-		for (var i = 0; i < itemKeys.length; i++) {
-			if (inv != null && inv[itemKeys[i]] != undefined) {
-				value = inv[itemKeys[i]];
-			} else {
-				value = 0;
-			}
-			var askForItemElem = makeElem("div",undefined,"askForItem");
-			var inputElem = makeElem("input",undefined,"userInvInput","userItemCount"+itemKeys[i]);
-			inputElem.type = "number";
-			inputElem.min = "0";
-			inputElem.valueAsNumber = value;
-			inputElem.addEventListener("wheel",function(e){
-				adjustStep(e.currentTarget.id,true);
-			});
-			inputElem.addEventListener("keydown",function(e){
-				adjustStep(e.currentTarget.id);
-			});
-			askForItemElem.appendChild(makeItemIcon(itemKeys[i],inputElem,-1,"mini",true));
-			elem.appendChild(askForItemElem);
+		for (var i = 0; i < itemKeys.length; i++) {			
+			elem.appendChild(new gcItemIconInput(itemKeys[i],inv[itemKeys[i]]));
 		}
 		return elem;
 	}
@@ -823,7 +806,7 @@
 		var elem = makeElem("div", undefined, "outputRequired");
 		var itemKeys = Object.keys(items);
 		orderItems(itemKeys);
-		var inv = loadInventory();
+		var inv = parseLSItem("inv","");
 		var value = 0;
 
 		for (var i = 0; i < itemKeys.length; i++) {
@@ -853,7 +836,7 @@
 	// 	get("toggleConverts").innerText = "Hide Converts?";
 	// 	prefs.showConverts = true;
 	// 	var html = "<br><div class=\"outputRequired\">";
-	// 	var inv = loadInventory();
+	// 	var inv = parseLSItem("inv","");
 	// 	var groups = [];
 	// 	var intraGroups = [];
 	// 	var gems = false;

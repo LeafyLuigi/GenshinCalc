@@ -112,7 +112,8 @@
 		"source": "Dropped by Golden Wolflord.",
 		"type": "boss"
 	},
-	"Dragonheir's False Fin": {
+	"Dragonheirs False Fin": {
+		"title": "Dragonheir's False Fin",
 		"rarity": 4,
 		"source": "Dropped by Coral Defenders.",
 		"type": "boss"
@@ -167,7 +168,8 @@
 		"source": "Dropped by Icewind Suite's \"Nemesis of Coppelius\"",
 		"type": "boss"
 	},
-	"Emperor's Resolution": {
+	"Emperors Resolution": {
+		"title": "Emperor's Resolution",
 		"rarity": 4,
 		"source": "Dropped by Emperor of Fire and Iron.",
 		"type": "boss"
@@ -194,16 +196,19 @@
 		"type": "boss"
 	},
 
-	"Hero's Wit": {
+	"Heros Wit": {
+		"title": "Hero's Wit",
 		"rarity": 4,
 		"type": "exp"
 	},
-	"Adventurer's Experience": {
+	"Adventurers Experience": {
 		"rarity": 3,
+		"title": "Adventurer's Experience",
 		"type": "exp"
 	},
-	"Wanderer's Advice": {
+	"Wanderers Advice": {
 		"rarity": 2,
+		"title": "Wanderer's Advice",
 		"type": "exp"
 	},
 	"Mystic Enhancement Ore": {
@@ -271,7 +276,8 @@
 		"rarity": 2,
 		"type": "common"
 	},
-	"Lieutenant's Insignia": {
+	"Lieutenants Insignia": {
+		"title": "Lieutenant's Insignia",
 		"rarity": 3,
 		"type": "common"
 	},
@@ -287,7 +293,8 @@
 		"rarity": 3,
 		"type": "common"
 	},
-	"Recruit's Insignia": {
+	"Recruits Insignia": {
+		"title": "Recruit's Insignia",
 		"rarity": 1,
 		"type": "common"
 	},
@@ -299,7 +306,8 @@
 		"rarity": 2,
 		"type": "common"
 	},
-	"Sergeant's Insignia": {
+	"Sergeants Insignia": {
+		"title": "Sergeant's Insignia",
 		"rarity": 2,
 		"type": "common"
 	},
@@ -388,7 +396,8 @@
 		"rarity": 2,
 		"type": "elite"
 	},
-	"Agent's Sacrificial Knife": {
+	"Agents Sacrificial Knife": {
+		"title": "Agent's Sacrificial Knife",
 		"rarity": 3,
 		"type": "elite"
 	},
@@ -500,7 +509,8 @@
 		"rarity": 2,
 		"type": "elite"
 	},
-	"Hunter's Sacrificial Knife": {
+	"Hunters Sacrificial Knife": {
+		"title": "Hunter's Sacrificial Knife",
 		"rarity": 2,
 		"type": "elite"
 	},
@@ -508,7 +518,8 @@
 		"rarity": 2,
 		"type": "elite"
 	},
-	"Inspector's Sacrificial Knife": {
+	"Inspectors Sacrificial Knife": {
+		"title": "Inspector's Sacrificial Knife",
 		"rarity": 4,
 		"type": "elite"
 	},
@@ -560,8 +571,9 @@
 		"rarity": 3,
 		"type": "elite"
 	},
-	"Wanderer's Blooming Flower": {
+	"Wanderers Blooming Flower": {
 		"rarity": 4,
+		"title": "Wanderer's Blooming Flower",
 		"type": "elite"
 	},
 	"Rift Core": {
@@ -588,15 +600,18 @@
 		"rarity": 4,
 		"type": "elite"
 	},
-	"Operative's Constancy": {
+	"Operatives Constancy": {
 		"rarity": 4,
+		"title": "Operative's Constancy",
 		"type": "elite"
 	},
-	"Operative's Standard Pocket Watch": {
+	"Operatives Standard Pocket Watch": {
+		"title": "Operative's Standard Pocket Watch",
 		"rarity": 3,
 		"type": "elite"
 	},
-	"Old Operative's Pocket Watch": {
+	"Old Operatives Pocket Watch": {
+		"title": "Old Operative's Pocket Watch",
 		"rarity": 2,
 		"type": "elite"
 	},
@@ -1143,20 +1158,24 @@
 		"rarity": 4,
 		"type": "weaponAsc"
 	},
-	"Boreal Wolf's Broken Fang": {
+	"Boreal Wolfs Broken Fang": {
 		"rarity": 4,
+		"title": "Boreal Wolf's Broken Fang",
 		"type": "weaponAsc"
 	},
-	"Boreal Wolf's Cracked Tooth": {
+	"Boreal Wolfs Cracked Tooth": {
 		"rarity": 3,
+		"title": "Boreal Wolf's Cracked Tooth",
 		"type": "weaponAsc"
 	},
-	"Boreal Wolf's Milk Tooth": {
+	"Boreal Wolfs Milk Tooth": {
 		"rarity": 2,
+		"title": "Boreal Wolf's Milk Tooth",
 		"type": "weaponAsc"
 	},
-	"Boreal Wolf's Nostalgia": {
+	"Boreal Wolfs Nostalgia": {
 		"rarity": 5,
+		"title": "Boreal Wolf's Nostalgia",
 		"type": "weaponAsc"
 	},
 	"Chains of the Dandelion Gladiator": {
@@ -1175,8 +1194,9 @@
 		"rarity": 2,
 		"type": "weaponAsc"
 	},
-	"Debris of Decarabian's City": {
+	"Debris of Decarabians City": {
 		"rarity": 3,
+		"title": "Debris of Decarabian's City",
 		"type": "weaponAsc"
 	},
 	"Divine Body from Guyun": {
@@ -1199,8 +1219,9 @@
 		"rarity": 2,
 		"type": "weaponAsc"
 	},
-	"Fragment of Decarabian's Epic": {
+	"Fragment of Decarabians Epic": {
 		"rarity": 4,
+		"title": "Fragment of Decarabian's Epic",
 		"type": "weaponAsc"
 	},
 	"Golden Branch of a Distant Sea": {
@@ -1243,8 +1264,9 @@
 		"rarity": 4,
 		"type": "weaponAsc"
 	},
-	"Mask of the Tiger's Bite": {
+	"Mask of the Tigers Bite": {
 		"rarity": 3,
+		"title": "Mask of the Tiger's Bite",
 		"type": "weaponAsc"
 	},
 	"Mask of the Wicked Lieutenant": {
@@ -1267,36 +1289,44 @@
 		"rarity": 5,
 		"type": "weaponAsc"
 	},
-	"Narukami's Affection": {
+	"Narukamis Affection": {
 		"rarity": 4,
+		"title": "Narukami's Affection",
 		"type": "weaponAsc"
 	},
-	"Narukami's Joy": {
+	"Narukamis Joy": {
 		"rarity": 3,
+		"title": "Narukami's Joy",
 		"type": "weaponAsc"
 	},
-	"Narukami's Valor": {
+	"Narukamis Valor": {
 		"rarity": 5,
+		"title": "Narukami's Valor",
 		"type": "weaponAsc"
 	},
-	"Narukami's Wisdom": {
+	"Narukamis Wisdom": {
 		"rarity": 2,
+		"title": "Narukami's Wisdom",
 		"type": "weaponAsc"
 	},
-	"Oasis Garden's Kindness": {
+	"Oasis Gardens Kindness": {
 		"rarity": 3,
+		"title": "Oasis Garden's Kindness",
 		"type": "weaponAsc"
 	},
-	"Oasis Garden's Mourning": {
+	"Oasis Gardens Mourning": {
 		"rarity": 4,
+		"title": "Oasis Garden's Mourning",
 		"type": "weaponAsc"
 	},
-	"Oasis Garden's Reminiscence": {
+	"Oasis Gardens Reminiscence": {
 		"rarity": 2,
+		"title": "Oasis Garden's Reminiscence",
 		"type": "weaponAsc"
 	},
-	"Oasis Garden's Truth": {
+	"Oasis Gardens Truth": {
 		"rarity": 5,
+		"title": "Oasis Garden's Truth",
 		"type": "weaponAsc"
 	},
 	"Olden Days of Scorching Might": {
@@ -1315,8 +1345,9 @@
 		"rarity": 3,
 		"type": "weaponAsc"
 	},
-	"Scattered Piece of Decarabian's Dream": {
+	"Scattered Piece of Decarabians Dream": {
 		"rarity": 5,
+		"title": "Scattered Piece of Decarabian's Dream",
 		"type": "weaponAsc"
 	},
 	"Shackles of the Dandelion Gladiator": {
@@ -1327,8 +1358,9 @@
 		"rarity": 4,
 		"type": "weaponAsc"
 	},
-	"Tile of Decarabian's Tower": {
+	"Tile of Decarabians Tower": {
 		"rarity": 2,
+		"title": "Tile of Decarabian's Tower",
 		"type": "weaponAsc"
 	},
 	"Broken Goblet of the Pristine Sea": {
@@ -1380,16 +1412,19 @@
 		"type": "weaponAsc"
 	},
 
-	"Dvalin's Plume": {
+	"Dvalins Plume": {
 		"rarity": 5,
+		"title": "Dvalin's Plume",
 		"type": "weeklyBoss"
 	},
-	"Dvalin's Claw": {
+	"Dvalins Claw": {
 		"rarity": 5,
+		"title": "Dvalin's Claw",
 		"type": "weeklyBoss"
 	},
-	"Dvalin's Sigh": {
+	"Dvalins Sigh": {
 		"rarity": 5,
+		"title": "Dvalin's Sigh",
 		"type": "weeklyBoss"
 	},
 	"Tail of Boreas": {
@@ -1416,8 +1451,9 @@
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Dragon Lord's Crown": {
+	"Dragon Lords Crown": {
 		"rarity": 5,
+		"title": "Dragon Lord's Crown",
 		"type": "weeklyBoss"
 	},
 	"Bloodjade Branch": {
@@ -1460,8 +1496,9 @@
 		"rarity": 5,
 		"type": "weeklyBoss"
 	},
-	"Daka's Bell": {
+	"Dakas Bell": {
 		"rarity": 5,
+		"title": "Daka's Bell",
 		"type": "weeklyBoss"
 	},
 	"Worldspan Fern": {

@@ -4,7 +4,7 @@
 	"charExp": {
 		"priority": 0,
 		"craftUp": false,
-		"items": ["Hero's Wit", "Adventurer's Experience","Wanderer's Advice"]
+		"items": ["Heros Wit", "Adventurers Experience","Wanderers Advice"]
 	},
 	"weapExp": {
 		"priority": 1,
@@ -58,12 +58,12 @@
 	"fatuiPyroAgent": {
 		"priority": 8,
 		"source": "Dropped by Fatui Pyro Agents.",
-		"items":["Hunter's Sacrificial Knife", "Agent's Sacrificial Knife", "Inspector's Sacrificial Knife"]
+		"items":["Hunters Sacrificial Knife", "Agents Sacrificial Knife", "Inspectors Sacrificial Knife"]
 	},
 	"fatuiSkirmisher": {
 		"priority": 9,
 		"source": "Dropped by Fatui Skirmishers.",
-		"items":["Recruit's Insignia", "Sergeant's Insignia", "Lieutenant's Insignia"]
+		"items":["Recruits Insignia", "Sergeants Insignia", "Lieutenants Insignia"]
 	},
 	"treasureHoarder": {
 		"priority": 10,
@@ -143,7 +143,7 @@
 	"hilichurlRogue": {
 		"priority": 25,
 		"source": "Dropped by Hilichurl Rogues.",
-		"items":["A Flower Yet to Bloom", "Treasured Flower", "Wanderer's Blooming Flower"]
+		"items":["A Flower Yet to Bloom", "Treasured Flower", "Wanderers Blooming Flower"]
 	},
 	"transoceanic": {
 		"priority": 26,
@@ -168,7 +168,7 @@
 	"fatuiOperative": {
 		"priority": 30,
 		"source": "Dropped by Fatui Operatives.",
-		"items": ["Old Operative's Pocket Watch", "Operative's Standard Pocket Watch", "Operative's Constancy"]
+		"items": ["Old Operatives Pocket Watch", "Operatives Standard Pocket Watch", "Operatives Constancy"]
 	},
 	"fins": {
 		"priority": 31,
@@ -179,12 +179,12 @@
 	"decarabianTiles": {
 		"priority": 0,
 		"source": "Can be obtained from Cecilia Garden in Mondstadt on Monday, Thursday and Sunday.",
-		"items":["Tile of Decarabian's Tower","Debris of Decarabian's City","Fragment of Decarabian's Epic","Scattered Piece of Decarabian's Dream"]
+		"items":["Tile of Decarabians Tower","Debris of Decarabians City","Fragment of Decarabians Epic","Scattered Piece of Decarabians Dream"]
 	},
 	"borealWolfTeeth": {
 		"priority": 1,
 		"source": "Can be obtained from Cecilia Garden in Mondstadt on Tuesday, Friday and Sunday.",
-		"items":["Boreal Wolf's Milk Tooth","Boreal Wolf's Cracked Tooth","Boreal Wolf's Broken Fang","Boreal Wolf's Nostalgia"]
+		"items":["Boreal Wolfs Milk Tooth","Boreal Wolfs Cracked Tooth","Boreal Wolfs Broken Fang","Boreal Wolfs Nostalgia"]
 	},
 	"gladiatorShackles": {
 		"priority": 2,
@@ -214,12 +214,12 @@
 	"narukami": {
 		"priority": 7,
 		"source": "Can be obtained from Court of Flowing Sand in Inazuma on Tuesday, Friday and Sunday.",
-		"items":["Narukami's Wisdom","Narukami's Joy","Narukami's Affection","Narukami's Valor"]
+		"items":["Narukamis Wisdom","Narukamis Joy","Narukamis Affection","Narukamis Valor"]
 	},
 	"oniMasks": {
 		"priority": 8,
 		"source": "Can be obtained from Court of Flowing Sand in Inazuma on Wednesday, Saturday and Sunday.",
-		"items":["Mask of the Wicked Lieutenant","Mask of the Tiger's Bite","Mask of the One-Horned","Mask of the Kijin"]
+		"items":["Mask of the Wicked Lieutenant","Mask of the Tigers Bite","Mask of the One-Horned","Mask of the Kijin"]
 	},
 	"forestDewTalismans": {
 		"priority": 9,
@@ -229,7 +229,7 @@
 	"oasisGardens": {
 		"priority": 10,
 		"source": "Can be obtained from Tower of Abject Pride in Sumeru on Tuesday, Friday and Sunday.",
-		"items":["Oasis Garden's Reminiscence","Oasis Garden's Kindness","Oasis Garden's Mourning","Oasis Garden's Truth"]
+		"items":["Oasis Gardens Reminiscence","Oasis Gardens Kindness","Oasis Gardens Mourning","Oasis Gardens Truth"]
 	},
 	"scorchingMights": {
 		"priority": 11,
@@ -405,7 +405,7 @@
 		"convertType": "intra",
 		"icon": true,
 		"source": "Dropped in Confront Stormterror at domain levels 4 and higher.",
-		"items": ["Dvalin's Plume", "Dvalin's Claw", "Dvalin's Sigh"]
+		"items": ["Dvalins Plume", "Dvalins Claw", "Dvalins Sigh"]
 	},
 	"Andrius": {
 		"priority": 1,
@@ -429,7 +429,7 @@
 		"convertType": "intra",
 		"icon": true,
 		"source": "Dropped in Beneath the Dragon-Queller at domain levels 2 and higher.",
-		"items": ["Dragon Lord's Crown", "Bloodjade Branch", "Gilded Scale"]
+		"items": ["Dragon Lords Crown", "Bloodjade Branch", "Gilded Scale"]
 	},
 	"La Signora": {
 		"priority": 4,
@@ -453,7 +453,7 @@
 		"convertType": "intra",
 		"icon": true,
 		"source": "Dropped in Joururi Workshop at domain levels 2 and higher.",
-		"items": ["Puppet Strings", "Mirror of Mushin", "Daka's Bell"]
+		"items": ["Puppet Strings", "Mirror of Mushin", "Dakas Bell"]
 	},
 	"Apep": {
 		"priority": 7,

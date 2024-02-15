@@ -52,104 +52,10 @@
 		}
 		orderItems(itemKeys);
 		for(let i in itemKeys) {
-			var value = 0;
-			if(inv[itemKeys[i]]) {
-				value = inv[itemKeys[i]];
-			}
-			newItem(itemKeys[i],value);
+			get("items").appendChild(new gcItemIconInput(itemKeys[i],inv[itemKeys[i]]));
 		}
 		get("items").removeChild(get("loading"));
 	};
-
-	function newItem(item,value) {
-		var type = itemDB[item].type;
-		let img = spaceToUnderscore(item);
-		let rarity = itemDB[item].rarity;
-
-		let wrapper = Object.assign(document.createElement("div"));
-		wrapper.classList.add("askForItem");
-		
-		let container = Object.assign(document.createElement("div"));
-		container.classList.add("itemIconContainer");
-		container.classList.add("mini");
-		
-		let iconElemContainer = Object.assign(document.createElement("div"));
-		iconElemContainer.classList.add("itemIcon");
-		if(rarity !== undefined) {
-			iconElemContainer.classList.add("rarity-"+rarity);
-		} else {
-			iconElemContainer.classList.add("rarity-0");
-		}
-
-		// crown item is placed in "other" directory
-		if(type === "crown") {
-			type="other";
-		}
-
-		let elemItemImg = Object.assign(document.createElement("img"));
-		elemItemImg.src = "images/"+type+"/"+img+".png";
-		elemItemImg.height = 72;
-		elemItemImg.width = 72;
-		elemItemImg.classList.add("itemIconImg");
-		iconElemContainer.appendChild(elemItemImg)
-
-		if(rarity !== undefined && rarity !== 0) {
-			let rarityIcon = Object.assign(document.createElement("img"));
-			rarityIcon.classList.add("rarityIcon");
-			rarityIcon.classList.add("extraIcon");
-			rarityIcon.src = "images/icons/rarity/"+rarity+".png";
-			rarityIcon.setAttribute("draggable", "false");
-			rarityIcon.setAttribute("loading", "lazy");
-
-			iconElemContainer.appendChild(rarityIcon)
-		}
-
-		let input = Object.assign(document.createElement("input"));
-		input.classList.add("userInvInput");
-		input.type = "number";
-		input.setAttribute("min","0");
-		input.value = value;
-		input.setAttribute("id","userItemCount"+spaceToUnderscore(item));
-		input.addEventListener("wheel",function(e) {
-			adjustStep(e.currentTarget.id,true);
-		});
-		input.addEventListener("keydown",function(e) {
-			adjustStep(e.currentTarget.id);
-		});
-		input.addEventListener("change",function(e) {
-			saveItem(e.currentTarget);
-		});
-
-		iconElemContainer.appendChild(input);
-
-		if (itemDB[item].source !== undefined) {
-			let sourceImg = Object.assign(document.createElement("img"));
-			sourceImg.classList.add("itemSource");
-			sourceImg.height = 20;
-			sourceImg.width = 20;
-			sourceImg.src = "images/icons/info.svg";
-			sourceImg.setAttribute("tabindex","0");
-			sourceImg.setAttribute("draggable", "false");
-			sourceImg.setAttribute("loading", "lazy");
-			sourceImg.addEventListener("click", function (e) {
-				toggleClass(e.currentTarget, "active");
-			});
-			iconElemContainer.appendChild(sourceImg)
-
-			let sourceDiv = Object.assign(document.createElement("div"), { textContent: itemDB[item].source });
-			sourceDiv.classList.add("itemSourceTooltip");
-			iconElemContainer.appendChild(sourceDiv);
-		}
-
-		container.appendChild(iconElemContainer);
-
-		let nameContainer = Object.assign(document.createElement("div"),{textContent:item});
-		nameContainer.classList.add("itemName");
-		container.appendChild(nameContainer);
-		wrapper.appendChild(container);
-
-		get("items").appendChild(wrapper);
-	}
 
 	function saveItem(element) {
 		let itemName = underscoreToSpace(element.id.slice(13))

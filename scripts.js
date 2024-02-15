@@ -315,6 +315,45 @@ var orderItems = (items) => {
 	})
 }
 
+// Attempt at making a JS Class that makes an element that allows usage of adjustStep and 
+class gcItemIconInput {
+	constructor(item,value=0) {
+		if(itemDB[item] === undefined) throw new Error("Item does not exist in itemDB.");
+		this.item = item;
+		this.value = value;
+		return this.draw();
+	}
+	draw() {
+		this.type = itemDB[this.item].type === "crown" ? "other" : itemDB[this.item].type;
+		this.title = itemDB[this.item].title !== undefined ? itemDB[this.item].title : this.item;
+		this.rarity = itemDB[this.item].rarity !== undefined ? itemDB[this.item].rarity : 0;
+		let wrapper = makeElem("div",undefined,"askForItem");
+		let container = makeElem("div",undefined,["itemIconContainer","mini"]);
+		let iconElemContainer = makeElem("div",undefined,["itemIcon","rarity-"+this.rarity]);
+		iconElemContainer.appendChild(makeImg("images/"+this.type+"/"+spaceToUnderscore(this.item)+".png",72,72,["itemIconImg"]));
+		if(this.rarity !== 0) iconElemContainer.appendChild(makeImg("images/icons/rarity/"+this.rarity+".png","unset","unset",["rarityIcon","extraIcon"]));
+		let input = makeElem("input",undefined,"userInvInput","userItemCount"+spaceToUnderscore(this.item));
+		input.type = "number";
+		input.min = "0";
+		input.value = this.value;
+		input.addEventListener("wheel",function(e){adjustStep(e.currentTarget.id,true)});
+		input.addEventListener("keydown",function(e){adjustStep(e.currentTarget.id)});
+		input.addEventListener("change",function(e){saveItem(e.currentTarget)});
+		iconElemContainer.appendChild(input);
+		if(itemDB[this.item].source !== undefined) {
+			let sourceImg = makeImg("images/icons/info.svg",20,20,["itemSource"],{"tabindex":"0"});
+			sourceImg.addEventListener("click",function(e){toggleClass(e.currentTarget,"active")});
+			iconElemContainer.appendChild(sourceImg);
+			iconElemContainer.appendChild(makeElem("div",itemDB[this.item].source,"itemSourceTooltip"));
+		}
+		container.appendChild(iconElemContainer);
+		container.appendChild(makeElem("div",this.title,"itemName"));
+		wrapper.appendChild(container);
+		return wrapper;
+	}
+}
+
+
 // Quick and dirty icon creator for items
 function makeItemIcon (item,count=1,rarity=-1,size="mini",showSource=false,forcedValues=false) {
 	var fallback = item;

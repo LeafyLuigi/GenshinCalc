@@ -33,6 +33,8 @@ Make classes for characters, weapons, artifacts, parties, set, selectedCharacter
 	if all weapons and artifacts are only classes by type rather than individual items:
 	- [wa] create new, delete weapon/artifact
 
+check if possible to make a class for item element with input stuff then add both adjustStep and auto item saving to it
+
 Make site usable without using mouse (ie keyboard nav):
 	index:
 		- on select of char/weap in dropdown, automatically move focus to "add char/weap" button
@@ -337,12 +339,7 @@ The following functions should use new format:
 
 ## inventory.js
 
-The following functions should use new format:
-
-- fixInv (might want to be deleted due to completely new localStorage)
-- saveInventory
-- loadInventory
-- clearInventory
+idk
 
 ## prefs.js
 
