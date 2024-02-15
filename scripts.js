@@ -351,16 +351,13 @@ function makeItemIcon (item,count=1,rarity=-1,size="mini",showSource=false,force
 	} else {
 		type = itemDB[item].type;
 		img = spaceToUnderscore(item);
-		if(rarity == -1) rarity = itemDB[item].rarity;
+		if(rarity === -1) rarity = itemDB[item].rarity !== undefined ? itemDB[item].rarity : 0;
 	}
 	var itemElem = makeElem("div",undefined,"itemIconContainer");
 	if(size == "micro" || size == "tiny" || size == "mini" || size == "small" || size == "normal") {
 		itemElem.classList.add(size);
 	}
-	var itemIconElem = makeElem("div",undefined,"itemIcon");
-	if(rarity != undefined && rarity != 0) {
-		itemIconElem.classList.add("rarity-"+rarity);
-	}
+	var itemIconElem = makeElem("div",undefined,["itemIcon","rarity-"+rarity]);
 	if(!forcedValues && fallback != item) {
 		console.warn("[MakeItemIcon] Fallback doesn't match item.");
 	}
