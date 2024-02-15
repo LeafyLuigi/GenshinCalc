@@ -189,7 +189,7 @@ async function loadArtifactData() {
 /* META stuff */
 // Load page links
 const allLinks = {
-	"": {
+	index: {
 		text: "Home",
 	},
 	inv: {
