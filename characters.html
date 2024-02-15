@@ -710,10 +710,10 @@
 		let equipmentModuleElem = makeElem("details",undefined,"equipmentDetails");
 		equipmentModuleElem.appendChild(makeElem("summary","Equipment:","boxTitle"))
 		
-		if(char == "Ganyu") {
-			equipmentModuleElem.open = true;
-			equipmentModuleElem.appendChild(equipmentModule(char,sets,activeSet));
-		}
+		// if(char == "Ganyu") {
+		equipmentModuleElem.open = true;
+		equipmentModuleElem.appendChild(equipmentModule(char,sets,activeSet));
+		// }
 		
 		charInfoElem.appendChild(equipmentModuleElem);
 		
