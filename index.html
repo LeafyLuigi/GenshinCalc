@@ -92,7 +92,6 @@
 			var img = spaceToUnderscore(charName);
 			var rarity = charDB[i].rarity;
 			if (charName != "Traveler") {
-				// if(charDB[charName].include === false) continue;
 				if(charDB[charName].visionType != null) vision += "_"+charDB[charName].visionType;
 
 				var charOuter = makeElem("button",undefined,["charDropdownButton","fauxButton","rarity-"+rarity]);
