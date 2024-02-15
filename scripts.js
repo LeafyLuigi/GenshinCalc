@@ -328,7 +328,7 @@ function makeItemIcon (item,count=1,rarity=-1,size="mini",showSource=false,force
 
 	var type, img;
 
-	if(itemDB[item] == undefined) {
+	if(itemDB[item] === undefined) {
 		if(!forcedValues) {
 			console.warn("\""+item+"\" not found in itemsdb.js; using fallback.");
 			item = "Unknown";
@@ -362,7 +362,12 @@ function makeItemIcon (item,count=1,rarity=-1,size="mini",showSource=false,force
 		console.warn("[MakeItemIcon] Fallback doesn't match item.");
 	}
 	if(type=="crown") {type="other";} // crown item is placed in "other" directory
-	itemIconElem.appendChild(makeImg((itemDB[item].icon!==undefined?"images/"+itemDB[item].icon+".png":"images/"+type+"/"+img+".png"),pixels[validSizes.indexOf(size)],pixels[validSizes.indexOf(size)],["itemIconImg"],fallback!=item?{"data-fallback":fallback}:{}));
+	
+	if(itemDB[item] !== undefined) {
+		itemIconElem.appendChild(makeImg((itemDB[item].icon!==undefined?"images/"+itemDB[item].icon+".png":"images/"+type+"/"+img+".png"),pixels[validSizes.indexOf(size)],pixels[validSizes.indexOf(size)],["itemIconImg"],fallback!=item?{"data-fallback":fallback}:{}));
+	} else {
+		itemIconElem.appendChild(makeImg("images/"+type+"/"+img+".png"),pixels[validSizes.indexOf(size)],pixels[validSizes.indexOf(size)],["itemIconImg"],fallback!=item?{"data-fallback":fallback}:{});
+	}
 	if(rarity != undefined && rarity != 0) {
 		itemIconElem.appendChild(makeImg("images/icons/rarity/"+rarity+".png","unset","unset",["rarityIcon","extraIcon"])); // height is set in css
 	}
