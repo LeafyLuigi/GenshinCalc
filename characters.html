@@ -4,6 +4,7 @@
 		<title>Genshin Calculator - Characters</title>
 		<link rel="stylesheet" href="style.css">
 		<script type="text/javascript" src="loadData.js"></script>
+
 		<script type="text/javascript" src="ascdb.js"></script>
 		<script type="text/javascript" src="scripts.js"></script>
 		<script type="text/javascript" src="scripts/cookieLocalStorage.js"></script>
@@ -12,9 +13,7 @@
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
 	<!--
-	TODO:
-		add hideExtraIcons toggle thingy
-		
+	TODO:		
 		ascension, either automatically calculated or manually addable. not saved by trav type
 
 		show owned by type for trav
@@ -81,16 +80,16 @@
 		note exists for each type
 	-->
 	<body>
-		<div>
-			<a href="index.html">Home</a>
-			<a href="inv.html">Inventory</a>
-			<a href="party.html">Party Saver</a>
-		</div>
+		<noscript>You need to enable JavaScript to use this page. It's all open source and no data is sent between this site and third parties. <a href="https://github.com/LeafyLuigi/GenshinCalc">Click here to view the GitHub Repo.</a></noscript>
+		<div id="links"></div>
+		<div id="prefsContainer"></div>
 		known issue with holding shift/ctrl/cmd/whatever and not exactly matching maximum exp not allowing level up
-		<div class="invBlock" id="characters"></div>
-		<footer style="font-size:12px;overflow-x:auto;">
-			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site, the interactive map and from the game itself. This site <strong>does not</strong> use Cookies and is completely open source. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
-		</footer>
+		<div class="invBlock" id="allCharacters">
+			<div id="loading">
+				<span class="loadingText">Loading...</span>
+				<img class="loadingSpin" src="images/icons/loading.svg" height="64" width="64">
+			</div>
+		</div>
 	</body>
 	<script>
 	'use strict';
@@ -98,8 +97,26 @@
 	var confirmDelete = [];
 	var artifactIDIndex;
 	pageType = "characters";
-	window.addEventListener("load", () => {
-		var html = "<div class=\"boxName\">Characters</div><div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div><em style=\"display:block\">You can hold Shift to adjust EXP by 10 or CTRL (CMD on Mac) to adjust EXP by 100. Use both for 1000.</em><br><div class=\"characterList\">";
+	async function loadPage() {
+		await loadAllPrefs();
+		if (get("prefsContainer") !== undefined) {
+			await insertPrefElements({include:["hideLimited","hideExtraIcons","themeDropdown"]});
+		}
+		await loadData();
+		get("skipLink").href = "#allCharacters";
+
+		get("allCharacters").appendChild(makeElem("div","Characters","boxName"));
+		let emElem = makeElem("em","You can hold Shift to adjust EXP by 10 or CTRL (CMD on Mac) to adjust EXP by 100. Use both for 1000.");
+		emElem.style = "display:block";
+		get("allCharacters").appendChild(emElem);
+		get("allCharacters").appendChild(makeElem("br"));
+		let characterListElem = makeElem("div",undefined,"characterList");
+		// var html = "";
+		// 	html +="<div class=\"boxName\">Characters</div>";
+		// 	html +="<div class=\"boxSubtitle\">Be sure to click the save button before changing pages!</div>";
+		// 	html +="<em style=\"display:block\">You can hold Shift to adjust EXP by 10 or CTRL (CMD on Mac) to adjust EXP by 100. Use both for 1000.</em>";
+		// 	html +="<br>";
+		// 	html +="<div class=\"characterList\">";
 		var maxInputSize = 3;
 		var value = 0;
 		var charKeys = Object.keys(charDB);
@@ -114,20 +131,24 @@
 		charKeys = ownedChars.concat(charOrder); 
 		for(var i in charKeys) {
 			// if(charDB[charKeys[i]].include == false || charKeys[i] != "Ganyu") continue;
-			if(charDB[charKeys[i]].include == false) continue;
+			// if(charDB[charKeys[i]].include == false) continue;
 			if(charKeys[i] == "Traveler") {
-				html += addCharacterCharPage(charKeys[i],true);
+				characterListElem.appendChild(addCharacterCharPage(charKeys[i],true));
+				// html += addCharacterCharPage(charKeys[i],true);
 			} else {
-				html += addCharacterCharPage(charKeys[i],false);
+				characterListElem.appendChild(addCharacterCharPage(charKeys[i],false));
+				// html += addCharacterCharPage(charKeys[i],false);
 				continue;
 			}
 		}
-		get("characters").innerHTML = html;
+		get("allCharacters").appendChild(characterListElem)
+		get("allCharacters").removeChild(get("loading"));
+		// get("allCharacters").innerHTML += html;
 
-	})
+	}
 
-	var addCharacterCharPage = (char="Lynette",isTrav=false,data={nickname:null,owned:false,hideInfo:false,exp:0,con:0,talents:[1,1,1],note:"",activeSet:""}) => {
-		var owned, exp, con, talents, nickname, note, byElement, hideInfo, setsMap, activeSet;
+	function addCharacterCharPage(char="Lynette",isTrav=false,data={nickname:null,owned:false,hideInfo:false,exp:0,con:0,talents:[1,1,1],note:"",activeSet:""}) {
+		var owned, exp, con, talents, nickname, note, byElement, hideInfo, activeSet = "";
 
 		data = parseLSItem(char,data);
 
@@ -135,8 +156,7 @@
 
 		if (data.sets !== undefined) {
 			sets = data.sets;
-			setsMap = sets.map(i => i.id);
-			if(data.activeSet == undefined || typeof(data.activeSet) != "string" || setsMap.indexOf(data.activeSet) != -1) {
+			if(data.activeSet == undefined || typeof(data.activeSet) != "string") {
 				activeSet = "";
 			} else {
 				activeSet = data.activeSet;
@@ -264,180 +284,444 @@
 		
 		var charName = char;
 		var img = spaceToUnderscore(char);
-		var html= "<div id=\""+id+"\" class='charBlock";
+		let charBlockElem = makeElem("div",undefined,"charBlock",id);
+		// var html= "<div id=\""+id+"\" class='charBlock";
 		if(char == "Aloy") {
-			html+=" eventIcon";
+			// html+=" extraIcon";
+			charBlockElem.classList.add("limited");
 		}
 		if(!isTrav && !owned) {
-			html+=" collapse";
+			// html+=" collapse";
+			charBlockElem.classList.add("collapse");
 		}
-		html+="'><div class='topFlex'><div class='boxName'>";
-		html+=makeImg("images/char/"+img+".png",64,64);
+		// html+="'>";
+
+		let topFlexElem = makeElem("div",undefined,"topFlex");
+		// html+="<div class='topFlex'>";
+	
+		let charNameElem = makeElem("div",undefined,"boxName");
+		// html+="<div class='boxName'>";
+
+		charNameElem.appendChild(makeImg("images/char/"+img+".png",64,64));
+		// html+=makeImg("images/char/"+img+".png",64,64);
+
 		if(charDB[char].canRename == true) {
-			html += "<span><span id='"+char+"-nickname'>"+nickname+"</span> <em class='realName'>("+char+")</em></span>";
+			var nickContainer = makeElem("span");
+			// html += "<span>";
+
+			var nickElem = makeElem("span",nickname,undefined,char+"-nickname");
+			// html += "<span id='"+char+"-nickname'>"+nickname+"</span>";
+
+			var realNameElem = makeElem("em"," ("+char+")","realName");
+			// html += " <em class='realName'>("+char+")</em>";
+			
+			nickContainer.appendChild(nickElem);
+			nickContainer.appendChild(realNameElem);
+			// html += "</span>";
+
+			charNameElem.appendChild(nickContainer);
 		} else {
-			html+=char;
+			charNameElem.appendChild(makeElem(undefined,char));
+			// html+=char;
 		}
 		if(img != "Traveler") {
 			var vision = region+"_"+type;
 			if (charDB[char].vision != undefined) {
-				html += makeImg("images/icons/visions/" + charDB[char].vision + ".png", 48, 48, ["dropdownType", "extraIcon", "vision"]);
+				charNameElem.appendChild(makeImg("images/icons/visions/"+charDB[char].vision+ ".png",48,48,["dropdownType","extraIcon","vision"]));
+				// html += makeImg("images/icons/visions/"+charDB[char].vision+ ".png",48,48,["dropdownType","extraIcon","vision"]);
 			} else if (charDB[char].region != undefined) {
 				var vision = charDB[char].region + "_" + charDB[char].type;
 				if (charDB[char].visionType != undefined && charDB[char].visionType != "") vision = vision + "_" + charDB[char].visionType;
-				html += makeImg("images/icons/visions/" + vision + ".png", 48, 48, ["dropdrownType", "extraIcon", "vision"]);
+				charNameElem.appendChild(makeImg("images/icons/visions/"+vision+".png",48,48,["dropdrownType","extraIcon","vision"]));
+				// html += makeImg("images/icons/visions/"+vision+".png",48,48,["dropdrownType","extraIcon","vision"]);
 			}
 		// } else {
 		// 	html+= "<img loading='lazy' draggable=\"false\" class='extraIcon vision' width='48' height='48' src='images/icons/visions/Traveler_"+type+".png'>";
 		}
 
 		if(weapon !== undefined) {
-			html+=makeImg("images/icons/weapon/"+weapon+".png",32,32,["extraIcon"]);
+			charNameElem.appendChild(makeImg("images/icons/weapon/"+weapon+".png",32,32,["extraIcon"]));
+			// html+=makeImg("images/icons/weapon/"+weapon+".png",32,32,["extraIcon"]);
 		}
-		html +="</div>";
+		// html +="</div>";
+		topFlexElem.appendChild(charNameElem);
 
-		html+="<div class='vertFlex alignEnd'>";
+		let infoOwnedElem = makeElem("div",undefined,["vertFlex","alignEnd"]);
+		// html+="<div class='vertFlex alignEnd'>";
 		if(!isTrav) {
-			html+="<div>Owned? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+"-owned\" onchange=\"charHideInfo(this.id);saveOwned(this)\"";
+			let ownedCheckboxContainer = makeElem("div");
+			// html+="<div>";
+			ownedCheckboxContainer.appendChild(makeLabelElem("Owned? ",id+"-owned"));
+			// html+="Owned? ";
+
+			let ownedCheckbox = makeElem("input",undefined,"ownedCheckbox",id+"-owned");
+			ownedCheckbox.type = "checkbox";
+			
+			// html+="<input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+"-owned\" onchange=\"charHideInfo(this.id);saveOwned(this)\"";
 			if(owned) {
-				html+=" checked";
+				ownedCheckbox.checked = true;
+				// html+=" checked";
 			}
-			html+="></div>";
+			ownedCheckbox.addEventListener("change",ownedButton);
+			ownedCheckboxContainer.appendChild(ownedCheckbox);
+			// html+="></div>";
+			infoOwnedElem.appendChild(ownedCheckboxContainer);
 		}
-		html+="<div>Hide info? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+"-hideInfo\" onchange=\"charHideInfo(this.id);saveHideInfo(this)\"";
-		if(hideInfo) {
-			html+=" checked";
-		}
-		html+="></div>"
 
-		html+="</div>";
-		html+="</div>";
-
-		html+="<div class='charInfo";
+		let hideCheckboxContainer = makeElem("div");
+		// html+="<div>";
+		hideCheckboxContainer.appendChild(makeLabelElem("Hide Info? ",id+"-hideInfo"));
+		// html+="Hide info? ";
+		let hideCheckbox = makeElem("input",undefined,"ownedCheckbox",id+"-hideInfo");
+		hideCheckbox.type = "checkbox";
+		// html+="<input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+"-hideInfo\" onchange=\"charHideInfo(this.id);saveHideInfo(this)\"";
 		if(hideInfo) {
-			html+=" collapse";
+			hideCheckbox.checked = true;
+			// html+=" checked";
 		}
-		html+="'><div>";
+		hideCheckbox.addEventListener("change",hideButton);
+		hideCheckboxContainer.appendChild(hideCheckbox);
+		infoOwnedElem.appendChild(hideCheckboxContainer);
+		topFlexElem.appendChild(infoOwnedElem);
+		charBlockElem.appendChild(topFlexElem);
+		// html+="></div>"
+
+		// html+="</div>";
+		// html+="</div>";
+
+		let charInfoElem = makeElem("div",undefined,"charInfo");
+		// html+="<div class='charInfo";
+		if(hideInfo) {
+			charInfoElem.classList.add("collapse");
+			// html+=" collapse";
+		}
+		// html+="'><div>";
 		if(charDB[char].canRename == true) {
-			html+="<div><span>Name: </span><input type='text' placeholder='"+char+"' id='"+char+"-customName' onchange='saveNickname(this)'";
-			if(nickname != char) {
-				html+=" value='"+nickname+"'";
-			}
-			html+="></div>";
-			html+="<em style='display:block;font-size:small'>Unlike the game, there are no restrictions for nicknames here.</em>";
-		}
-		html+="<div><span>Note: </span><textarea placeholder='Note for "+char+"' cols='50' rows='1' id='"+char+"-note' onchange='saveNote(this)'>"+note+"</textarea></div>";
-		html+="</div>"
+			let nickContainer = makeElem("div");
+			nickContainer.appendChild(makeLabelElem("Name: ",char+"-customName"));
+			let nickElem = makeElem("input",undefined,undefined,char+"-customName");
+			nickElem.type = "text";
+			nickElem.placeholder = char;
 
-		html+="<div class='boxTitle'>Character Stats:</div>";
-		html+="<div>";
+			// html+="<div>";
+			// html+="<span>Name: </span>";
+			// html+="<input type='text' placeholder='"+char+"' id='"+char+"-customName' onchange='saveNickname(this)'";
+			if(nickname != char) {
+				nickElem.value = nickname;
+				// html+=" value='"+nickname+"'";
+			}
+			nickElem.addEventListener("change",function(e){
+				saveNickname(e.currentTarget);
+			});
+			// html+=">";
+			// html+="</div>";
+			nickContainer.appendChild(nickElem);
+			let emElem = makeElem("em","Unlike the game, there are no restrictions for nicknames here.");
+			emElem.style = "display:block;font-size:small";
+			nickContainer.appendChild(emElem);
+			charInfoElem.appendChild(nickContainer);
+			// html+="<em style='display:block;font-size:small'>Unlike the game, there are no restrictions for nicknames here.</em>";
+		}
+		let noteContainer = makeElem("div");
+		noteContainer.appendChild(makeLabelElem("Note: ",char+"-note"));
+		let noteElem = makeElem("textarea",undefined,undefined,char+"-note");
+		noteElem.placeholder = "Note for "+char;
+		noteElem.cols = 50;
+		noteElem.rows = 1;
+		noteElem.value = parseHTMLUnsafe(note);
+		noteElem.addEventListener("change",function(e){saveNote(e.currentTarget)});
+		noteContainer.appendChild(noteElem);
+		charInfoElem.appendChild(noteContainer);
+
+		// html+="<div><span>Note: </span><textarea placeholder='Note for "+char+"' cols='50' rows='1' id='"+char+"-note' onchange='saveNote(this)'>"+note+"</textarea></div>";
+		// html+="</div>"
+
+		charInfoElem.appendChild(makeElem("div","Character Stats:","boxTitle"));
+		// html+="<div class='boxTitle'>Character Stats:</div>";
+
+		let charStatsContainer = makeElem("div");
+		// html+="<div>";
 
 		var level, expRemainder;
 		exp = getLevelFromExp("char",exp);
 		level = exp[0];
 		expRemainder = exp[1];
 
-		html+="<div>Level: <input type='number' size='3' min='1' max='"+(charLevelValues.length+1)+"' value='"+level+"' id='"+id+"-lvl' onchange='updateExp(this)'> / <span class='expMaxLevel'>"+(charLevelValues.length+1)+"</span>";
+		let levelContainer = makeElem("div");
+		levelContainer.appendChild(makeLabelElem("Level: ",id+"-lvl"));
+		let levelElem = makeElem("input",undefined,undefined,id+"-lvl");
+		levelElem.type = "number";
+		levelElem.size = "3";
+		levelElem.min = "1";
+		levelElem.max = charLevelValues.length+1
+		levelElem.value = level;
+		levelElem.addEventListener("change",function(e){updateExp(e.currentTarget)});
+		levelContainer.appendChild(levelElem);
+		levelContainer.appendChild(makeElem(undefined," / "));
+		levelContainer.appendChild(makeElem("span",charLevelValues.length+1,"expMaxLevel"));
+		charStatsContainer.appendChild(levelContainer);
+
+		// html+="<div>Level: ";
+		// html+="<input type='number' size='3' min='1' max='"+(charLevelValues.length+1)+"' value='"+level+"' id='"+id+"-lvl' onchange='updateExp(this)'>";
+		// html+=" / ";
+		// html+="<span class='expMaxLevel'>"+(charLevelValues.length+1)+"</span>";
+
 		var maxExpNeeded = charLevelValues[level-1];
 		if(maxExpNeeded == undefined) {
 			maxExpNeeded = 0;
 		}
-		html+="</div>";
+		// html+="</div>";
 
-		html+="<div";
+		let levelRemContainer = makeElem("div");
+		// html+="<div";
 		if(level == charLevelValues.length+1) {
-			html+=" style='display:none'";
+			levelRemContainer.style = "display:none";
+			// html+=" style='display:none'";
 		}
-		html+=">Level progress: <input class='expTotal' type='number' min='0' max='"+maxExpNeeded+"' value='"+expRemainder+"' id='"+id+"-expRemainder' onwheel=\"adjustStep(this.id,true,true)\" onkeydown=\"adjustStep(this.id,false,true)\" onchange='updateBar(this)'><span class='expTotal'>/"+maxExpNeeded+"</span>";
-		html+="</div><div class='expBar' id='"+char+"-expBar' style='--fill:";
-		if(maxExpNeeded == 0) {
-			html += "100";
-		} else {
-			html+=((expRemainder/maxExpNeeded).toPrecision(3)*100);
-		}
-		html+="%'></div>";
+		// html+=">";
+		levelRemContainer.appendChild(makeLabelElem("Level progress: ",id+"-expRemainder"));
+		let levelRemElem = makeElem("input",undefined,"expTotal",id+"-expRemainder");
+		levelRemElem.type = "number"
+		levelRemElem.min = "0";
+		levelRemElem.max = maxExpNeeded;
+		levelRemElem.value = expRemainder;
+		levelRemElem.addEventListener("wheel",function(e){adjustStep(e.currentTarget.id,true,true)})
+		levelRemElem.addEventListener("keydown",function(e){adjustStep(e.currentTarget.id,false,true)})
+		levelRemElem.addEventListener("change",function(e){updateBar(e.currentTarget)})
+		levelRemContainer.appendChild(levelRemElem);
+		// levelRemContainer.appendChild(makeElem("span"," / "+maxExpNeeded,"expTotal"));
+		// html+="Level progress: ";
+		// html+="<input class='expTotal' type='number' min='0' max='"+maxExpNeeded+"' value='"+expRemainder+"' id='"+id+"-expRemainder' onwheel=\"adjustStep(this.id,true,true)\" onkeydown=\"adjustStep(this.id,false,true)\" onchange='updateBar(this)'>";
+		// html+="<span class='expTotal'>/"+maxExpNeeded+"</span>";
+		// html+="</div>";
+		let levelRemBar = makeElem("div",undefined,"expBar",char+"-expBar");
+		levelRemBar.style = "--fill:"+(maxExpNeeded==0?"100":((expRemainder/maxExpNeeded).toPrecision(3)*100));
+		levelRemContainer.appendChild(levelRemBar);
+		// html+="<div class='expBar' id='"+char+"-expBar' style='--fill:";
+		// if(maxExpNeeded == 0) {
+		// 	html += "100";
+		// } else {
+		// 	html+=((expRemainder/maxExpNeeded).toPrecision(3)*100);
+		// }
+		// html+="%'></div>";
+		charStatsContainer.appendChild(levelRemContainer);
+		
 
 		if(isTrav) {
-			html+="</div>";
+			// html+="</div>";
+			let allTravTypesElem = makeElem("div");
 			for(let j in travTypeOrder) {
-				html+="<div id='"+char+j+"'";
+				let typeElem = makeElem("div",undefined,undefined,char+j);
+				// html+="<div id='"+char+j+"'";
 				if(j == 0) {
-					html += " class='extraIcon";
+					// html += " class='extraIcon";
+					typeElem.classList.add("limited");
 					if(byElement[j].hideInfo) {
-						html+=" collapse";
+						// html+=" collapse";
+						typeElem.classList.add("collapse");
 					}
-					html += "'";
+					// html += "'";
 				} else {
 					if(!byElement[j].owned || byElement[j].hideInfo) {
-						html+=" class='collapse'";
+						typeElem.classList.add("collapse");
+						// html+=" class='collapse'";
 					}
 				}
-				html+=">";
-				html+="<div class='topFlex'><div class='boxName boxSubtitle'>"+travTypeOrder[j];
-				html+=makeImg("images/icons/elements/"+travTypeOrder[j]+".svg",32,32,["extraIcon"]);
-				html+="</div><div class='vertFlex alignEnd'><div>Owned? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+j+"-owned\" onchange=\"charHideInfo(this.id);saveOwned(this)\"";
-				if(j == 0) {
-					html+=" checked disabled";
-				} else if(byElement[j].owned) {
-					html+=" checked";
-				}
-				html+="></div>";
-				html+="<div>Hide info? <input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+j+"-hideInfo\" onchange=\"charHideInfo(this.id);saveHideInfo(this)\"";
-				if(byElement[j].hideInfo) {
-					html+=" checked";
-				}
-				html+="></div></div>";
-				html+="</div>";
+				// html+=">";
+				let travTopFlex = makeElem("div",undefined,"topFlex");
+				// html+="<div class='topFlex'>";
 
-				html+="<div class='charTravInfo'><div><span>Note: </span><textarea type='text' cols='50' rows='1' onchange='saveNote(this)' placeholder='Note for "+ charDB[char].regions[j].type+" "+char+"' id='"+id+j+"-note'>"+byElement[j].note+"</textarea></div>";
+				let travTitle = makeElem("div",undefined,["boxName","boxSubtitle"]);
+				// html+="<div class='boxName boxSubtitle'>";
+
+				travTitle.appendChild(makeElem(undefined,travTypeOrder[j]));
+				// html+=travTypeOrder[j];
+
+				travTitle.appendChild(makeImg("images/icons/elements/"+travTypeOrder[j]+".svg",32,32,["extraIcon"]));
+				// html+=makeImg("images/icons/elements/"+travTypeOrder[j]+".svg",32,32,["extraIcon"]);
+				
+				travTopFlex.appendChild(travTitle);
+				// html+="</div>";
+
+				let hideOwnedCheckboxContainer = makeElem("div",undefined,["vertFlex","alignEnd"]);
+				// html+="<div class='vertFlex alignEnd'>";
+				let ownedCheckboxContainer = makeElem("div");
+				ownedCheckboxContainer.appendChild(makeLabelElem("Owned? ",id+j+"-owned"));
+				// html+="<div>Owned? ";
+
+				let ownedInput = makeElem("input",undefined,"ownedCheckbox",id+j+"-owned");
+				ownedInput.type = "checkbox";
+				// html+="<input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+j+"-owned\" onchange=\"charHideInfo(this.id);saveOwned(this)\"";
+				if(j == 0) {
+					ownedInput.checked = true;
+					ownedInput.disabled = true;
+					// html+=" checked disabled";
+				} else if(byElement[j].owned) {
+					ownedInput.checked = true;
+					// html+=" checked";
+				}
+				ownedInput.addEventListener("change",ownedButton);
+				ownedCheckboxContainer.appendChild(ownedInput);
+				hideOwnedCheckboxContainer.appendChild(ownedCheckboxContainer);
+
+				let hideCheckboxContainer = makeElem("div");
+				hideCheckboxContainer.appendChild(makeLabelElem("Hide Info? ",id+j+"-hideInfo"));
+				let hideInput = makeElem("input",undefined,"ownedCheckbox",id+j+"-hideInfo");
+				hideInput.type = "checkbox";
+				if (byElement[j].hideInfo) {
+					hideInput.checked = true;
+				}
+				hideInput.addEventListener("change",hideButton);
+				hideCheckboxContainer.appendChild(hideInput);
+				hideOwnedCheckboxContainer.appendChild(hideCheckboxContainer);
+				travTopFlex.appendChild(hideOwnedCheckboxContainer);
+				typeElem.appendChild(travTopFlex);
+
+				// html+="></div>";
+				// html+="<div>Hide info? ";
+				// html+="<input class=\"ownedCheckbox\" type=\"checkbox\" id=\""+id+j+"-hideInfo\" onchange=\"charHideInfo(this.id);saveHideInfo(this)\"";
+				// if(byElement[j].hideInfo) {
+				// 	html+=" checked";
+				// }
+				// html+="></div></div>";
+				// html+="</div>";
+
+				let typeInfoElem = makeElem("div",undefined,"charTravInfo");
+				// html+="<div class='charTravInfo'>";
+				
+				let typeNoteContainer = makeElem("div");
+				// html+="<div>";
+					
+				typeNoteContainer.appendChild(makeLabelElem("Note: ",id+j+"-note"));
+				// html+="<span>Note: </span>";
+				
+				let typeNoteElem = makeElem("textarea",undefined,undefined,id+j+"-note");
+				typeNoteElem.cols = "50";
+				typeNoteElem.rows = "1";
+				typeNoteElem.value = parseHTMLUnsafe(byElement[j].note);
+				typeNoteElem.placeholder = "Note for "+charDB[char].regions[j].type+" "+char;
+				typeNoteElem.addEventListener("change",function(e){saveNote(e.currentTarget)});
+				typeNoteContainer.appendChild(typeNoteElem);
+				// html+="<textarea type='text' cols='50' rows='1' onchange='saveNote(this)' placeholder='Note for "+ charDB[char].regions[j].type+" "+char+"' id='"+id+j+"-note'>"+byElement[j].note+"</textarea>";
+				typeInfoElem.appendChild(typeNoteContainer);
+				// html+="</div>";
 			
+				let typeTalentsContainer = makeElem("div");
 				if(charDB[char].regions[j].hasCons != false) {
-					html+="<span>Constellation: </span><input size='3' type='number' min='0' max='"+maxCon+"' value='"+byElement[j].con+"' id='"+id+j+"-con' onChange='updateTalents(this)'>";
+					typeTalentsContainer.appendChild(makeLabelElem("Constellation: ",id+j+"-con"))
+					let conInput = makeElem("input",undefined,undefined,id+j+"-con");
+					conInput.type = "number";
+					conInput.size = "3";
+					conInput.min = 0;
+					conInput.max = maxCon;
+					conInput.value = byElement[j].con;
+					conInput.addEventListener("change",function(e){updateTalents(e.currentTarget)});
+					typeTalentsContainer.appendChild(conInput);
+					// html+="<span>Constellation: </span>";
+					// html+="<input size='3' type='number' min='0' max='"+maxCon+"' value='"+byElement[j].con+"' id='"+id+j+"-con' onChange='updateTalents(this)'>";
 				}
 
 				for(let i in charTalentNames) {
-					html+="<span>"+charTalentNames[i]+" level: </span><input size='3' type='number' id='"+id+j+charTalentSuffix[i]+"' onchange='saveTalents(&quot;"+char+j+"&quot;)'";
+					typeTalentsContainer.appendChild(makeLabelElem(charTalentNames[i]+" level: ",id+j+charTalentSuffix[i]));
+					let talInput = makeElem("input",undefined,undefined,id+j+charTalentSuffix[i]);
+					talInput.type = "number";
+					talInput.size = "3";
+					talInput.setAttribute("data-char",char+j);
+					// html+="<span>"+charTalentNames[i]+" level: </span>";
+					// html+="<input size='3' type='number' id='"+id+j+charTalentSuffix[i]+"' onchange='saveTalents(&quot;"+char+"&quot;)'";
 					if(charDB[char].regions[j].hasCons != false && charDB[char].regions[j].conBonus[Math.floor(i)+1] <= byElement[j].con) {
-						html+="min='4' max='"+(charMaxTalents[i]+3)+"' value='"+(byElement[j].talents[i]+3)+"' class='conBonus'>";
+						talInput.max = charMaxTalents[i]+3;
+						talInput.min = 4;
+						talInput.value = byElement[j].talents[i]+3;
+						talInput.classList.add("conBonus");
+						// html+=" min='4' max='"+(charMaxTalents[i]+3)+"' value='"+(byElement[j].talents[i]+3)+"' class='conBonus'>";
 					} else {
-						html+="min='1' max='"+charMaxTalents[i]+"' value='"+byElement[j].talents[i]+"'>";
+						talInput.max = charMaxTalents[i];
+						talInput.min = 1;
+						talInput.value = byElement[j].talents[i];
+						// html+=" min='1' max='"+charMaxTalents[i]+"' value='"+byElement[j].talents[i]+"'>";
 					}
+					talInput.addEventListener("change",function(e){saveTalents(e.currentTarget.getAttribute("data-char"))});
+					typeTalentsContainer.appendChild(talInput);
+
+					// html+="<span>"+charTalentNames[i]+" level: </span><input size='3' type='number' id='"+id+j+charTalentSuffix[i]+"' onchange='saveTalents(&quot;"+char+j+"&quot;)'";
+					// if(charDB[char].regions[j].hasCons != false && charDB[char].regions[j].conBonus[Math.floor(i)+1] <= byElement[j].con) {
+					// 	html+="min='4' max='"+(charMaxTalents[i]+3)+"' value='"+(byElement[j].talents[i]+3)+"' class='conBonus'>";
+					// } else {
+					// 	html+="min='1' max='"+charMaxTalents[i]+"' value='"+byElement[j].talents[i]+"'>";
+					// }
 				}
-			
-				html+="</div></div>";
+				typeInfoElem.appendChild(typeTalentsContainer);
+				typeElem.appendChild(typeInfoElem)
+
+				// html+="</div></div>";
+				allTravTypesElem.appendChild(typeElem);
 			}
-			html+="<div class='boxTitle'>Equipment:</div>";
+			charStatsContainer.appendChild(allTravTypesElem);
+			// html+="<div class='boxTitle'>Equipment:</div>";
 		} else {
+			let talentsContainer = makeElem("div");
 			if(charDB[char].hasCons != false) {
-				html+="<span>Constellation: </span><input size='3' type='number' min='0' max='"+maxCon+"' value='"+con+"' id='"+id+"-con' onchange='updateTalents(this)'>";
+				talentsContainer.appendChild(makeLabelElem("Constellation: ",id+"-con"));
+				let conInput = makeElem("input",undefined,undefined,id+"-con");
+				conInput.type = "number";
+				conInput.size = "3";
+				conInput.min = 0;
+				conInput.max = maxCon;
+				conInput.value = con;
+				conInput.addEventListener("change",function(e){updateTalents(e.currentTarget)});
+				talentsContainer.appendChild(conInput);
+				// html+="<span>Constellation: </span>";
+				// html+="<input size='3' type='number' min='0' max='"+maxCon+"' value='"+con+"' id='"+id+"-con' onchange='updateTalents(this)'>";
 			} 
 	
 			for(let i in charTalentNames) {
-				html+="<span>"+charTalentNames[i]+" level: </span><input size='3' type='number' id='"+id+charTalentSuffix[i]+"' onchange='saveTalents(&quot;"+char+"&quot;)'";
+				talentsContainer.appendChild(makeLabelElem(charTalentNames[i]+" level: ",id+charTalentSuffix[i]));
+				let talInput = makeElem("input",undefined,undefined,id+charTalentSuffix[i]);
+				talInput.type = "number";
+				talInput.size = "3";
+				talInput.setAttribute("data-char",char);
+				// html+="<span>"+charTalentNames[i]+" level: </span>";
+				// html+="<input size='3' type='number' id='"+id+charTalentSuffix[i]+"' onchange='saveTalents(&quot;"+char+"&quot;)'";
 				if(charDB[char].hasCons != false && charDB[char].conBonus != null && charDB[char].conBonus[Math.floor(i)+1] <= con) {
-					html+=" min='4' max='"+(charMaxTalents[i]+3)+"' value='"+(talents[i]+3)+"' class='conBonus'>";
+					talInput.max = charMaxTalents[i]+3;
+					talInput.min = 4;
+					talInput.value = talents[i]+3;
+					talInput.classList.add("conBonus");
+					// html+=" min='4' max='"+(charMaxTalents[i]+3)+"' value='"+(talents[i]+3)+"' class='conBonus'>";
 				} else {
-					html+=" min='1' max='"+charMaxTalents[i]+"' value='"+talents[i]+"'>";
+					talInput.max = charMaxTalents[i];
+					talInput.min = 1;
+					talInput.value = talents[i];
+					// html+=" min='1' max='"+charMaxTalents[i]+"' value='"+talents[i]+"'>";
 				}
+				talInput.addEventListener("change",function(e){saveTalents(e.currentTarget.getAttribute("data-char"))});
+				talentsContainer.appendChild(talInput);
 			}
 
-			html+="</div>";
+			charStatsContainer.appendChild(talentsContainer);
+			// html+="</div>";
 		}
 
+		charInfoElem.appendChild(charStatsContainer);
 
-		html+="<div>Add set module thING here</div>";
-		if(char == "Ganyu") {
-			var html2 = equipmentModule(char,sets,activeSet);
-			console.log(html2)
-		}
 
-		html+="</div>";
 
-		html+="</div>";
+		let equipmentModuleElem = makeElem("details",undefined,"equipmentDetails");
+		equipmentModuleElem.appendChild(makeElem("summary","Equipment:","boxTitle"))
 		
-		return html;
+		if(char == "Ganyu") {
+			equipmentModuleElem.open = true;
+			equipmentModuleElem.appendChild(equipmentModule(char,sets,activeSet));
+		}
+		
+		charInfoElem.appendChild(equipmentModuleElem);
+		
+		charBlockElem.appendChild(charInfoElem);
+		return charBlockElem;
+		// return html;
 	};
-	var charHideInfo = (id) => {
+	function charHideInfo(id) {
 		var char, type, isConfirmDelete = false;
 		if(id.indexOf("-owned") != -1) {
 			char = id.slice(0,-6);
@@ -455,7 +739,7 @@
 			get(char).classList.toggle("collapse");
 		}
 	};
-	var updateTalents = (element) => {
+	function updateTalents(element) {
 		var char, level, travType, keys, cb;
 		char = element.id.slice(0,-4);
 		level = val(element,true);
@@ -495,13 +779,13 @@
 			}
 		}
 	};
-	var saveCon = (id,con) => {
+	function saveCon(id,con) {
 		if(con == 0) {
 			con = undefined;
 		}
 		saveCharacter(id,"con",con);
 	}
-	var saveNote = (element) => {
+	function saveNote(element) {
 		var id = element.id.slice(0,-5);
 		var content = parseHTMLSafe(element.value.trim());
 		if(content == "") {
@@ -509,7 +793,7 @@
 		}
 		saveCharacter(id,"note",content);
 	}
-	var saveNickname = (element) => {
+	function saveNickname(element) {
 		var id = element.id.slice(0,-11);
 		var content = parseHTMLSafe(element.value.trim());
 		if(content != "" && content != id) {
@@ -520,7 +804,7 @@
 			get(id+"-nickname").innerText = id;
 		}
 	}
-	var saveHideInfo = (element) => {
+	function saveHideInfo(element) {
 		var id = element.id.slice(0,-9);
 		var checked = element.checked;
 		if(!checked) {
@@ -533,25 +817,29 @@
 			}
 		}
 	}
-	var saveOwned = (element,confirmRemove=false) => {
+	function saveOwned (element,confirmRemove=false) {
 		var id = element.id.slice(0,-6);
 		var checked = element.checked;
 		if(!checked) {
 			if(!confirmRemove) {
+				console.log("hello")
+				element.removeEventListener("change",ownedButton);
 				element.checked = true;
-				element.previousSibling.data = "Uncheck again to confirm deletion. ";
-				element.setAttribute("onchange","saveOwned(this,true);confirmDeleteChar('"+id+"')");
+				element.previousSibling.innerText = "Uncheck again to confirm deletion. ";
+				element.addEventListener("change",allowDeletion);
 				confirmDelete.push(id);
 				window.setTimeout(function(){
 					if(element.checked){
-						element.previousSibling.data = "Owned? ";
-						element.setAttribute("onchange","charHideInfo(this.id);saveOwned(this)");
+						element.previousSibling.innerText = "Owned? ";
+						element.removeEventListener("change",allowDeletion);
+						element.addEventListener("change",ownedButton);
 						confirmDelete = confirmDelete.filter(item => item !== id);
 					}
 				},5000);
 			} else {
-				element.previousSibling.data = "Owned? ";
-				element.setAttribute("onchange","charHideInfo(this.id);saveOwned(this)");
+				element.previousSibling.innerText = "Owned? ";
+				element.removeEventListener("change",allowDeletion);
+				element.addEventListener("change",ownedButton);
 				saveCharacter(id,"owned",undefined);
 				get(id).classList.toggle("collapse");
 			}
@@ -559,84 +847,1377 @@
 			saveCharacter(id,"owned",checked);
 		}
 	}
-	var confirmDeleteChar = (id) => {
+	function confirmDeleteChar(id) {
 		confirmDelete = confirmDelete.filter(item => item !== id);
 		saveCharacter(id,"owned",undefined);
 	}
-	var equipmentModule = (char, setsData, activeSet) => {
-		// check for empty setsData and empty activeSet
-		// if(setsData === undefined || JSON.stringify(setsData) === "[]") 
-		// if(activeSet === "")
-		console.log("START EQUIP MODULE",char,setsData,activeSet);
+	function equipmentModule(char="Ganyu",setsData=[],activeSet="") {
+		// char - name of the character
+		// setsData - basically the same as charInfoIndex[char].sets
+		// activeSet - whichever set the character currently has
+		// this'll return an element containing everything inside the "module"
 
-		var html = "";
+		// EMPTY SET DATA:
+		// {
+		// 	weapon: null,
+		// 	artifacts: [null,null,null,null,null],
+		// 	id: null,
+		// 	name: null
+		// }
+		if(charDB[char] === undefined) throw new Error("Character does not exist in charDB");
+		
+		// var setData = {weapon:"undefined",artifacts:[null,null,null,null,null],name:"Create new set"}
+		var setData = {};
 
-		// create wrapper
-		html += "<div class='equipmentModule' id='equip-"+char+"'>";
+		// No sets
+		if(setsData.length === 0) {
+			activeSet = ""; // no active set would exist thus this should be treated as null
+			console.info(char,"lacks any sets.")
+		} else {
+			// No active set
+			if(activeSet === "") {
+				console.info(char,"does not have an active set; using first set.")
+				activeSet = setsData.map(i=>i.id)[0];
+			}
+			setData = setsData[setsData.map(i=>i.id).indexOf(activeSet)];
+		}
+
+		console.log("[EQUIPMENT MODULE]","CHAR:",char,"SETS DATA:",setsData,"ACTIVE SET:",activeSet);
 
 		
+		let containerElem = makeElem("div",undefined,"equipmentModule",char+"-equip");
+
+		// Container for Name and dropdown
+		var topFlexElem = makeElem("div",undefined,"topFlex");
+
+		var nameContainer = makeElem("div");
+		nameContainer.appendChild(makeLabelElem("Set name: ",char+"-setName"));
+		var setNameInput = makeElem("input",undefined,undefined,char+"-setName");
+		setNameInput.type = "text";
+		setNameInput.size = "40";
+		setNameInput.maxlength = "35";
+		setNameInput.minlength = "1";
+		if(activeSet != "") {
+			setNameInput.setAttribute("data-setid",activeSet);
+			setNameInput.value = setData.name !== undefined ? setData.name : activeSet;
+			setNameInput.placeholder = "Rename currently selected set";
+		} else {
+			setNameInput.placeholder = "Rename or add equipment to create a new set";
+		}
+		setNameInput.addEventListener("change",renameSet);
+
+		nameContainer.appendChild(setNameInput);
+		topFlexElem.appendChild(nameContainer);
+
+		// Dropdown fun fun
+		let dropdownElem = makeElem("select",undefined,undefined,char+"-setSelector");
+		dropdownElem.value = activeSet;
+		dropdownElem.setAttribute("data-char",char);
+		// TODO: add function for changing dropdown element
+		dropdownElem.addEventListener("change",changeDisplayedSet);
+
+		// dropdown items - value must be the ID and the displayed text should be the name of the set.
+		// maybe add a little icon if it's the active set.
+		for(let i in setsData) {
+			var name = "Unnamed (ID "+setsData[i].id+")";
+			// console.log(setsData[i])
+			if(setsData[i].name !== undefined) name = setsData[i].name;
+			var optionElem = makeElem("option",name,"equipDropdownOption",setsData[i].id+"-option");
+			optionElem.value = setsData[i].id;
+			dropdownElem.appendChild(optionElem);
+		}
+
+		// Extra dropdown items
+		var addNewSetElem = makeElem("option","--Add New--",["equipDropdownOption","equipDropdownAddNew"],char+"-dropdownAddNewSet");
+		addNewSetElem.value = ""; // yes i'm using an empty string for the "add new" equiv
+		dropdownElem.appendChild(addNewSetElem);
+
+		var reorderSetsElem = makeElem("option","--Reorder Existing Sets--",["equipDropdownOption","equipDropdownReorder"]);
+		reorderSetsElem.value = "undefined"; // string as "undefined" is blacklisted from being an ID. this needs an explicit option in dropdownElem's function
+		dropdownElem.appendChild(reorderSetsElem);
+
+		topFlexElem.appendChild(dropdownElem);
+		containerElem.appendChild(topFlexElem);
+
+		// Container for Weapons and Artifacts
+		// Weapon will default to a "fallback" for the default kind in /images/icons/weapon/<type>.svg
+		// Artifacts will default to the fallback in /images/artifacts/<type>/fallback.png
+		var itemsContainer = makeElem("div",undefined,"equipmentItems",char+"-setItems");
+
+		// contains the icon of the weapon as if it was in the inventory
+		// contains the rarity stars + name
+		// might show stats?
+		// on click(?) it asks to if you want to...
+		// - change the exp/level/refinement
+		// - remove the weapon from character:
+		//   - (remove no swap)
+		//   - swap with another weapon
+		// - outright delete the weapon
+
+		var weapData = {
+			itemID: setData.weapon !== undefined ? setData.weapon : undefined,
+			char: char,
+			weapType: charDB[char].weapon
+		}
+		itemsContainer.appendChild(makeEquipIcon(-1,weapData));
+
+		/*
+			[refinement]<  >edit button
+			img w rarity bg
+			>rarity stars<
+			level
+			-----
+			name
+		*/
+
+
+		for(let i = 0; i < artifactTypes.length; i++) {
+			// contains icon of arti as if it was in the inventory
+			// contains rarity stars + name (not set name)
+			// might show stats?
+			// on click(?) it asks to if you want to...
+			// - change the exp/level/rarity/stats
+			// - remove the arti from character:
+			//   - (remove no swap)
+			//   - swap with another arti
+			// - outright delete the arti
+
+			var data = {
+				itemID: setData.artifacts!==undefined?setData.artifacts[i]:undefined,
+				skip: ["refinement"],
+				char: char
+			};
+			itemsContainer.appendChild(makeEquipIcon(i,data))
+		}
+
+
+		containerElem.appendChild(itemsContainer);
+
+		// display at bottom aligned to right with warning (hidden on blank set)
+		var deleteSetButton = makeElem("button","Delete equipment set",["equipmentDeleteButton","fauxButton"]);
+		// add event which shows warning "items wont be lost" and have a confirm thing
+
+
+		return containerElem;
+	}
+
+	function makeEquipIcon(type=-2,data) {
+		// type - range from -1 to 4 inclusive. -1 = weapon, 0 = flower, 1 = plume, etc.
+		// data - object with any of the following: -- UNDEFINED PROBABLY THROWS ERROR!!!
+		//        weapType - string; which weapon type this will use, required for weapon stuff otherwise this might throw errors
+		//        itemID - string for the item's id; undefined/null uses a blank using type skipping setting of multiple things
+		//        char - string; name of the character, required to allow for IDs on things -- will also set weapType if that's unset
+		//        skip - array containing any of the following strings to skip the relevant element(s)
+		//               edit, refinement, level, popup, rarityStar
+		//        isPopup - bool, true is equiv to char and weapType being unset and skip being filled with all above (except rarityStar)
+		//        customRarity - int from 0 to 5 inclusive, what rarity the item will take will be
+		//        customName - string, used in place of whatever name exists
+		//        customImg - string, used to replace the src of the image
+		//        size - string of the size of the icon, can be one of ["micro","tiny","mini","small","normal","big"] -- default is "mini"
+		// function will return an element
+
+		if(type > 4 || type < -1) throw new Error("type was out of bounds. It should be between -1 and 4 inclusive.")
+
+		// sizing variables
+		const validSizes = ["micro","tiny","mini","small","normal","big"];
+		const pixels = [36, 56, 72, 96, 112, 256];
+
+		// pre-init some variables as they may be skipped
+		var levelContainer, levelNumber, refinementContainer, refinementText, editButton, popupContainerElem;
+
+		var itemInfo;
+
+		var isWeap = false, useID = false, useCustomName = false, useCustomImg = false;
+
+		if(typeof(data) === "undefined") {
+			// i have no idea what to do when this is undefined.
+			data = {skip:[]};
+		} else if(typeof(data) !== "object") {
+			throw new Error("data was not undefined nor an object");
+		} else {
+			if(data.char !== undefined) {
+				if(charDB[data.char] === undefined) throw new Error("data.char is not a character");
+				useID = true;
+				if(data.weapType === undefined) data.weapType = charDB[data.char].weapon;
+			}
+			if(type !== -1 && (data.weapType === undefined || allWeaponTypes.indexOf(data.weapType) === -1)) throw new Error("Unknown weapon type set.");
+			if(data.skip === undefined) data.skip = [];
+			if(data.customName !== undefined && typeof(data.customName) === "string") useCustomName = true;
+			if(data.customImg !== undefined && typeof(data.customImg) === "string") useCustomImg = true;
+			if(data.isPopup === true) {
+				data.skip = ["edit","refinement","level","popup"];
+				delete data.char;
+				delete data.weapType;
+			}
+			if(data.customRarity !== undefined && typeof(data.customRarity) === "number" && (data.customRarity > 5 || data.customRarity < 0)) delete data.customRarity;
+			if((data.size === undefined) || (data.size !== undefined && validSizes.indexOf(data.size) === -1)) {
+				data.size = "mini";
+			}
+		}
+		if(type === -1) {
+			isWeap = true;
+		} else {
+			if(data.skip.indexOf("refinement") === -1) data.skip.push("refinement");
+		}
+
+		var element = makeElem("div",undefined,["equipment"+(isWeap?"Weapon":"Artifact"),"itemIconContainer",data.size]);
+		var iconContainer = makeElem("div",undefined,"itemIcon",(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Icon":""));
+		var imgElem = makeElem("img",undefined,"itemIconImg",(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Img":""));
+		imgElem.width = pixels[validSizes.indexOf(data.size)];
+		imgElem.height = pixels[validSizes.indexOf(data.size)];
+		iconContainer.appendChild(imgElem);
+		var rarityElem = makeElem("img",undefined,["rarityIcon","extraIcon"],(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Rarity":""));
+		iconContainer.appendChild(rarityElem);
+
+		if(data.skip.indexOf("level") === -1) {
+			levelContainer = makeElem("div","Lv. ","itemCount");
+			levelNumber = makeElem("span",undefined,undefined,(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Level":""));
+			levelContainer.appendChild(levelNumber);
+			iconContainer.appendChild(levelContainer);
+		} else {
+			var blankDiv = makeElem("div","\u200b");
+			blankDiv.style.userSelect = "none";
+			iconContainer.appendChild(blankDiv);
+		}
+
+		if(data.skip.indexOf("refinement") === -1) {
+			refinementContainer = makeElem("div",undefined,"refinementLevel",(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Refinement":""));
+			refinementText = makeElem("span",undefined,undefined,(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"RefinementText":""));
+			refinementContainer.appendChild(refinementText);
+			iconContainer.appendChild(refinementContainer);
+		}
+
+		if(data.skip.indexOf("edit") === -1) {
+			editButton = makeElem("button",undefined,"equipmentEdit",(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Edit":""));
+			editButton.appendChild(makeImg("images/icons/threeDots.svg",24,24));
+			if(!isWeap) editButton.setAttribute("data-artitype",type.toString());
+			editButton.addEventListener("click",editEquipmentItem);
+			iconContainer.appendChild(editButton);
+		}
+		element.appendChild(iconContainer);
+
+		var nameElem = makeElem("div",undefined,"itemName",(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Name":""));
+		element.appendChild(nameElem);
+
+		if(data.skip.indexOf("popup") === -1) {
+			popupContainerElem = makeElem("div",undefined,"equipmentPopupContainer",(useID?data.char+"-equip"+(isWeap?"Weapon":"Artifact"+type)+"Popup":""));
+			element.appendChild(popupContainerElem);
+		}
+
+		if(data.itemID !== undefined) {
+			var itemType, rarity;
+			if(isWeap) {
+				debugger;
+				itemType = ids[data.itemID].split("--")[1];
+				if(weapDB[itemType] === undefined) throw new Error("Weapon doesn't exist");
+				itemInfo = weaponInfoIndex[itemType][weaponIDIndex[itemType].indexOf(data.itemID)];
+				rarity = weapDB[itemType].rarity;
+			} else {
+				var idStack = ids[data.itemID].split("--");
+				if (artifactDB[idStack[1]] === undefined) throw new Error("Artifact set doesn't exist");
+				var artifactSetInfo = artifactDB[idStack[1]];
+				itemType = idStack[1];
+				if (idStack.length == 2) {
+					// Prayers of/to... sets
+					itemInfo = artifactInfoIndex[idStack[1]][artifactIDIndex[idStack[1]].indexOf(setData.artifacts[i])];
+				} else {
+					// All other sets
+					itemInfo = artifactInfoIndex[idStack[1]][idStack[2]][artifactIDIndex[idStack[1]][idStack[2]].indexOf(setData.artifacts[i])]
+				}
+				rarity = itemInfo.rarity;
+			}
+			if(data.skip.indexOf("edit") === -1) {editButton.setAttribute("data-itemid",data.itemID);}
+			iconContainer.classList.add("rarity-"+rarity);
+			imgElem.src = "images/"+(isWeap?"weapon":"artifacts/"+artifactTypes[type])+"/"+spaceToUnderscore(itemType)+".png";
+			if(data.skip.indexOf("rarityStar") === -1) rarityElem.src = "images/icons/rarity/"+rarity+".png";
+			if(useCustomName) {
+				nameElem.innerText = data.customName;
+			} else {
+				if(isWeap) {
+					nameElem.innerText = weapDB[itemType].title !== undefined ? weapDB[itemType].title : itemType;
+				} else {
+					nameElem.innerText = itemInfo[artifactTypes[i]];
+				}
+			}
+			if(data.skip.indexOf("level") === -1) {
+				if(itemInfo.exp !== undefined) {
+					levelNumber.innerText = getLevelFromExp((isWeap?"weap":"artifact"),itemInfo.exp,rarity)[0];
+				} else {
+					levelNumber.innerText = "1";
+				}
+			}
+			if(isWeap) {
+				if(weapDB[itemType].canRefine === false) {
+					refinementContainer.classList.add("max");
+					refinementText.innerText = "1";
+				} else {
+					refinementText.innerText = itemInfo.refinement !== undefined ? itemInfo.refinement.toString() : "1";
+				}
+			}
+		} else {
+			if(useCustomImg) {
+				imgElem.src = data.customImg;
+			} else {
+				if(isWeap) {
+					imgElem.src = "images/icons/weapon/"+data.weapType+".png";
+					imgElem.style = "filter: drop-shadow(0 0 5px white) drop-shadow(0 0 5px white)";
+				} else {
+					imgElem.src = "images/artifacts/"+artifactTypes[type]+"/fallback.png";
+				}
+			}
+			if(data.skip.indexOf("level") === -1) levelNumber.innerText = "1";
+			if(data.customRarity !== undefined) {
+				iconContainer.classList.add("rarity-"+data.customRarity);
+				if(data.skip.indexOf("rarityStar") !== -1) rarityElem.src = "images/icons/rarity/"+data.customRarity+".png";
+			} else {
+				iconContainer.classList.add("rarity-0");
+			}
+			if(data.skip.indexOf("refinement") === -1) {refinementText.innerText = "1";}
+			if(useCustomName) {
+				nameElem.innerText = data.customName;
+			} else {
+				nameElem.innerText = "No "+(isWeap?"Weapon":"Artifact");
+			}
+		}
+		// if(itemID !== null) {
+		// 	editButton.setAttribute("data-itemid",itemID);
+		// 	iconContainer.classList.add("rarity-"+itemInfo.rarity);
+		// 	rarityElem.src = "images/icons/rarity/"+itemInfo.rarity+".png";
+		// 	imgElem.src = "images/artifacts/"+artifactTypes[i]+"/"+spaceToUnderscore(removeQuotes(artifactSetInfo[artifactTypes[i]]))+".png";
+		// 	nameElem.innerText = itemInfo[artifactTypes[i]];
+		// 	if(itemInfo.exp !== undefined) {
+		// 		levelNumber.innerText = getLevelFromExp("artifact",itemInfo.exp,itemInfo.rarity)[0];
+		// 	} else {
+		// 		levelNumber.innerText = "1";
+		// 	}
+		// } else {
+		// 	imgElem.src = "images/artifacts/"+artifactTypes[i]+"/fallback.png";
+		// 	levelNumber.innerText = "1";
+		// }
+
+
+		return element;
+	}
+
+	function renameSet(e) {
+		var char = e.currentTarget.id.slice(0,-8);
+		// char - name of the character to change the name of
+		if(char === null) throw new Error("data-char was not set");
+		var setID = e.currentTarget.getAttribute("data-setid");
+		// setID - id of the set to change. if this is `null`, it means the set is new.
 		
-		// close wrapper
-		html += "</div>";
+		// get name and if null use "Unnamed ($id)"
+		var newSetName = e.currentTarget.value.trim();
 
-		return html;
-	};
-	var addItemToChar = (item="",char="",setNumber=-1,itemID="",artifactType=-1,rarity=0,ignoreErrors=false) => {
-		var id;
-		var lsItem = parseLSItem(item,[]);
-		// TODO: ADD FALLBACK FOR NOT-FOUND itemID TO MAKE NEW ID.
-		if(itemID == "") {
-			id = "a1234";
+		if(setID === null) {
+			// NEW SETS
+			if(newSetName === "") return; // skip empty names for new sets
+
+			var setData = {};
+			
+			if(newSetName !== "") {
+				setData.name = newSetName;
+			}
+			
+			var setID = newCharacterSet(char,setData);
+			setData = charInfoIndex[char].sets[setsIDIndex[char].indexOf(setID)]
+			if(newSetName === "") {
+				newSetName = "Unnamed (ID "+setID+")";
+			}
+			charInfoIndex[char].sets[setsIDIndex[char].indexOf(setID)].name = newSetName;
+			
+			e.currentTarget.setAttribute("data-setid",setID);
+			
+			let newDropdownOption = makeElem("option",newSetName,"equipDropdownOption",setID+"-option");
+			newDropdownOption.value = setID;
+			get(char+"-setSelector").insertBefore(newDropdownOption,get(char+"-dropdownAddNewSet"));
+
+			get(char+"-setSelector").value = setID;
+
 		} else {
-			id = itemID;
+			// rename existing sets
+			if(newSetName === "") newSetName = "Unnamed (ID "+setID+")";
+			get(setID+"-option").innerText = newSetName;
+			charInfoIndex[char].sets[setsIDIndex[char].indexOf(setID)].name = newSetName;
 		}
-		if(!ignoreErrors) {
-			// if(itemID) {
-			//	// itemID needs to be real. this error shouldn't be avoided. blank ids make a new id.
-			// 	console.error("[addItemToChar] newItem variable must be a bool.");
-			// 	return;
-			// }
-			if(item == "" || char == "" || setNumber == -1) {
-				console.error("[addItemToChar] Do not use default values for this. Below are your inputs.");
-				console.info("Item:",item,"\nChar:",char,"\nSet Number",setNumber);
-				return;
-			}
-			if(artifactDB[item] != undefined) {
-				if(rarity > artifactDB[item].rarityMax || rarity < artifactDB[item].rarityMin) {
-					console.warn("[addItemToChar] Rarity outside expected range. It should be within "+artifactDB[item].rarityMin+" and "+artifactDB[item].rarityMax+". Using minimum valid rarity.");
-					rarity = artifactDB[item].rarityMin;
-				}
-				if(artifactType == -1) {
-					throw new Error("[addItemToChar] Do not use default value for artifactType.");
-				} else if(artifactType > artifactTypes.length - 1) {
-					console.error("[addItemToChar] artifactType value was too high. It should be between 0 and "+(artifactTypes.length - 1)+".");
-					return;
-				}
-			}
-			if(weapDB[item] != undefined && weapDB[item].type != charDB[char].weapon) {
-				console.error("[addItemToChar] Do not add incompatable weapon types to characters.");
-				return;
-			}
-		} else {
-			console.warn("[addItemToChar] You're at fault for any errors.");
-		}
-		if(artifactDB[item] != undefined) {
-			if(lsItem.length != 5 || JSON.stringify(lsItem) == "[]") {
-				lsItem = [[],[],[],[],[]];
-			}
-			// if item not in lsItem[artifactType]
-			lsItem[artifactType].push({id:id,rarity:rarity,exp:0})
+		setLSItem(char,JSON.stringify(charInfoIndex[char]));
+		
+	}
 
-			// if(artifactIDIndex[id][char] != undefined) {
-			// 	artifactIDIndex[id][char]
-			// }
-		} else if (weapDB[item] != undefined) {
+	function changeDisplayedSet(e) {
+		var char = e.currentTarget.getAttribute("data-char");
+		// char - name of the character to change the shown set of
+		if(char === null) throw new Error("data-char was not set");
 
-		} else {
-			console.error("[addItemToChar] The item, \""+item+"\" could not be found in artifactDB or weapDB. If you're using an artifact, the item should be the artifact set name such as \"Lucky Dog\". Items should not have quotation marks or apostrophes in their name.");
+		var setID = e.currentTarget.value;
+		// setID - ID of the set to change to
+		// use empty string for a new, blank set whose ID is only defined upon adding first item.
+		// use "undefined" for reordering existing sets.
+		
+
+		// looks for char+"-setItems", changes any data-?? attributes and images to correct stuff
+		// if setID === "" it'll reset all to a fresh slate
+
+	}
+
+	function editEquipmentItem(e) {
+		// without attirbute "data-itemid" it adds item
+		// otherwise...
+		//
+		// Weapons: allows... (determined by a lack of data-artitype attribute)
+		// - change the exp/level/refinement
+		// - remove the weapon from character:
+		//   - (remove no swap)
+		//   - swap with another weapon
+		// - outright delete the weapon
+		//
+		// Artifact: allows... (determined by data-artitype attribute number)
+		// - change the exp/level/rarity/stats
+		// - remove the arti from character:
+		//   - (remove no swap)
+		//   - swap with another arti
+		// - outright delete the arti
+		
+		var elem = e.currentTarget;
+		// check if it's an artifact -- null indicates a weapon.
+		var artifactType = elem.getAttribute("data-artitype");
+		// check for existing ID -- null indicates empty slot and should add item instead.
+		var itemID = elem.getAttribute("data-itemid");
+		// get character name
+		var char = elem.id.split("-")[0];
+		// get set id -- null means make new set
+		var setID = get(char+"-setName").getAttribute("data-setid");
+		
+		// Add new item
+		if(itemID === null) {
+			if(setID === null) setID = "undefined"; // makes new set
+			if (artifactType === null) {
+				// Weapons
+				createPopup(char+"-equipWeaponPopup");
+				var p = get("popup");
+				p.classList.add("hideContent");
+				p.setAttribute("data-char",char);
+				p.setAttribute("data-setid",setID);
+				p.setAttribute("data-equipslot","-1"); // Set it for adding weapon in updateEquipmentItemVisuals
+				get("popupTitle").innerText = "Add new "+capitalise(charDB[char].weapon)+"...";
+				
+				var weapList = allWeapons[allWeaponTypes.indexOf(charDB[char].weapon)];
+				console.log(weapList);
+
+				var r = get("popupResults");
+				for(let i = 0; i < weapList.length; i++) {
+					var weap = weapList[i];
+					var data = {
+						isPopup: true,
+						size: "tiny",
+						customName: weapDB[weap].title!==undefined?weapDB[weap].title:weap,
+						customImg: "images/weapon/"+spaceToUnderscore(weap)+".png",
+						customRarity: weapDB[weap].rarity
+					}
+					var btn = makeElem("button",undefined,"popupResult");
+					if(weapDB[weap].source !== undefined) btn.classList.add("limited");
+					btn.setAttribute("data-itemname",weap);
+					btn.name = weap.replace(/\s/,"");
+					btn.appendChild(makeEquipIcon(-1,data))
+					btn.addEventListener("click",checkItems)
+					r.appendChild(btn);
+				}
+			} else {
+				// Artifacts
+				var type = artifactTypes[artifactType];
+				var allArtisOfType = allArtifacts[artifactType];
+				var allArtisWithType = {};
+				for(let i = 0; i < allArtifactGroups.length; i++) {
+					var setName = allArtifactGroups[i];
+					if(allArtifactGroupsWithOneType.indexOf(setName) !== -1 && allArtifactGroupsWithOneTypeIs[allArtifactGroupsWithOneType.indexOf(setName)] !== type) continue;
+					allArtisWithType[setName] = (artifactDB[setName]);
+				}
+				console.log(allArtisWithType);
+
+
+				createPopup(char+"-equipArtifact"+artifactType+"Popup");
+				var p = get("popup");
+				p.classList.add("hideContent");
+				p.setAttribute("data-char",char);
+				p.setAttribute("data-setid",setID);
+				p.setAttribute("data-equipslot",artifactType);
+				get("popupTitle").innerText = "Add new "+capitalise(type)+"...";
+
+				var r = get("popupResults");
+				for(let i in allArtisWithType) {
+					var set = allArtisWithType[i];
+					var name = set[type];
+					var data = {
+						isPopup: true,
+						size: "tiny",
+						skip: ["rarityStar"],
+						customName: name,
+						customImg: "images/artifacts/"+artifactTypes[artifactType]+"/"+spaceToUnderscore(removeQuotes(name))+".png",
+						customRarity: set.rarityMin.toString()+set.rarityMax
+					}
+
+					var btn = makeElem("button",undefined,"popupResult");
+					btn.setAttribute("data-itemname",i);
+					btn.name = name.replace(/['"\s]+/g,"");
+					btn.appendChild(makeEquipIcon(-1,data))
+					btn.addEventListener("click",checkItems)
+					r.appendChild(btn);
+				}
+
+			}
+			console.log("char",char,"itemID",itemID,"artifactType",artifactType,"setID",setID)
+			// finishPopup();
 			return;
 		}
-		console.log(lsItem);
+		// Edit existing item
+		if(artifactType === null) {
+			// Weapons
+			artifactType = -1; // Set it for adding weapon in updateEquipmentItemVisuals
+			
+			createPopup(char+"-equipWeaponPopup");
+			var p = get("popup");
+			p.classList.add("hideSearch");
+			p.setAttribute("data-char",char);
+			p.setAttribute("data-setid",setID);
+			p.setAttribute("data-equipslot",artifactType);
+			// p.setAttribute("data-itemid",itemID); // itemID exists on get($char -equipWeaponEdit)
+			var itemName = ids[itemID].split("--")[1];
+			get("popupTitle").innerText = (weapDB[itemName].title !== undefined ? weapDB[itemName].title : itemName)+" options...";
+			
+			var pc = get("popupContent");
+			var inputContainer = makeElem("div");
+
+			// $lvl               (small)???/rem
+			// ===========e x p b a r============
+			// asc / max
+			// ref / max -- only if rarity is 3+, force disabled to max if impossible to refine
+			// (intentional gap)
+			// [swap wpn btn OR add new of type] | [remove wpn btn] --- swap/addNew will go to swap list if other weapons of that type exist, adds new otherwise -- remove only removes from set
+			// [del btn w "u sure?"]
+
+
+			inputContainer.appendChild(popupMakeInputElems(itemName,-1,itemID));
+			inputContainer.appendChild(makeElem("br"));
+
+			// Buttons still need events!!
+			inputContainer.appendChild(addItemButtons(itemName,-1,itemID));
+			
+			pc.appendChild(inputContainer);
+			
+			// Check if other items exist and add those to a second child of popupContent
+			if(weaponIDIndex[itemName] !== undefined && weaponIDIndex[itemName].length > 1) {
+				var extraItemsContainer = makeElem("div");
+				console.log("multiple items exist yay...");
+				for(let i = 0; i < weaponInfoIndex[itemName].length; i++) {
+					if(weaponInfoIndex[itemName][i].id === itemID) continue; // skip current weapon for obvious reasons
+					var rarity = weapDB[itemName].rarity, weap = weaponInfoIndex[itemName][i];
+					var text = "Level ";
+					if(weap.exp !== undefined) {
+						var exp = getLevelFromExp("weap",weap.exp,rarity);
+						text += exp[0]+"/"+(weapLevelValues[rarity - 1].length + 1)+", "+exp[1]+"/"+weapLevelValues[rarity - 1][exp[0] - 1];
+					} else {
+						text += "1/"+(weapLevelValues[rarity - 1].length + 1)+", 0/"+weapLevelValues[rarity - 1][0];
+					}
+					text += " | Ascension ";
+					if(weap.ascension !== undefined) {
+						text += weap.ascension+"/"+weapAscAtExp[rarity - 1].length;
+					} else {
+						text += "0/"+weapAscAtExp[rarity - 1].length;
+					}
+					if(rarity > 2 && weapDB[itemName].canRefine !== false) {
+						text += " | Refinement "+(weap.refinement !== undefined ? weap.refinement : "1")+"/5";
+					}
+					// check if it's used by others!
+
+					var button = makeElem("button",text,"fauxButton");
+					button.setAttribute("data-itemid",weap.id);
+					// event should change the popup's contents and icon stuff 
+					// button.addEventListener("click",function(e){})
+					
+					extraItemsContainer.appendChild(button);
+
+				}
+				pc.appendChild(extraItemsContainer);
+			}
+
+
+		} else {
+			// Artifacts
+			// createPopup(char+"-equipArtifactPopup"+artifactType);
+			var buttonsContainer = addItemButtons(itemName,-1,itemID);
+		}
 	}
+
+	function checkItems(e) {
+		var p = get("popup");
+		if(p === null) throw new Error("This function requires the popup to exist and should not be called from any non-children elements.");
+		var el = e.currentTarget;
+		// console.log(e.currentTarget)
+
+		// Get all required variables in prep for addItemToCharSet
+		var char = p.getAttribute("data-char");
+		var setID = p.getAttribute("data-setid"); // "undefined" means it's a new set
+		var artifactType = Math.floor(p.getAttribute("data-equipslot")); // -1 for weapons, 0 for flowers, 1 for plumes...
+		var itemName = el.getAttribute("data-itemname"); // weapons are the item name while artifacts are the set name
+
+		var foundItems; // Should be an array of objects where each object is an item
+		// Check if any items exist already for the chosen item
+		if(artifactType === -1 && weaponInfoIndex[itemName] !== undefined) {
+			// Weapons, items exist
+			foundItems = weaponInfoIndex[itemName];
+		} else if(allArtifactGroupsWithOneType.indexOf(itemName) === -1 && artifactInfoIndex[itemName] !== undefined && artifactInfoIndex[itemName][artifactTypes[artifactType]] !== undefined) {
+			// Artifacts not in a set with only one type (ie not "Prayers of..."), items exist for artifact type
+			foundItems = artifactInfoIndex[itemName][artifactTypes[artifactType]];
+		} else if(allArtifactGroupsWithOneType.indexOf(itemName) !== -1 && artifactInfoIndex[itemName] !== undefined) {
+			// Artifacts of a single type (ie "Prayers of..."), items exist
+			foundItems = artifactInfoIndex[itemName];
+		}
+		// foundItems should not be undefined if items really do exist.
+		// console.log(foundItems);
+		if(foundItems === undefined) {
+			if(artifactType === -1) {
+				// Add new weapon to character's set.
+				addItemToCharSet(itemName,char,"",setID);
+				removePopup();
+				return;
+			} else {
+				// Artifacts vary on rarity. This should change the content to be "what's the stats?" before adding
+				get("popupTitle").innerText = "Adding new "+artifactDB[itemName][artifactTypes[artifactType]]+"...";
+				var pc = get("popupContent");
+				pc.appendChild(popupMakeInputElems(itemName,artifactType));
+				get("popupClose").style.display = "none";
+				get("popupBack").removeAttribute("style");
+				p.classList.remove("hideContent");
+				p.classList.add("hideSearch");
+				pc.appendChild(makeElem("hr"));
+				pc.appendChild(addItemButtons(itemName,artifactType));
+			}
+		} else {
+			// Items exist. This should change the "contents" part to be "here is list" with add new and cancel buttons
+			// add new does same as foundItems === undefined for both types
+			// cancel aborts, goes back to search results.
+		}
+	}
+
+	function popupMakeInputElems(itemName="",artifactType=-2,itemID) {
+		// This should only be called for popup stuff.
+
+		// abort if artifactType is above 4 or less than -1.
+		if(artifactType > 4 || artifactType < -1) throw new Error("artifactType is out of bounds");
+		
+		// preset variables
+		var exp, dbInfo, itemInfo;
+
+		var isWeap = false;
+		if(artifactType === -1) {
+			// Weapons
+			if(weapDB[itemName] === undefined) throw new Error("Weapon does not exist");
+
+			dbInfo = weapDB[itemName];
+			if(itemID !== undefined) {
+				itemInfo = weaponInfoIndex[itemName][weaponIDIndex[itemName].indexOf(itemID)];
+				if(itemInfo.exp !== undefined) exp = getLevelFromExp("weap",itemInfo.exp,dbInfo.rarity);
+			}
+			isWeap = true;
+		} else {
+			// Artifacts
+			if(artifactDB[itemName] === undefined) throw new Error("Artifact set does not exist");
+			
+			if(allArtifactGroupsWithOneType.indexOf(itemName) === -1) {
+				if(artifactType > 4 || artifactType < 0) throw new Error("Artifact type is out of bounds");
+				if(itemID !== undefined) itemInfo = artifactInfoIndex[itemName][artifactTypes[artifactType]][artifactIDIndex[itemName][artifactTypes[artifactType]].indexOf(itemID)];
+			} else {
+				artifactType = allArtifactGroupsWithOneTypeIs[allArtifactGroupsWithOneType.indexOf(itemName)];
+				if(itemID !== undefined) itemInfo = artifactInfoIndex[itemName][artifactIDIndex[itemName].indexOf(itemID)];
+			}
+			if(itemInfo !== undefined && itemInfo.exp !== undefined && itemInfo.rarity !== undefined) exp = getLevelFromExp("artifact",itemInfo.exp,itemInfo.rarity);
+			dbInfo = artifactDB[itemName];
+		}
+
+		// ============ WEAPONS ============
+		// probably gonna look like
+
+		// $lvl               (small)???/rem
+		// ------------e x p b a r-----------
+		// asc / max
+		// ref / max -- only if rarity is 3+, force disabled to max if impossible to refine
+		// (intentional gap)
+		// [swap wpn btn OR add new of type] | [remove wpn btn] --- swap/addNew will go to swap list if other weapons of that type exist, adds new otherwise -- remove only removes from set
+		// [del btn w "u sure?"]
+
+
+		// ============ ARTIFACTS ============
+
+		// If the artifact ID exists yeah work with that
+
+		// Required elements:
+		// level, exp remainder, exp bar
+		// main stat, main stat value
+		// up to 4 substats with different kinds, settable values
+
+		// probably gonna look something like
+
+		// rarity dropdown
+		// (intentional gap)
+		// $lvl                (small)???/rem
+		// ------------e x p b a r-----------
+		// MAIN STAT dropdown           value
+		// substat dropdown             value -- repeat 4 times
+		// [swap wpn btn OR add new of type] | [remove wpn btn] --- swap/addNew will go to swap list if other artis of that type exist, adds new otherwise -- remove only removes from set
+		// [del btn w "u sure?"]
+
+
+
+		var container = makeElem("div");
+
+		if(!isWeap) {
+			// Only artifacts have rarity dropdown
+			var rarityContainer = makeElem("div");
+			rarityContainer.appendChild(makeLabelElem("Rarity: ","artiRarityDropdown"))
+			var rarityDropdown = makeElem("select",undefined,undefined,"artiRarityDropdown");
+			
+			if(itemInfo === undefined || (itemInfo !== undefined && itemInfo.rarity !== undefined)) {
+				var option = makeElem("option","Select a rarity",undefined,"artiDropdownBlank");
+				option.value = "";
+				option.selected = true;
+				rarityDropdown.appendChild(option);
+			}
+	
+			for(let i = dbInfo.rarityMin; i <= dbInfo.rarityMax; i++) {
+				var option = makeElem("option",i);
+				option.value = i;
+				if(itemID !== undefined && itemInfo.rarity === i) option.selected = true;
+				rarityDropdown.appendChild(option);
+			}
+			rarityContainer.appendChild(rarityDropdown);
+			rarityDropdown.addEventListener("change",artiUpdateInputsR);
+	
+			container.appendChild(rarityContainer);
+			container.appendChild(makeElem("hr"));
+		}
+
+		var flex = makeElem("div",undefined,"topFlex");
+		var nameContainer = makeElem("div");
+		nameContainer.appendChild(makeLabelElem("Level: ","itemLevel"));
+		var input = makeElem("input",undefined,undefined,"itemLevel");
+		input.type = "number";
+		input.min = "1";
+		input.size = "3";
+		// weap only
+		if(isWeap) input.max = (weapLevelValues[dbInfo.rarity - 1].length + 1);
+		if(exp !== undefined) {
+			input.value = exp[0];
+			if(!isWeap) input.max = (artifactLevelValues[itemInfo.rarity - 1].length + 1);
+		} else {
+			input.value = "1";
+			if(!isWeap) {
+				input.max = "1";
+				input.disabled = true;
+			}
+		}
+		nameContainer.appendChild(input);
+		nameContainer.appendChild(makeElem(undefined," / "));
+		nameContainer.appendChild(makeElem("span",
+			isWeap?
+			// Weapons
+				(weapLevelValues[dbInfo.rarity - 1].length + 1)
+			// Artifacts
+				:(exp!==undefined?(artifactLevelValues[itemInfo.rarity - 1].length + 1):"???")
+			,
+		"expMaxLevel","itemMaxLevel"));
+		flex.appendChild(nameContainer);
+
+		var remContainer = makeElem("div",undefined,"alignEnd");
+		remContainer.appendChild(makeLabelElem("Level progress: ","itemLevelRem"));
+		input = makeElem("input",undefined,"expTotal","itemLevelRem");
+		input.type = "number";
+		input.min = "0";
+		input.size = "8";
+		if(isWeap) input.max = (weapLevelValues[dbInfo.rarity - 1][(exp!==undefined?exp[0]-1:0)]);
+		if(exp !== undefined) {
+			input.value = exp[1];
+			// arti only
+			if(!isWeap) input.max = (artifactLevelValues[itemInfo.rarity - 1][exp[0] - 1]);
+		} else {
+			input.value = "0";
+			// arti only
+			if(!isWeap) {
+				input.max = "0";
+				input.disabled = true;
+			}
+		}
+		remContainer.appendChild(input);
+		remContainer.appendChild(makeElem(undefined," / "));
+		remContainer.appendChild(makeElem("span",
+			isWeap?
+				// Weapons
+				(weapLevelValues[dbInfo.rarity - 1][(exp!==undefined?exp[0]-1:0)])
+				// Artifacts
+				:(exp!==undefined?(artifactLevelValues[itemInfo.rarity - 1][exp[0] - 1]):"???")
+			,
+		"expTotal","itemMaxLevelRem"));
+		flex.appendChild(remContainer);
+		container.appendChild(flex);
+
+		var expBar = makeElem("div",undefined,"expBar","itemExpBar");
+		expBar.style = "width:unset;--fill:"+
+			(exp!==undefined?
+				(isWeap?
+					// Weapons
+					(exp[1]/(weapLevelValues[dbInfo.rarity - 1][exp[0] - 1]))
+					// Artifacts				
+					:((exp[1]/artifactLevelValues[itemInfo.rarity - 1][exp[0] - 1]).toPrecision(3)*100)
+				)
+				:
+				"0"
+			)
+		+"%;";
+		container.appendChild(expBar);
+
+		// weapons only, rarity 3+ only, special case for already maxed
+		if(isWeap && dbInfo.rarity > 2) {
+			var refinementContainer = makeElem("div");
+			refinementContainer.appendChild(makeLabelElem("Refinement: ","itemRefinement"))
+			input = makeElem("input",undefined,undefined,"itemRefinement");
+			input.type = "number";
+			input.min = "1";
+			input.size = "3";
+			input.value = (itemInfo!==undefined&&itemInfo.refinement!==undefined?itemInfo.refinement:"1")
+			if(dbInfo.canRefine === false) {
+				input.max = "1";
+				input.disabled = true;
+			} else {
+				input.max = "5";
+			}
+			refinementContainer.appendChild(input);
+			container.appendChild(refinementContainer);
+		}
+
+		// artifacts only again
+		if(!isWeap) {
+			// Main stat stuff
+			flex = makeElem("div",undefined,"topFlex");
+			var mainStatDropdownContainer = makeElem("div");
+			var mainStatDropdown = makeElem("select",undefined,undefined,"itemMainStat");
+
+			var mainStatDropdownOptions = artiValidStats[artifactType];
+			if(typeof(mainStatDropdownOptions) === "string") {
+				var option = makeElem("option",mainStatDropdownOptions);
+				option.value = mainStatDropdownOptions;
+				option.selected = true;
+				option.disabled = true;
+				mainStatDropdown.disabled = true;
+				mainStatDropdown.appendChild(option);
+			} else {
+				if(itemInfo !== undefined && itemInfo.mainStat === undefined) {
+					var option = makeElem("option","Select the main stat",undefined,"itemMainStatBlank");
+					option.value = "";
+					mainStatDropdown.appendChild(option);
+				}
+				for(let i = 0; i < mainStatDropdownOptions.length; i++) {
+					var option = makeElem("option",artiLabels[mainStatDropdownOptions[i]]!==undefined?artiLabels[mainStatDropdownOptions[i]]:mainStatDropdownOptions[i]);
+					option.value = mainStatDropdownOptions[i];
+					if(itemInfo !== undefined && itemInfo.mainStat !== undefined && itemInfo.mainStat === mainStatDropdownOptions[i]) option.selected = true;
+					mainStatDropdown.appendChild(option);
+				}
+			}
+			mainStatDropdownContainer.appendChild(mainStatDropdown);
+			flex.appendChild(mainStatDropdownContainer);
+			container.appendChild(flex);
+
+			// Make sure substats are disabled until mainstat is set!!!
+			// All substats will contain *every* option but disable those matching main (and those that already exist but aren't itself)
+			// substat values will be made too, disabled unless substat is valid and mainstat is set
+			var existingSubstatKeys = itemInfo!==undefined&&itemInfo.substats!==undefined?itemInfo.substats.keys():undefined;
+			if(itemInfo !== undefined && itemInfo.mainStat !== undefined) existingSubstatKeys.push(itemInfo.mainStat);
+			for(let i = 0; i < 4; i++) {
+				flex = makeElem("div",undefined,"topFlex");
+				var substatDropdownContainer = makeElem("div");
+				var substatDropdown = makeElem("select",undefined,undefined,"itemSubstat"+i);
+				if(itemInfo !== undefined && itemInfo.mainStat === undefined) substatDropdown.disabled = true;
+				// make options
+				var option = makeElem("option");
+				option.value = "";
+				substatDropdown.appendChild(option);
+				for(let j = 0; j < artiValidSubstats.length; j++) {
+					option = makeElem("option",itemInfo!==undefined&&artiLabels[artiValidSubstats[j]]!==undefined?artiLabels[artiValidSubstats[j]]:artiValidSubstats[j]);
+					option.value = artiValidSubstats[j];
+					if(itemInfo !== undefined && itemInfo.mainStat === artiValidSubstats[j] || (existingSubstatKeys !== undefined && existingSubstatKeys.indexOf(artiValidSubstats[j]) !== -1)) option.disabled = true;
+					substatDropdown.appendChild(option);
+				}
+				substatDropdownContainer.appendChild(substatDropdown);
+				flex.appendChild(substatDropdownContainer);
+				container.appendChild(flex);
+			}
+		}
+		return container;
+	}
+
+	function addItemButtons(itemName="",artifactType=-2,itemID) {
+		// This should only be called for popup stuff.
+
+		// abort if artifactType is above 4 or less than -1.
+		if(artifactType > 4 || artifactType < -1) throw new Error("artifactType is out of bounds");
+
+		itemName = removeQuotes(itemName);
+		
+		// preset variables
+		var exp, dbInfo, itemInfo;
+
+		var isWeap = false;
+		if(artifactType === -1) {
+			// Weapons
+			if(weapDB[itemName] === undefined) throw new Error("Weapon does not exist");
+
+			dbInfo = weapDB[itemName];
+			if(itemID !== undefined) {
+				itemInfo = weaponInfoIndex[itemName][weaponIDIndex[itemName].indexOf(itemID)];
+				if(itemInfo.exp !== undefined) exp = getLevelFromExp("weap",itemInfo.exp,dbInfo.rarity);
+			}
+			isWeap = true;
+		} else {
+			// Artifacts
+			if(artifactDB[itemName] === undefined) throw new Error("Artifact set does not exist");
+			
+			if(allArtifactGroupsWithOneType.indexOf(itemName) === -1) {
+				if(artifactType > 4 || artifactType < 0) throw new Error("Artifact type is out of bounds");
+				if(itemID !== undefined) itemInfo = artifactInfoIndex[itemName][artifactTypes[artifactType]][artifactIDIndex[itemName][artifactTypes[artifactType]].indexOf(itemID)];
+			} else {
+				artifactType = allArtifactGroupsWithOneTypeIs[allArtifactGroupsWithOneType.indexOf(itemName)];
+				if(itemID !== undefined) itemInfo = artifactInfoIndex[itemName][artifactIDIndex[itemName].indexOf(itemID)];
+			}
+			if(itemInfo !== undefined && itemInfo.exp !== undefined && itemInfo.rarity !== undefined) exp = getLevelFromExp("artifact",itemInfo.exp,itemInfo.rarity);
+			dbInfo = artifactDB[itemName];
+		}
+
+		var isSwap = false;
+		if(isWeap && weaponIDIndex[itemName] !== undefined && weaponIDIndex[itemName].length > 1 ) {
+			console.log("MULTIPLE ITEMS EXIST");
+			isSwap = true;
+		} else if(!isWeap) {
+			if(allArtifactGroupsWithOneType.indexOf(itemName) === -1 && artifactIDIndex[itemName] !== undefined && artifactIDIndex[itemName][artifactTypes[artifactType]] !== undefined) {
+				console.log("multi-kind artis work");
+			if(itemID !== undefined) itemInfo = artifactInfoIndex[itemName][artifactTypes[artifactType]][artifactIDIndex[itemName][artifactTypes[artifactType]].indexOf(itemID)];
+			} else {
+				artifactType = allArtifactGroupsWithOneTypeIs[allArtifactGroupsWithOneType.indexOf(itemName)];
+				if(itemID !== undefined) itemInfo = artifactInfoIndex[itemName][artifactIDIndex[itemName].indexOf(itemID)];
+			// } else {
+				console.log("sod.")
+			}
+		} else {
+			console.log("no they do not");
+
+		}
+		// if(itemID !== undefined) {
+		// 	// isSwap = true;
+		// } else {
+		// }
+
+		var container = makeElem("div");
+
+		// Check if other items of same kind exist; if not "swap" is replaced with "add new".
+		var inline = makeElem("div");
+		var button = makeElem("button",
+			(isSwap?
+				"Swap "+
+					(isWeap?"Weapon":"Artifact")+"..."
+				:("Add new...")
+			),undefined,"itemSwapAddButton"
+		);
+		if(isSwap) {
+			button.addEventListener("click",popupGoToSwapList)
+		} else {
+			button.addEventListener("click",function(e){})
+		}
+		inline.appendChild(button);
+		inline.appendChild(makeElem(undefined," | "));
+		button = makeElem("button","Remove",undefined,"itemRemoveFromSetButton");
+		inline.appendChild(button);
+		container.appendChild(inline);
+		
+		container.appendChild(makeElem("hr"));
+		button = makeElem("button","Delete "+(isWeap?"Weapon":"Artifact")+"?",undefined,"itemDeleteButton");
+		container.appendChild(button);
+
+		return container;
+
+	}
+
+	function artiUpdateInputsR(e) {
+		// function will update all artifact related inputs based on different rarity values.
+		var el = e.currentTarget;
+
+		// e.currentTarget is "artiRarityDropdown"
+		// steps:
+		// 1. if dropdown.value !== "": delete the blank value from options (if existed)
+		// 2. if dropdown.value !== "": remove disable of other inputs
+		// 3. reset values of level, exp, exp remainder, bar to minimum possible [1,0,0,--fill:0%]
+		// 4. update value of mainstat (but keep selected stat the same)
+
+		// 1. remove blank option
+		if(el.value !== "" && get("artiDropdownBlank") !== null) get("artiDropdownBlank").remove();
+
+		// 2. reenable all inputs
+		if(el.value !== "") {
+			if(get("artiLevel") !== null) get("artiLevel").disabled = false;
+		}
+
+		// 3. reset values of level, exp, exp remainder, exp bar, other various labels
+		// TEXT IDS: "artiMaxLevel", "artiMaxLevelRem"
+		// INPUTS: "artiRarityDropdown", "artiLevel", "artiLevelRem"
+		// EXP BAR: "artiExpBar"
+
+	}
+
+	function artiUpdateStatOptions() {
+		// get value of "artiMainStat" - if blank disable all substats
+		// if value of "artiMainStat" isn't blank, delete blank option from within (id "artiMainStatBlank")
+		// also disable (via elem.disabled = true) all substat options that match.
+		// all substats should be disabled until *that* is set.
+		// if the substat chosen goes back to blank option, remove substat value too
+	}
+
+	function popupGoToSwapList() {
+		// changes actively displayed popupContent child to whatever the "swap list" is.
+	}
+
+	function addItemToCharSet(itemName="",char="",itemID="",setID="",artifactType=-1,rarity=0) {
+		// itemName - name of the artifact set or weapon
+		// char - name of the character to attach the item to
+		// OPTIONAL:
+		// itemID - the id of the item (blank makes new id)
+		// setID - which set the item should be attached to (blank makes new set and new ID)
+		// [ARTIFACTS ONLY; REQUIRED IF itemID IS UNSET]
+		// artifactType - which artifact this should be (0 = flower, 1 = plume, etc)
+		// rarity - the rarity of the artifact in question
+
+		if(charDB[char] === undefined) {
+			throw new Error("Character is not in charDB. Aborting.");
+		}
+
+		var setData = {}, setWasBlank=true;
+		var itemData = {}, itemWasBlank=true;
+
+		// Check if set exists
+		if(setID === "" || setID === "undefined") {
+			setData.id = newCharacterSet(char);
+		} else {
+			setData = charInfoIndex[char].sets.indexOf(setsIDIndex[char].indexOf(setID));
+			setWasBlank = false;
+		}
+		
+		if(artifactDB[itemName] !== undefined) {
+			// If the item is an artifact...
+			console.info("Item is an artifact");
+
+			if(artifactType > 4 || artifactType < 0) throw new Error("artifactType is out of range");
+
+			if(itemID === "") {
+				console.info("Item ID is blank or doesn't exist in artifactIDIndex for the arti")
+				itemData.id = newArtifact(itemName,rarity,artifactType);
+				console.log(itemData);
+			} else {
+				if(allArtifactGroupsWithOneType.indexOf(itemName) === -1) {
+					itemData = artifactInfoIndex[itemName][artifactTypes[artifactType]][artifactIDIndex[itemName][artifactTypes[artifactType]].indexOf(itemID)]
+				} else {
+					artifactType = allArtifactGroupsWithOneTypeIs[allArtifactGroupsWithOneType.indexOf(itemName)];
+					itemData = artifactInfoIndex[itemName][artifactIDIndex[itemName].indexOf(itemID)];
+				}
+				itemWasBlank = false;
+			}
+
+			// if(artifactIDIndex[itemName][artifactTypes[artifactType]] != undefined) {
+			// 	artifactIDIndex[itemName][artifactTypes[artifactType]]
+			// }
+
+			// Check if the usedIn stuff exists or not
+			if(itemData.usedIn === undefined) {
+				itemData.usedIn = {};
+				itemData.usedIn[char] = [setData.id];
+			} else if(itemData.usedIn[char] === undefined) {
+				itemData.usedIn[char] = [setData.id];
+			} else {
+				itemData.usedIn[char].push(setData.id);
+			}
+
+		} else if (weapDB[itemName] !== undefined) {
+			// If the item is a weapon...
+			console.info("Item is a weapon");
+			if (itemID === "") {
+				// Get new ID if itemID is empty string OR weapon with that ID doesn't exist
+				console.info("Item ID is blank or doesn't exist in weaponIDIndex for the weapon")
+				itemData.id = newWeapon(itemName);
+			} else {
+				// ID exists as a weapon and will be used instead
+				console.info("Item data exists for that ID")
+				itemData = weaponInfoIndex[itemName][weaponIDIndex[itemName].indexOf(itemID)];
+				itemWasBlank = false;
+			}
+			setData.weapon = itemData.id;
+			// Check if the usedIn stuff exists or not
+			if(itemData.usedIn === undefined) {
+				itemData.usedIn = {};
+				itemData.usedIn[char] = [setData.id];
+			} else if(itemData.usedIn[char] === undefined) {
+				itemData.usedIn[char] = [setData.id];
+			} else {
+				itemData.usedIn[char].push(setData.id);
+			}
+
+			// if(weaponIDIndex[itemName] === undefined) weaponIDIndex[itemName] = [itemData.id];
+			// if(weaponInfoIndex[itemName] === undefined) weaponInfoIndex[itemName] = [itemData];
+			weaponInfoIndex[itemName][weaponIDIndex[itemName].indexOf(itemData.id)] = itemData;
+			// console.log(charInfoIndex[char],charInfoIndex[char].sets,)
+			charInfoIndex[char].sets[setsIDIndex[char].indexOf(setData.id)] = setData;
+			
+
+			// Change image and rarities
+			get(char+"-equipWeaponImg").src = "images/weapon/"+spaceToUnderscore(itemName)+".png";
+
+			setLSItem(itemName,JSON.stringify(weaponInfoIndex[itemName]));
+		} else {
+			throw new Error("[addItemToCharSet] The item, \""+itemName+"\" could not be found in artifactDB or weapDB. If you're using an artifact, the item should be the artifact set name such as \"Lucky Dog\" and all items should not have quotation marks or apostrophes in their name.");
+		}
+		setLSItem(char,JSON.stringify(charInfoIndex[char]));
+	}
+
+	function updateEquipmentItemVisuals(itemName="",char="",itemID="",artifactSlot=-1) {
+		// itemName - name of the item (either weapon name or artifact set); use "undefined" to reset the image.
+		// char - name of the character to attach the item to
+		// itemID - id of the item; must not be left empty unless resetting item
+		// artifactSlot - number for which slot to use. -1 = weapon, 0 = flower, 1 = plume etc. this WILL throw an error if unset for artifacts.
+		// --
+		// This function will update the image, rarity star count, rarity background and any data- attributes. This will NOT remove nor edit existing items.
+		// setting itemName to `"undefined"` will reset the image to the default weapon for the character or the "fallback" artifact image for those.
+		// Picking the desired slot uses artifactSlot as -1 = weapon, 0 = flower, 1 = plume etc.
+		// itemID must NOT be left empty unless itemName is `"undefined"`
+
+		if(charDB[char] === undefined) throw new Error("Character does not exist in charDB");
+		
+		// Check for artifactSlot malfunctioning
+		if(artifactSlot < -1 || artifactSlot > 4) throw new Error("artifactSlot was out of bounds. It should be between -1 and 4 inclusive");
+
+		if(itemName !== "undefined") {
+			if(itemID === "") throw new Error("itemID was blank when it shouldn't be");
+			
+			// if(artifactSlot === -1) {
+			// 	// Weapons
+			// 	get(char+"-equipWeaponEdit").removeEventListener("click",editEquipmentItem);
+			// 	get(char+"-equipWeaponEdit").removeAttribute("data-itemid");
+			// 	get(char+"-equipWeaponImg").src = "images/icons/weapon/"+charDB[char].weapon+".png";
+			// 	get(char+"-equipWeaponImg").style = "filter: drop-shadow(0 0 5px white) drop-shadow(0 0 5px white)";
+			// 	get(char+"-equipWeaponRefinement").classList.remove("max");
+			// 	get(char+"-equipWeaponRefinementText").innerText = "1";
+			// 	get(char+"-equipWeaponIcon").classList.remove("rarity-1","rarity-2","rarity-3","rarity-4","rarity-5");
+			// 	get(char+"-equipWeaponRarity").removeAttribute("src");
+			// 	get(char+"-equipWeaponName").innerText = "No Weapon";
+			// } else {
+			// 	// Artifacts
+			// 	get(char+"-equipArtifactEdit"+artifactSlot).removeEventListener("click",editEquipmentItem);
+			// 	get(char+"-equipArtifactEdit"+artifactSlot).removeAttribute("data-itemid");
+			// 	get(char+"-equipArtifactImg"+artifactSlot).src = "images/artifacts/"+artifactTypes[artifactSlot]+"/fallback.png";
+			// 	get(char+"-equipArtifactIcon"+artifactSlot).classList.remove("rarity-1","rarity-2","rarity-3","rarity-4","rarity-5");
+			// 	get(char+"-equipArtifactRarity"+artifactSlot).removeAttribute("src");
+			// 	get(char+"-equipArtifactName"+artifactSlot).innerText = "No Artifact";
+			// }
+
+		} else {
+			// Resetting item stuff now
+			if(artifactSlot === -1) {
+				// Weapons
+				get(char+"-equipWeaponEdit").removeEventListener("click",editEquipmentItem);
+				get(char+"-equipWeaponEdit").removeAttribute("data-itemid");
+				get(char+"-equipWeaponImg").src = "images/icons/weapon/"+charDB[char].weapon+".png";
+				get(char+"-equipWeaponImg").style = "filter: drop-shadow(0 0 5px white) drop-shadow(0 0 5px white)";
+				get(char+"-equipWeaponRefinement").classList.remove("max");
+				get(char+"-equipWeaponRefinementText").innerText = "1";
+				get(char+"-equipWeaponIcon").classList.remove("rarity-1","rarity-2","rarity-3","rarity-4","rarity-5");
+				get(char+"-equipWeaponRarity").removeAttribute("src");
+				get(char+"-equipWeaponName").innerText = "No Weapon";
+			} else {
+				// Artifacts
+				get(char+"-equipArtifactEdit"+artifactSlot).removeEventListener("click",editEquipmentItem);
+				get(char+"-equipArtifactEdit"+artifactSlot).removeAttribute("data-itemid");
+				get(char+"-equipArtifactImg"+artifactSlot).src = "images/artifacts/"+artifactTypes[artifactSlot]+"/fallback.png";
+				get(char+"-equipArtifactIcon"+artifactSlot).classList.remove("rarity-1","rarity-2","rarity-3","rarity-4","rarity-5");
+				get(char+"-equipArtifactRarity"+artifactSlot).removeAttribute("src");
+				get(char+"-equipArtifactName"+artifactSlot).innerText = "No Artifact";
+			}
+		}
+		
+	}
+	
+	// Some helper functions for addItemToCharSet
+	function newCharacterSet(charName,extraData={}) {
+		// extraData is an object that can have any of the following keys: name="", artifacts=[], weapon="".
+
+		// Creates a new set for the character in question
+		// Returns the ID of the set
+		if(charDB[charName] === undefined) throw new Error("Character does not exist within charDB");
+		let setID = createID("set--"+charName);
+		let setData = {id:setID};
+		if(extraData.name !== undefined) setData.name = extraData.name;
+		if(extraData.weapon !== undefined) setData.weapon = extraData.weapon;
+		if(extraData.artifacts !== undefined) setData.artifacts = extraData.artifacts;
+
+		if(charInfoIndex[charName] == undefined) {
+			charInfoIndex[charName] = {sets:[setData]};
+		} else if (charInfoIndex[charName].sets == undefined) {
+			charInfoIndex[charName].sets = [setData];
+		} else {
+			charInfoIndex[charName].sets.push(setData);
+		}
+		if(setsIDIndex[charName] == undefined) {
+			setsIDIndex[charName] = [setID];
+		} else {
+			setsIDIndex[charName].push(setID);
+		}
+		return setID;
+	}
+	function newWeapon(weaponName) {
+		// Creates a new, blank Weapon. No stats attached to it just the ID.
+		// Returns the ID of the weapon.
+		if(weapDB[weaponName] === undefined) throw new Error("Weapon does not exist within weapDB");
+		let weaponID = createID("weap--"+weaponName);
+		if(weaponInfoIndex[weaponName] == undefined) {
+			weaponInfoIndex[weaponName] = [{id:weaponID}];
+		} else {
+			weaponInfoIndex[weaponName].push([{id:weaponID}]);
+		}
+		if(weaponIDIndex[weaponName] == undefined) {
+			weaponIDIndex[weaponName] = [weaponID];
+		} else {
+			weaponIDIndex[weaponName].push(weaponID);
+		}
+		return weaponID;
+	}
+	function newArtifact(artifactName,rarity,artifactType=-1) {
+		// Creates a new Artifact. No main nor substats are attached.
+		// Returns the ID of the artifact.
+		if(artifactDB[artifactName] === undefined) throw new Error("Artifact set does not exist within artifactDB");
+		var containsOnlyOne = false;
+		// Check if the Artifact set only contains a single type
+		if(allArtifactGroupsWithOneType.indexOf(artifactName) != -1) containsOnlyOne = true;
+		// Check rarity to make sure that's legit
+
+		if(!containsOnlyOne && (artifactType < 0 || artifactType >= 5)) throw new Error("artifactType is outside the range for the desired type");
+		let artifactID = createID("weap--"+artifactName+(containsOnlyOne?"":"--"+artifactTypes[artifactType]));
+		let artiData = {id:artifactID,rarity:rarity}
+		
+		// Add to artifactInfoIndex and artifactIDIndex
+		if(artifactInfoIndex[artifactName] === undefined) {
+			artifactInfoIndex[artifactName] = [];
+		}
+		if (artifactIDIndex[artifactName] === undefined) {
+			artifactIDIndex[artifactName] = [];
+		}
+
+		if (containsOnlyOne) {
+			// Stuff like the Prayers for/to sets
+			artifactInfoIndex[artifactName].push(artiData);
+			artifactIDIndex[artifactName].push(artifactID);
+		} else {
+			// All other sets
+			if (artifactIDIndex[artifactName][artifactTypes[artifactType]] === undefined) {
+				artifactIDIndex[artifactName][artifactTypes[artifactType]] = [];
+			}
+			if (artifactInfoIndex[artifactName][artifactTypes[artifactType]] === undefined) {
+				artifactInfoIndex[artifactName][artifactTypes[artifactType]] = [];
+			}
+			artifactInfoIndex[artifactName][artifactTypes[artifactType]].push(artiData);
+			artifactIDIndex[artifactName][artifactTypes[artifactType]].push(artifactID);
+		}
+		// console.log(artifactID);
+		return artifactID;
+	}
+
+	function createPopup(elemID) {
+		// elemID - ID of the given element to attach the popup to
+		// Creates a popup to mess about with but does not fill any contents except for empty title, search and close button.
+		if(get("popup") !== null) throw new Error("Only one popup is allowed to exist.");
+		if(get(elemID) === null) throw new Error("An element with that ID does not exist.");
+
+		get("html","tag")[0].classList.add("popupExists");
+		var popupElem = makeElem("div",undefined,"rendering","popup");
+		popupElem.classList.remove("rendering");
+		get(elemID).appendChild(popupElem);
+
+		// popupElem.addEventListener("transitionend",()=>{get("popup").focus()});
+		var topFlex = makeElem("div",undefined,"topFlex");
+		var popupTitle = makeElem("span",undefined,"popupTitle","popupTitle");
+		topFlex.appendChild(popupTitle);
+		var popupCloseButton = makeElem("button","Close","popupClose","popupClose");
+		popupCloseButton.addEventListener("click",removePopup);
+		topFlex.appendChild(popupCloseButton);
+		var popupBackButton = makeElem("button","Back","popupClose","popupBack");
+		popupBackButton.style.display = "none";
+		popupBackButton.addEventListener("click",goBackPopup);
+		topFlex.appendChild(popupBackButton);
+		popupElem.appendChild(topFlex);
+
+		popupElem.appendChild(makeElem("div",undefined,"popupContent","popupContent"));
+
+		var popupSearchContainer = makeElem("div",undefined,"popupSearchContainer");
+		popupSearchContainer.appendChild(makeLabelElem("Search: ","popupSearch"));
+		var popupSearchBox = makeElem("input",undefined,"popupSearch","popupSearch");
+		popupSearchBox.type = "text";
+		popupSearchBox.addEventListener("input",function(e){
+			searchDropdown(e.currentTarget.value,"popupResult");
+		});
+		popupSearchContainer.appendChild(popupSearchBox);
+		popupElem.appendChild(popupSearchContainer);
+		popupElem.appendChild(makeElem("div",undefined,"popupResults","popupResults"));
+	}
+	function addToPopupContent() {
+
+	}
+	function finishPopup() {
+		var popup = get("popup");
+		if(popup === null) throw new Error("No popup exists.");
+
+		var bodyRect = document.body.getBoundingClientRect();
+		var popupRect = popup.getBoundingClientRect();
+		var rect = {
+			top: popupRect.top - bodyRect.top,
+			left: popupRect.left,
+			width: popupRect.width,
+			height: popupRect.height
+		}
+		console.log("top", rect.top, "left", rect.left);
+
+		// popup.style = "left:"+(rect.left+rect.right)+"px;bottom:"+rect.bottom+"px";
+		popup.classList.remove("rendering");
+	}
+	function goBackPopup() {
+		// valid data-backaction values: "cycle"
+		var type = get("popup").getAttribute("data-backaction");
+		// cycle - changes which child element of popupContent is shown; must also have data-backorigin set to an int for what the child's placement is.
+		if(type === "cycle" && get("popup").getAttribute("data-backorigin") !== null) {
+			// moves visibility to back to child number data-backorigin of popupContent
+
+			get("popup").removeAttribute("data-backorigin");
+			return;
+		}
+		// If all else fails...
+		// Returns to search without saving anything
+		get("popupBack").style.display = "none";
+		get("popupClose").removeAttribute("style");
+		get("popup").classList.add("hideContent");
+		get("popupContent").children[0].remove();
+		get("popup").classList.remove("hideSearch");
+
+	}
+	function removePopup() {
+		get("html","tag")[0].classList.remove("popupExists");
+		get("popup").remove();
+	}
+
+
+	// Stuff for addEventListener and removeEventListener; used with checkboxes.
+	function ownedButton(e){charHideInfo(e.currentTarget.id);saveOwned(e.currentTarget)};
+	function hideButton(e){charHideInfo(e.currentTarget.id);saveHideInfo(e.currentTarget)};
+	function allowDeletion(e){saveOwned(e.currentTarget,true);confirmDeleteChar(e.currentTarget.id)};
+
+	loadPage();
 	</script>
 </html>

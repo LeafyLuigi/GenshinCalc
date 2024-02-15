@@ -101,7 +101,6 @@
 		"rarity": 3,
 		"type": "Sword",
 		"source": "NPC",
-		"canRefine": false,
 		"weapon": "guyunPillars",
 		"elite": "fatuiPyroAgent",
 		"common": "hilichurl"
@@ -932,6 +931,15 @@
 		"elite": "primalConstruct",
 		"common": "nobushi"
 	},
+	"Ultimate Overlords Mega Magic Sword": {
+		"rarity": 4,
+		"title": "\"Ultimate Overlord's Mega Magic Sword\"",
+		"type": "Claymore",
+		"source": "event",
+		"weapon": "pristineSeaGoblet",
+		"elite": "fatuiOperative",
+		"common": "clockworkMeka"
+	},
 	"Wandering Evenstar": {
 		"rarity": 4,
 		"type": "Catalyst",
@@ -1033,6 +1041,14 @@
 		"weapon": "pristineSeaGoblet",
 		"elite": "fatuiOperative",
 		"common": "transoceanic"
+	},
+	"Cranes Echoing Call": {
+		"rarity": 5,
+		"title": "Crane's Echoing Call",
+		"type": "Catalyst",
+		"weapon": "elixirs",
+		"elite": "fins",
+		"common": "samachurl"
 	},
 	"Elegy for the End": {
 		"rarity": 5,
@@ -1261,6 +1277,13 @@
 		"weapon": "scorchingMights",
 		"elite": "fungusStateShifted",
 		"common": "fungus"
+	},
+	"Verdict": {
+		"rarity": 5,
+		"type": "Claymore",
+		"weapon": "ancientChord",
+		"elite": "breacherPrimuses",
+		"common": "clockworkMeka"
 	},
 	"Vortex Vanquisher": {
 		"rarity": 5,

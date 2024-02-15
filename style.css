@@ -3,6 +3,7 @@ body {
   --page-background: #fff;
   --text-color: #000;
   --text-alt-color: #222;
+  --text-alt-color-2: #495366;
   --exp-color: #00f;
   --exp-text-color: #00f;
   --invalid: #f00;
@@ -11,12 +12,18 @@ body {
   --button-border: 2px outset #8f8f9d;
   --button-hover: #d0d0d7;
   --button-hover-border: 2px outset #676774;
-  --text-alt-color-2: #495366;
   --box-border-color: #495366;
   --text-on-light-color: #222;
   --tooltip: #e9e5dc;
   --tooltip-text: #000;
   --tooltip-border: 2px solid currentcolor;
+  --refinement-text: #495366;
+  --refinement-background: #00000080;
+  --refinement-max-text: #ffe14b;
+  --refinement-max-background: #ffde4b80;
+  --popup-text: #000;
+  --popup-background: #ebe4d6;
+  --popup-border: 2px solid #4a5366;
 }
 
 .theme-white {
@@ -37,6 +44,10 @@ body {
   --tooltip: #16161b;
   --tooltip-text: #f4e5c6;
   --tooltip-border: 2px solid currentcolor;
+  --refinement-text: #b4b4b4;
+  --refinement-background: #00000080;
+  --refinement-max-text: #ffe14b;
+  --refinement-max-background: #ffde4b80;
 }
 
 .theme-light {
@@ -61,13 +72,14 @@ body {
 }
 
 body {
-  background-color: var(--page-background);
+  background: var(--page-background);
   color: var(--text-color);
   line-height: 1.6;
   font-family: sans-serif;
+  direction: ltr;
 }
 
-a {
+:link {
   color: var(--links);
 }
 
@@ -81,11 +93,9 @@ a {
   align-items: center;
   width: 100%;
 }
-
 .loadingSpin {
   filter: drop-shadow(0 0 3px var(--text-color));
 }
-
 .loadingText {
   display: none;
 }
@@ -98,7 +108,7 @@ a {
     display: block;
   }
 }
-@media not (prefers-reduced-motion) {
+@media (prefers-reduced-motion) {
   body.noAnimation .loadingText {
     display: block;
   }
@@ -220,7 +230,7 @@ body:not(.showConverts) #convertsTotal {
 :is(.charDropdown, .weaponDropdown) input {
   max-width: 136px;
 }
-:is(.charDropdown, .weaponDropdown):hover .dropdownContent, :is(.charDropdown, .weaponDropdown).active .dropdownContent {
+:is(.charDropdown, .weaponDropdown):is(:focus-within, :hover, .active) .dropdownContent {
   display: block;
 }
 
@@ -253,7 +263,7 @@ body:not(.showConverts) #convertsTotal {
 .dropdownContent > .fauxButton {
   display: flex;
   justify-content: space-between;
-  min-width: inherit;
+  min-width: 100%;
   max-width: inherit;
 }
 .dropdownContent > .fauxButton > span:not([class]) {
@@ -279,7 +289,7 @@ body:not(.showConverts) #convertsTotal {
   margin-top: 8px;
 }
 
-:is(.testButton, .submitButton) {
+:is(.testButton, .submitButton, .clearInvButton) {
   white-space: unset;
   display: inline-block;
   height: -moz-fit-content;
@@ -350,30 +360,82 @@ body:not(.showConverts) #convertsTotal {
   --rarity-size: 8px;
 }
 
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon {
+:is(.rarity-0, .rarity-1) {
   background-color: #a2a2a2;
-  background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 82.35%, 82.36%, #e9e5dc 100%);
-  background-image: url(images/rarity/mini-1.png);
+  background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 100%);
+  background-image: url("images/rarity/1.png");
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-2 {
+
+:is(.micro, .tiny, .mini, .small, .normal) .itemIcon:is(.rarity-0, .rarity-1) {
+  background: #a2a2a2 none;
+  background: linear-gradient(to bottom, #707275 0%, #a2a2a2 82.35%, 82.36%, #e9e5dc 100%) top/cover no-repeat, transparent;
+  background: url("images/rarity/mini-1.png") top/cover no-repeat, transparent;
+}
+
+.rarity-2 {
   background-color: #6cad8d;
-  background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 82.35%, 82.36%, #e9e5dc 100%);
-  background-image: url(images/rarity/mini-2.png);
+  background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 100%);
+  background-image: url("images/rarity/2.png");
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-3 {
+
+:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-2 {
+  background: #6cad8d none;
+  background: linear-gradient(to bottom, #5c7670 0%, #6cad8d 82.35%, 82.36%, #e9e5dc 100%) top/cover no-repeat, transparent;
+  background: url("images/rarity/mini-2.png") top/cover no-repeat, transparent;
+}
+
+.rarity-3 {
   background-color: #6eaace;
-  background-image: linear-gradient(to bottom, #667896 0%, #6eaace 82.35%, 82.36%, #e9e5dc 100%);
-  background-image: url(images/rarity/mini-3.png);
+  background-image: linear-gradient(to bottom, #667896 0%, #6eaace 100%);
+  background-image: url("images/rarity/3.png");
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-4 {
+
+:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-3 {
+  background: #6eaace none;
+  background: linear-gradient(to bottom, #667896 0%, #6eaace 82.35%, 82.36%, #e9e5dc 100%) top/cover no-repeat, transparent;
+  background: url("images/rarity/mini-3.png") top/cover no-repeat, transparent;
+}
+
+.rarity-4 {
   background-color: #9674c5;
-  background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 82.35%, 82.36%, #e9e5dc 100%);
-  background-image: url(images/rarity/mini-4.png);
+  background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 100%);
+  background-image: url("images/rarity/4.png");
 }
-:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-5 {
+
+:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-4 {
+  background: #9674c5 none;
+  background: linear-gradient(to bottom, #65608c 0%, #9674c5 82.35%, 82.36%, #e9e5dc 100%) top/cover no-repeat, transparent;
+  background: url("images/rarity/mini-4.png") top/cover no-repeat, transparent;
+}
+
+.rarity-5 {
   background-color: #e09552;
-  background-image: linear-gradient(to bottom, #946a43 0%, #e09552 82.35%, 82.36%, #e9e5dc 100%);
-  background-image: url(images/rarity/mini-5.png);
+  background-image: linear-gradient(to bottom, #946a43 0%, #e09552 100%);
+  background-image: url("images/rarity/5.png");
+}
+
+:is(.micro, .tiny, .mini, .small, .normal) .itemIcon.rarity-5 {
+  background: #e09552 none;
+  background: linear-gradient(to bottom, #946a43 0%, #e09552 82.35%, 82.36%, #e9e5dc 100%) top/cover no-repeat, transparent;
+  background: url("images/rarity/mini-5.png") top/cover no-repeat, transparent;
+}
+
+.rarity-13 {
+  background: #a2a2a2 !important;
+  background: conic-gradient(from 0.1666666667turn, #6eaace 0turn 0.3333333333turn,#6cad8d 0.3333333333turn 0.6666666667turn,#a2a2a2 0.6666666667turn 1turn) top/auto var(--size) no-repeat, #e9e5dc !important;
+  background: url("images/rarity/mini-13.png") top/cover no-repeat, transparent !important;
+}
+
+.rarity-34 {
+  background: #6eaace !important;
+  background: conic-gradient(from 0.125turn, #9674c5 0turn 0.5turn,#6eaace 0.5turn 1turn) top/auto var(--size) no-repeat, #e9e5dc !important;
+  background: url("images/rarity/mini-34.png") top/cover no-repeat, transparent !important;
+}
+
+.rarity-45 {
+  background: #9674c5 !important;
+  background: conic-gradient(from 0.125turn, #e09552 0turn 0.5turn,#9674c5 0.5turn 1turn) top/auto var(--size) no-repeat, #e9e5dc !important;
+  background: url("images/rarity/mini-45.png") top/cover no-repeat, transparent !important;
 }
 
 .itemIconImg {
@@ -405,36 +467,6 @@ body:not(.showConverts) #convertsTotal {
   box-sizing: border-box;
   padding-block: 0;
   padding-inline: 2px;
-}
-
-.rarity-0, .rarity-1 {
-  background-color: #a2a2a2;
-  background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 100%);
-  background-image: url(images/rarity/1.png);
-}
-
-.rarity-2 {
-  background-color: #6cad8d;
-  background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 100%);
-  background-image: url(images/rarity/2.png);
-}
-
-.rarity-3 {
-  background-color: #6eaace;
-  background-image: linear-gradient(to bottom, #667896 0%, #6eaace 100%);
-  background-image: url(images/rarity/3.png);
-}
-
-.rarity-4 {
-  background-color: #9674c5;
-  background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 100%);
-  background-image: url(images/rarity/4.png);
-}
-
-.rarity-5 {
-  background-color: #e09552;
-  background-image: linear-gradient(to bottom, #946a43 0%, #e09552 100%);
-  background-image: url(images/rarity/5.png);
 }
 
 .outputRequired {
@@ -505,20 +537,23 @@ body:not(.showConverts) #convertsTotal {
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon) {
   font-size: 14px;
 }
+:is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon):is(.rarity-0, .rarity-1, .rarity-2, .rarity-3, .rarity-4, .rarity-5) {
+  background-position: -1px 0px;
+}
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon):is(.rarity-0, .rarity-1) {
-  background-image: linear-gradient(to right, #707275 0%, #a2a2a2 20%, transparent 44px);
+  background-image: linear-gradient(to right, #707275, #a2a2a2 20%, transparent 44px);
 }
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-2 {
-  background-image: linear-gradient(to right, #5c7670 0%, #6cad8d 20%, transparent 44px);
+  background-image: linear-gradient(to right, #5c7670, #6cad8d 20%, transparent 44px);
 }
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-3 {
-  background-image: linear-gradient(to right, #667896 0%, #6eaace 20%, transparent 44px);
+  background-image: linear-gradient(to right, #667896, #6eaace 20%, transparent 44px);
 }
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-4 {
-  background-image: linear-gradient(to right, #65608c 0%, #9674c5 20%, transparent 44px);
+  background-image: linear-gradient(to right, #65608c, #9674c5 20%, transparent 44px);
 }
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon).rarity-5 {
-  background-image: linear-gradient(to right, #946a43 0%, #e09552 20%, transparent 44px);
+  background-image: linear-gradient(to right, #946a43, #e09552 20%, transparent 44px);
 }
 
 .rarityIcon {
@@ -823,4 +858,143 @@ body:not(.showConverts) #convertsTotal {
 }
 .toggleNextVisible:checked + .hiddenDiv {
   display: block;
+}
+
+#links a:not(:last-child) {
+  margin-inline-end: 8px;
+}
+
+.skipLink:not([href]) {
+  display: none;
+}
+.skipLink[href] {
+  font-size: 0;
+}
+.skipLink[href]:not(:focus) {
+  margin: 0 !important;
+}
+.skipLink[href]:focus {
+  font-size: unset;
+}
+
+.equipmentDetails summary {
+  width: -moz-fit-content;
+  width: fit-content;
+}
+.equipmentDetails[open] summary {
+  margin-bottom: 10px;
+}
+.equipmentItems {
+  padding-block: 10px;
+  display: flex;
+  gap: 16px;
+}
+.equipmentEdit {
+  position: absolute;
+  top: -8px;
+  right: -8px;
+  padding: 0;
+  border: none;
+  background: none;
+  font-size: 0;
+  opacity: 0.5;
+}
+.equipmentEdit:hover, .equipmentEdit:focus {
+  opacity: 1;
+}
+.equipmentPopupContainer {
+  position: absolute;
+  z-index: 100;
+}
+.equipmentPopupContainer:empty {
+  display: none;
+}
+
+#popup {
+  position: absolute;
+  box-sizing: border-box;
+  padding: 4px;
+  color: var(--popup-text);
+  background: var(--popup-background);
+  border: var(--popup-border);
+  min-width: 50vw;
+  max-width: 80vw;
+  width: -moz-fit-content;
+  width: fit-content;
+}
+#popup.rendering {
+  visibility: hidden;
+  pointer-events: none;
+}
+
+html.popupExists {
+  overflow: hidden;
+}
+
+.popupTitle:not(:empty) {
+  margin-left: 4px;
+}
+.popupCloseButton {
+  padding: 0;
+  border: none;
+  background: none;
+}
+.popupSearchContainer {
+  display: block;
+  padding: 4px;
+}
+.hideSearch .popupSearchContainer {
+  display: none;
+}
+.popupResults {
+  display: flex;
+  flex-flow: row wrap;
+  gap: 4px;
+  padding: 0 8px;
+  justify-content: center;
+}
+.hideSearch .popupResults {
+  display: none;
+}
+.popupResult {
+  min-width: 60px;
+  min-height: 100px;
+  display: flex;
+  justify-content: center;
+  padding: 0;
+  border: none;
+  background: none;
+}
+.popupResult .itemName {
+  color: var(--popup-text);
+}
+.popupContent {
+  display: block;
+}
+.hideContent .popupContent {
+  display: none;
+}
+
+.equipDropdownReorder {
+  display: none;
+}
+.equipDropdownReorder:not(:nth-child(2), :nth-child(3)) {
+  display: block;
+}
+
+.refinementLevel {
+  position: absolute;
+  top: 4px;
+  left: 4px;
+  color: var(--refinement-text);
+  background-color: var(--refinement-background);
+  padding: 2px;
+  border-radius: 2px;
+}
+.refinementLevel.max {
+  color: var(--refinement-max-text);
+  background-color: var(--refinement-max-background);
+}
+:is(.rarity-0, .rarity-1, .rarity-2) .refinementLevel {
+  display: none;
 }

@@ -13,28 +13,29 @@
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
 	<body>
+		<noscript>You need to enable JavaScript to use this page. It's all open source and no data is sent between this site and third parties. <a href="https://github.com/LeafyLuigi/GenshinCalc">Click here to view the GitHub Repo.</a></noscript>
 		<div id="links"></div>
 		<div id="prefsContainer"></div>
-		<div class="addButtons">
+		<div class="addButtons" id="addButtons">
 			<div class="charDropdown" id="charDropdown">
 				<div class="fauxButton">
 					<img draggable="false" loading="lazy" id="dropdownCharIcon" class="dropdownCharImg" src="images/char/Unknown.png">
-					<input id="dropdownCharName" placeholder="Character" type="text" onfocusout="dropdownLoseFocus('charDropdown')" onfocusin="dropdownFocus('charDropdown')" oninput="searchDropdown(this.value,'charDropdownButton')">
+					<input id="dropdownCharName" placeholder="Character" type="text">
 				</div>
 			</div>
-			<div class="fauxButton" onclick="addCharacter(get('dropdownCharName').value);searchDropdown('','charDropdownButton')">Add Character</div>
+			<button id="addCharButton" class="fauxButton">Add Character</button>
 			<div class="weaponDropdown" id="weaponDropdown">
 				<div class="fauxButton">
 					<img draggable="false" loading="lazy" id="dropdownWeaponIcon" class="dropdownWeaponImg" src="images/weapon/Unknown.png">
-					<input id="dropdownWeaponName" placeholder="Weapon" type="text" onfocusout="dropdownLoseFocus('weaponDropdown')" onfocusin="dropdownFocus('weaponDropdown')" oninput="showExistingWeapons(this.value);searchDropdown(this.value,'weaponDropdownButton')">
+					<input id="dropdownWeaponName" placeholder="Weapon" type="text">
 				</div>
 			</div>
-			<div class="fauxButton" onclick="get('weaponDropdown','class')[0].classList.remove('unusedFound');addWeapon(allWeaponsLowerCase[removeQuotes(get('dropdownWeaponName').value.toLowerCase())]);searchDropdown('','weaponDropdownButton')">Add Weapon</div>
+			<button id="addWeaponButton" class="fauxButton">Add Weapon</button>
 		</div>
 		<em style="display:block">Do note that ascension is not tied to level and vice versa. You can completely remove specific weapons by setting all current stats to their minimum values.</em>
 		<div><strong>Known bug where changing a stats and adding a new char/weap reverts the changes. This is mostly visual with calculations prior to a reload using the pre-change numbers.</strong> <span>It should be fixed if I stop using innerHTML.</span></div>
 		<div id="inputs"></div>
-		<div id="testButton" class="fauxButton testButton">Click to calculate</div>
+		<button id="testButton" class="fauxButton testButton">Click to calculate</button>
 		<div class="invBlock empty">
 			<div id="totalOutput"></div>
 			<div id="whatDoYouHave"></div>
@@ -43,9 +44,6 @@
 			<div id="whatToObtain"></div>
 		</div>
 		<div class="fakeTextbox" id="textOutput"></div>
-		<footer style="font-size:12px;overflow-x:auto;">
-			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site, the interactive map and from the game itself. This site <strong>does not</strong> use Cookies and is completely open source. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
-		</footer>
 	</body>
 	
 	<script>
@@ -61,24 +59,43 @@
 			toggleAdvancedWeaponInputs();
 		}
 		await loadData();
+		get("skipLink").href = "#addButtons";
 
 		// Add Events
 		get("testButton").addEventListener("click",e=>test());
+		get("dropdownCharName").addEventListener("focusout",e=>dropdownLoseFocus("charDropdown"));
+		get("dropdownCharName").addEventListener("focusin",e=>dropdownFocus("charDropdown"));
+		get("dropdownCharName").addEventListener("input",e=>searchDropdown(e.currentTarget.value,"charDropdownButton"));
+		get("addCharButton").addEventListener("click",function(e){
+			addCharacter(get('dropdownCharName').value);
+			searchDropdown('','charDropdownButton');
+		});
+		get("dropdownWeaponName").addEventListener("focusout", e => dropdownLoseFocus("weaponDropdown"));
+		get("dropdownWeaponName").addEventListener("focusin", e => dropdownFocus("weaponDropdown"));
+		get("dropdownWeaponName").addEventListener("input", function(e){
+			showExistingWeapons(e.currentTarget.value);
+			searchDropdown(e.currentTarget.value, "weaponDropdownButton")
+		});
+		get("addWeaponButton").addEventListener("click", function (e) {
+			get('weaponDropdown','class')[0].classList.remove('unusedFound');
+			addWeapon(allWeaponsLowerCase[removeQuotes(get('dropdownWeaponName').value.toLowerCase())])
+			searchDropdown('', 'weaponDropdownButton');
+		});
 
 		// Generate Dropdowns
 		// Character
-		var dropdown = makeElem("div",undefined,"dropdownContent");
-		dropdown.id = "dropdownCharContent";
+		var dropdown = makeElem("div",undefined,"dropdownContent","dropdownCharContent");
+		dropdown.setAttribute("tabindex","-1");
 
 		for (var i in charDB) {
 			var charName = i;
 			var img = spaceToUnderscore(charName);
 			var rarity = charDB[i].rarity;
 			if (charName != "Traveler") {
-				if(charDB[charName].include === false) continue;
+				// if(charDB[charName].include === false) continue;
 				if(charDB[charName].visionType != null) vision += "_"+charDB[charName].visionType;
 
-				var charOuter = makeElem("div",undefined,["charDropdownButton","fauxButton","rarity-"+rarity]);
+				var charOuter = makeElem("button",undefined,["charDropdownButton","fauxButton","rarity-"+rarity]);
 				if(charName == "Aloy") {
 					charOuter.classList.add("limited");
 				}
@@ -112,7 +129,7 @@
 					if (charDB[i].regions[j].include === false) continue;
 					var travVariant = charDB[i].regions[j];
 
-					var charOuter = makeElem("div",undefined,["charDropdownButton","fauxButton","rarity-"+rarity]);
+					var charOuter = makeElem("button",undefined,["charDropdownButton","fauxButton","rarity-"+rarity]);
 
 					if(travVariant.type == "Unaligned") {
 						charOuter.classList.add("limited");
@@ -122,9 +139,10 @@
 					});
 					charOuter.setAttribute("name",travVariant.type+" "+charName);
 					charOuter.setAttribute("data-num",j);
-
-					charOuter.appendChild(makeImg("images/char/"+img+".png",32,32,["dropdownCharImg"]));
-					charOuter.appendChild(makeElem("span",travVariant.type+" "+charName));
+					var imgName = makeElem("span");
+					imgName.appendChild(makeImg("images/char/"+img+".png",32,32,["dropdownCharImg"]));
+					imgName.appendChild(makeElem("span",travVariant.type+" "+charName));
+					charOuter.appendChild(imgName);
 					var charIconsGroup = makeElem("span",undefined,"iconsGroup");
 					charIconsGroup.appendChild(makeImg("images/icons/visions/Traveler_"+travVariant.type+".png",48,48,["dropdownType","extraIcon","vision"]));
 					charIconsGroup.appendChild(makeImg("images/icons/weapon/"+charDB["Traveler"].weapon+".png",32,32,["dropdownType","extraIcon"]));
@@ -136,17 +154,17 @@
 		get("charDropdown").appendChild(dropdown);
 
 		// Weapon
-		dropdown = makeElem("div",undefined,"dropdownContent");
-		dropdown.id = "dropdownWeaponContent";
+		dropdown = makeElem("div",undefined,"dropdownContent","dropdownWeaponContent");
+		dropdown.setAttribute("tabindex","-1");
 		for (var i in weapDB) {
 			var weapName = i;
-			if(weapDB[weapName].include === false) continue;
+			// if(weapDB[weapName].include === false) continue;
 			var title = weapName;
 			var rarity = weapDB[i].rarity;
 			var img = spaceToUnderscore(weapName);
 			if (weapDB[i].title != undefined) title = weapDB[i].title;
 
-			var weapOuter = makeElem("div",undefined,["weaponDropdownButton","fauxButton","rarity-"+rarity]);
+			var weapOuter = makeElem("button",undefined,["weaponDropdownButton","fauxButton","rarity-"+rarity]);
 			if(weapDB[i].source != undefined && weapDB[i].source == "event") {
 				weapOuter.classList.add("limited");
 			}
@@ -170,29 +188,31 @@
 			dropdown.appendChild(weapOuter);
 		}
 		get("weaponDropdown").appendChild(dropdown);
-		var unusedWeaponsDropdown = makeElem("div",undefined,"unusedWeaponsDropdown");
-		unusedWeaponsDropdown.id = "unusedWeaponsDropdown";
+		var unusedWeaponsDropdown = makeElem("div",undefined,"unusedWeaponsDropdown","unusedWeaponsDropdown");
+		dropdown.setAttribute("tabindex","-1");
 		get("weaponDropdown").appendChild(unusedWeaponsDropdown)
 		
+		// Create boxes and add items to weapInfoIndex/charInfoIndex if need be
 		selectedChars = getSelectedChars();
 		if(selectedChars != null) {
 			selectedCharsIndex = selectedChars.map(i => {
-				if (i.id != undefined) { return i.id }
-				if (i.useTravElement != undefined && i.name == undefined) { return i.useTravElement }
+				if (i.id !== undefined) { return i.id }
+				if (i.useTravElement !== undefined && i.name === undefined) { return i.useTravElement }
 				return i.name;
 			});
-			let travPosition = selectedCharsIndex.indexOf("Traveler") != -1 ? selectedCharsIndex.indexOf("Traveler") : null;
+			let travPosition = selectedCharsIndex.indexOf("Traveler") !== -1 ? selectedCharsIndex.indexOf("Traveler") : null;
 			for(let i = 0; i < selectedChars.length; i++) {
 				let item = selectedChars[i]; 
+				console.log(item)
 				if(travPosition !== null && item.name == "Traveler") {
 					// Initial Traveler of any type
 					addCharacter("Traveler",true,item.useTravElement,item.targetExp,item.byElement[item.useTravElement].targetTalents,item.ascension);
-				} else if(travPosition !== null && item.name == undefined) {
+				} else if(travPosition !== null && item.name === undefined) {
 					// More Travelers of other types
 					addCharacter(null,true,item.useTravElement,null,selectedChars[travPosition].byElement[item.useTravElement].targetTalents,undefined);
 				} else if(charDB[item.name] != undefined) {
 					// other Characters
-					addCharacter(item.name,true);
+					addCharacter(item.name,true,null,item.targetExp,item.targetTalents,item.ascension);
 				} else {
 					console.log(item)
 					addWeapon(item.name,true,item.id,item.targetExp,item.ascension)
@@ -204,7 +224,7 @@
 		}
 	};
 
-	var showExistingWeapons = (weaponName) => {
+	function showExistingWeapons (weaponName) {
 		// trigger on #dropdownWeaponName matches a weapon [done]
 		// go through weaponIDIndex[<weaponName>]
 		// ids not in selectedCharsIndex should be displayed with current stats and who they're used by
@@ -212,86 +232,103 @@
 		if(weaponName === "") return; // skip empty strings
 		weaponName = removeQuotes(weaponName.toLowerCase());
 		if(allWeaponsLowerCase[weaponName] === undefined) return; // skip not-found weapons
-		if(weapDB[allWeaponsLowerCase[weaponName]].include === false) return; // skip include false
+		// if(weapDB[allWeaponsLowerCase[weaponName]].include === false) return; // skip include false
 		let weapon = allWeaponsLowerCase[weaponName];
 		if(weaponIDIndex[weapon] === undefined) return; // skip when no weapons are found
-		console.log(weapon)
+		console.log("weapon",weapon)
 		let rarity = weapDB[weapon].rarity;
 		const unusedWeapons = []; // "unused" being exists in LS but not in selectedChars
 
 		let lsItem = parseLSItem(weapon,[]);
+		console.log("lsItem",lsItem)
 		if(JSON.stringify(lsItem) === "[]") return; // Abort on broken weapon.
 
 		for(let i in weaponIDIndex[weapon]) {
 			let item = weaponIDIndex[weapon][i];
 			if(selectedCharsIndex.indexOf(item) === -1) unusedWeapons.push(item);
 		}
+		console.log("unusedWeapons",unusedWeapons,"len",unusedWeapons.length)
 		if(unusedWeapons.length === 0) return; // if no unused weapons are found this shouldn't be ran anymore.
 
-		get("addButtons","class")[0].children[3].classList.add("disabled");
+		get("addWeaponButton").classList.add("disabled");
 		get("weaponDropdown","class")[0].classList.add("unusedFound");
 		console.log(unusedWeapons)
-		var html = "";
+		var elem = makeElem("div");
+		// var html = "";
 		for(let i in unusedWeapons) {
 			let item = lsItem[weaponIDIndex[weapon].indexOf(unusedWeapons[i])]; // info about the weapon
 			if(item==undefined) continue;
 			// console.log(item);
-			html += "<div class=\"fauxButton\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"',false,'"+item.id+"')\">";
+			let buttonElem = makeElem("button",undefined,"fauxButton");
+			buttonElem.setAttribute("data-weap",weapon);
+			buttonElem.setAttribute("data-id",item.id);
+			buttonElem.addEventListener("click",function(e){
+				clearExistingWeapons();
+				addWeapon(e.currentTarget.getAttribute("data-weap"),false,e.currentTarget.getAttribute("data-id"));
+			});
+			var text = "";
+			// html += "<div class=\"fauxButton\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"',false,'"+item.id+"')\">";
 			// exp stuff
 			let exp = getLevelFromExp("weap",item.exp,rarity);
-			console.log(exp)
-			html+="Level "+exp[0]+"/"+(weapLevelValues[rarity-1].length+1);
+			// console.log(exp)
+			text = "Level "+exp[0]+"/"+(weapLevelValues[rarity-1].length+1);
+			// html+="Level "+exp[0]+"/"+(weapLevelValues[rarity-1].length+1);
 			if(exp[0] != (weapLevelValues[rarity-1].length+1)) {
+				text += ", "+exp[1]+"/"+weapLevelValues[rarity-1][exp[0]-1];
 				// TODO add small bar for fun
-				html+=", "+exp[1]+"/"+weapLevelValues[rarity-1][exp[0]-1];
+				// html+=", "+exp[1]+"/"+weapLevelValues[rarity-1][exp[0]-1];
 			}
 			// ascension
-			html+=" | Ascension "+(item.ascension != undefined ? item.ascension : 0);
+			text += " | Ascension "+(item.ascension != undefined ? item.ascension : 0)+"/"+weapAscValues[rarity-1].length;
+			// html+=" | Ascension "+(item.ascension != undefined ? item.ascension : 0);
 			// refinement
 			if(rarity > 2 && weapDB[weapon].canRefine != false) {
-				html+=" | Refinement "+(item.refinement != undefined ? item.refinement : 1);
+				text += " | Refinement "+(item.refinement != undefined ? item.refinement : 1);
+				// html+=" | Refinement "+(item.refinement != undefined ? item.refinement : 1);
 			}
-			html+="</div>";
+			buttonElem.appendChild(makeElem(undefined,text));
+			elem.appendChild(buttonElem);
+			// html+="</div>";
 		}
-		html += "<div style=\"display:flex\">";
-		html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"')\">Add New</div>";
-		html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons()\">Cancel</div>";
-		html += "</div>";
-		get("unusedWeaponsDropdown").innerHTML = html;
+		let flexBox = makeElem("div");
+		flexBox.style = "display:flex";
+		let addNew = makeElem("button","Add New","fauxButton");
+		addNew.style = "flex:1";
+		addNew.setAttribute("data-weapon",weapon);
+		addNew.addEventListener("click",function(e){
+			clearExistingWeapons();
+			addWeapon(e.currentTarget.getAttribute("data-weapon"));
+		})
+		flexBox.appendChild(addNew);
+		let cancel = makeElem("button","Cancel","fauxButton");
+		cancel.style = "flex:1";
+		cancel.addEventListener("click",e=>clearExistingWeapons());
+		flexBox.appendChild(cancel);
+		elem.appendChild(flexBox);
+		get("unusedWeaponsDropdown").appendChild(elem);
+		// html += "<div style=\"display:flex\">";
+		// html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons();addWeapon('"+weapon+"')\">Add New</div>";
+		// html += "<div class=\"fauxButton\" style=\"flex:1\" onclick=\"clearExistingWeapons()\">Cancel</div>";
+		// html += "</div>";
+		// get("unusedWeaponsDropdown").innerHTML = html;
 	}
-	var clearExistingWeapons = () => {
+	function clearExistingWeapons() {
+		get("unusedWeaponsDropdown").innerHTML = "";
 		get("unusedFound","class")[0].classList.remove("unusedFound");
-		get("addButtons","class")[0].children[3].classList.remove("disabled");
+		get("addWeaponButton").classList.remove("disabled");
 		get("dropdownWeaponName").value="";
 		get("dropdownWeaponIcon").src="images/weapon/Unknown.png";
 		searchDropdown("","weaponDropdownButton");
 	}
 
-	var searchDropdown = (string,className) => {
-		// TODO? - Sort by closest match? ie searching "zh" should bring Zhongli first then Baizhu.
-		var buttons = get(className,"class");
-		if(string != "") {
-				for(var i = 0; i < buttons.length; i++) {
-				if(buttons[i].getAttribute("name").toLowerCase().indexOf(string.toLowerCase()) == -1) {
-					buttons[i].style = "display:none";
-				} else {
-					buttons[i].removeAttribute("style");
-				}
-			}
-		} else {
-			for(var i = 0; i < buttons.length; i++) {
-				buttons[i].removeAttribute("style");
-			}
-		}
-	}
-	var dropdownFocus = (parentClass) => {
+	function dropdownFocus (parentClass) {
 		get(parentClass,"class")[0].classList.add("active");
 	}
-	var dropdownLoseFocus = (parentClass) => {
+	function dropdownLoseFocus (parentClass) {
 		get(parentClass,"class")[0].classList.remove("active");
 	}
 
-	var test = () => {
+	function test () {
 		var neededItems;
 		if (selectedCharsIndex.length == 0) return;
 		resetItemLists();
@@ -302,7 +339,7 @@
 			let id = item.id != undefined ? item.id : null;
 			let name = item.name != undefined ? item.name : null;
 			var outputElem = makeElem("div");
-			var html = "";
+			// var html = "";
 			if(id === null) {
 				var charData, charSet = false;
 				let travType = null;
@@ -360,20 +397,10 @@
 					if (!skip) neededItems = {};
 					if (i == 0) {
 						// html+="<div>";
-
-						var showExpLabel = makeElem("label","Show Exp Requirements?");
-						showExpLabel.setAttribute("for",name+"-toggleExpVisibility");
-						outputElem.appendChild(showExpLabel);
+						var detailsElem = makeElem("details");
+						detailsElem.appendChild(makeElem("summary","Show Exp Requirements?"));
 						// html+="<label for=\""+name+"-toggleExpVisibility\">Show Exp Requirements?</label>";
-
-						var showExpCheckbox = makeElem("input",undefined,"toggleNextVisible");
-						showExpCheckbox.id = name+"-toggleExpVisibility";
-						showExpCheckbox.type = "checkbox";
-						showExpCheckbox.setAttribute("name",showExpCheckbox.id);
-						outputElem.appendChild(showExpCheckbox);
 						// html+="<input id=\""+name+"-toggleExpVisibility\" type=\"checkbox\" class=\"toggleNextVisible\">";
-						
-						var requiredExpItemsDiv = makeElem("div",undefined,"hiddenDiv");
 						// html+="<div class=\"hiddenDiv\">";
 
 						let exp = charStats[0] != undefined ? charStats[0] : 0;
@@ -408,7 +435,7 @@
 						for(let i = ascBand; i < arr.length; i++) {
 							neededItems = {};
 							var remainingExpInBand = i == ascBand ? arr[i] - exp : arr[i] - arr[i-1];
-							while(remainingExpInBand >= 0) {
+							while(remainingExpInBand > 0) {
 								if(remainingExpInBand - charExpItems[0] >= 0) {
 									neededItems = addItem(itemGroupDB.charExp.items[0],1,neededItems);
 									remainingExpInBand -= charExpItems[0];
@@ -431,18 +458,18 @@
 								neededItems[itemGroupDB.charExp.items[1]] = neededItems[itemGroupDB.charExp.items[1]] % 4;
 							}
 
-							requiredExpItemsDiv.appendChild(makeElem("span","Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",charStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+":"));
+							detailsElem.appendChild(makeElem("span","Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",charStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+":"));
 							// html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",charStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
 
 							if(remainingExpInBand != 0) {
 								// html+=" A total of "+(-remainingExpInBand)+" Exp is wasted.";
-								requiredExpItemsDiv.appendChild(makeElem("em"," A total of "+(-remainingExpInBand)+" Exp is wasted."));
+								detailsElem.appendChild(makeElem("em"," A total of "+(-remainingExpInBand)+" Exp is wasted."));
 							}
 							// html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
-							requiredExpItemsDiv.appendChild(getItemsNeeded(neededItems, "tiny"));
+							detailsElem.appendChild(getItemsNeeded(neededItems, "tiny"));
 							charItems = mergeItems(neededItems, charItems)
 						}
-						outputElem.appendChild(requiredExpItemsDiv);
+						outputElem.appendChild(detailsElem);
 						outputElem.appendChild(makeElem("br"))
 						// html+="</div>";
 						// html+="</div>";
@@ -528,9 +555,12 @@
 					if(i == 0) { // level and exp
 						// console.log("weapon level/exp calculations not correctly implemented")
 						// continue;
-						html+="<div><label for=\""+id+"-toggleExpVisibility\">Show Exp Requirements?</label>";
-						html+="<input id=\""+id+"-toggleExpVisibility\" type=\"checkbox\" class=\"toggleNextVisible\">";
-						html+="<div class=\"hiddenDiv\">";
+						var detailsElem = makeElem("details");
+						detailsElem.appendChild(makeElem("summary","Show Exp Requirements?"));
+						// html+="<label for=\""+id+"-toggleExpVisibility\">Show Exp Requirements?</label>";
+						// html+="<input id=\""+id+"-toggleExpVisibility\" type=\"checkbox\" class=\"toggleNextVisible\">";
+						// html+="<div class=\"hiddenDiv\">";
+
 						let exp = weapStats[0] != undefined ? weapStats[0] : 0;
 						let expTarget = targets[0] != undefined ? targets[0] : 0;
 						let level = getLevelFromExp("weap",exp,rarity)[0];
@@ -549,21 +579,21 @@
 						}
 						// console.log("ascBand",ascBand,"expCurrent",weapStats[0],"expTarget",targets[0]);
 						let arr = [];
-						for(let i = 0; i < charAscAtExp.length && arr[(i-1)] != expTarget; i++) {
-							if(charAscAtExp[i] < expTarget) {
-								arr.push(charAscAtExp[i]);
+						for(let i = 0; i < weapAscAtExp[rarity-1].length && arr[(i-1)] != expTarget; i++) {
+							if(weapAscAtExp[rarity-1][i] < expTarget) {
+								arr.push(weapAscAtExp[rarity-1][i]);
 							} else {
 								arr.push(expTarget);
 							}
 						}
-						if(JSON.stringify(charAscAtExp) == JSON.stringify(arr) && charAscAtExp[charAscAtExp.length - 1] < expTarget) {
+						if(JSON.stringify(weapAscAtExp[rarity-1]) == JSON.stringify(arr) && weapAscAtExp[rarity-1][weapAscAtExp[rarity-1].length - 1] < expTarget) {
 							arr.push(expTarget);
 						}
 
 						for(let i = ascBand; i < arr.length; i++) {
 							let neededItems = {};
 							var remainingExpInBand = i == ascBand ? arr[i] - exp : arr[i] - arr[i-1];
-							while(remainingExpInBand >= 0) {
+							while(remainingExpInBand > 0) {
 								if(remainingExpInBand - weapExpItems[0] >= 0) {
 									neededItems = addItem(itemGroupDB.weapExp.items[0],1,neededItems);
 									remainingExpInBand -= weapExpItems[0];
@@ -587,13 +617,27 @@
 								neededItems[itemGroupDB.weapExp.items[1]] = neededItems[itemGroupDB.weapExp.items[1]] % 5;
 							}
 
-							html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",weapStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
-							if(remainingExpInBand != 0) html+=" A total of "+(-remainingExpInBand)+" Exp is wasted."
-							html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+							// html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",weapStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
+							// if(remainingExpInBand != 0) html+=" A total of "+(-remainingExpInBand)+" Exp is wasted."
+							// html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+							
+							detailsElem.appendChild(makeElem("span","Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("weap",arr[i-1],rarity)[0] : getLevelFromExp("weap",weapStats[0],rarity)[0])+" to "+getLevelFromExp("weap",arr[i],rarity)[0]+":"));
+							// html+="Required items to level up from "+(arr[i-1] != undefined ? getLevelFromExp("char",arr[i-1])[0] : getLevelFromExp("char",weapStats[0])[0])+" to "+getLevelFromExp("char",arr[i])[0]+".";
+
+							if(remainingExpInBand != 0) {
+								// html+=" A total of "+(-remainingExpInBand)+" Exp is wasted.";
+								detailsElem.appendChild(makeElem("em"," A total of "+(-remainingExpInBand)+" Exp is wasted."));
+							}
+							// html += "<div class=\"outputRequired\">" + getItemsNeeded(neededItems, "tiny") + "</div>";
+							detailsElem.appendChild(getItemsNeeded(neededItems, "tiny"));
+							// charItems = mergeItems(neededItems, charItems)
+							
 							weapItems = mergeItems(neededItems, weapItems)
 						}
-						html+="</div></div>";
-						neededItems = mergeItems(weapItems,neededItems);
+						outputElem.appendChild(detailsElem);
+						outputElem.appendChild(makeElem("br"))
+						// html+="</div></div>";
+						// neededItems = mergeItems(weapItems,neededItems);
 						continue;
 					}
 					if(i == 1) { // ascension
@@ -609,12 +653,17 @@
 								}
 							}
 						}
-						html += "The required materials for leveling ascension from "+weapStats[1]+" to "+targets[1]+" are:";
-						html += "<div class=\"outputRequired\">"+getItemsNeeded(weapItems, "mini")+"</div>";
+						outputElem.appendChild(makeElem("span","The required materials for leveling ascension from "+weapStats[1]+" to "+targets[1]+" are:"));
+						// html += "The required materials for leveling ascension from "+weapStats[1]+" to "+targets[1]+" are:";
+						
+						outputElem.appendChild(getItemsNeeded(weapItems, "mini"));
+						// html += "<div class=\"outputRequired\">"+getItemsNeeded(weapItems, "mini")+"</div>";
+
 					}
 					items = mergeItems(weapItems, items);
 				}
-				get(id+"-output").innerHTML = html;
+				get(id+"-output").appendChild(outputElem)
+				// get(id+"-output").innerHTML = html;
 			}
 
 		}
@@ -633,8 +682,7 @@
 		get("whatDoYouHave").appendChild(askUserForItems(items));
 
 		// Convert Elements
-		var showConvertsElem = makeElem("div");
-		showConvertsElem.id = "converts";
+		var showConvertsElem = makeElem("div",undefined,undefined,"converts");
 		// Hide it if showConverts is false
 		if(!getPref("prefs","showConverts")) {
 			showConvertsElem.style = "display:none";
@@ -702,14 +750,10 @@
 		console.log("convertedGroups",convertedGroups,"skipConvItems",skipConvertItems,"convItemsNeeded",convertedItemsNeeded);
 		showConvertsElem.appendChild(askUserForConvertItems(convertedItemsNeeded))
 
-		
-
-
 		get("whatDoYouHave").appendChild(showConvertsElem)
-
 		get("whatDoYouHave").appendChild(makeElem("br"));
 
-		var submitButton = makeElem("div","Submit",["submitButton","fauxButton"]);
+		var submitButton = makeElem("button","Submit",["submitButton","fauxButton"]);
 		submitButton.addEventListener("click",function(e){
 			getItemsRemaining()
 		});
@@ -760,11 +804,10 @@
 				value = 0;
 			}
 			var askForItemElem = makeElem("div",undefined,"askForItem");
-			var inputElem = makeElem("input",undefined,"userInvInput");
+			var inputElem = makeElem("input",undefined,"userInvInput","userItemCount"+itemKeys[i]);
 			inputElem.type = "number";
 			inputElem.min = "0";
 			inputElem.valueAsNumber = value;
-			inputElem.id = "userItemCount"+itemKeys[i];
 			inputElem.addEventListener("wheel",function(e){
 				adjustStep(e.currentTarget.id,true);
 			});
@@ -791,11 +834,10 @@
 				value = 0;
 			}
 			var askForItemElem = makeElem("div", undefined, "askForItem");
-			var inputElem = makeElem("input", undefined, "userInvInput");
+			var inputElem = makeElem("input", undefined, "userInvInput","userItemCount"+itemKeys[i]);
 			inputElem.type = "number";
 			inputElem.min = "0";
 			inputElem.valueAsNumber = value;
-			inputElem.id = "userItemCount" + itemKeys[i];
 			inputElem.addEventListener("wheel", function (e) {
 				adjustStep(e.currentTarget.id, true);
 			});
@@ -808,7 +850,7 @@
 		return elem;
 	}
 
-	// var toggleConverts = (state=false) => {
+	// function toggleConverts (state=false) {
 	// 	get("toggleConverts").innerText = "Hide Converts?";
 	// 	prefs.showConverts = true;
 	// 	var html = "<br><div class=\"outputRequired\">";
@@ -878,7 +920,7 @@
 	// }
 
 	// calc what's needed minus has
-	var getItemsRemaining = () => {
+	function getItemsRemaining () {
 		get("whatToObtain").innerHTML = "";
 		get("textOutput").innerText = "";
 		var userItemsLeft = {};
@@ -1003,8 +1045,7 @@
 			}
 			elem.appendChild(craftUpElem);
 
-			var convertedItems = makeElem("div");
-			convertedItems.id = "convertsTotal";
+			var convertedItems = makeElem("div",undefined,undefined,"convertsTotal");
 			if(!getPref("prefs","showConverts")) {
 				convertedItems.style = "display:none";
 			}
@@ -1017,18 +1058,18 @@
 			convertedItems.appendChild(convertedItemsList);
 			elem.appendChild(convertedItems)
 
-			// var textOutput = "You need to obtain the following lowest-tier equivalents:";
-			// for (var i in userItemsLeftKeys) {
-			// 	if (userItemsLeft[userItemsLeftKeys[i]] < 1) continue;
-			// 	textOutput += "<br>" + userItemsLeftKeys[i] + " x " + userItemsLeft[userItemsLeftKeys[i]];
-			// }
-			// get("textOutput").innerHTML = textOutput;
+			get("textOutput").appendChild(makeElem("span","You need to obtain the following lowest-tier equivalents:"));
+			for (var i in userItemsLeftKeys) {
+				if (userItemsLeft[userItemsLeftKeys[i]] < 1) continue;
+				get("textOutput").appendChild(makeElem("br"));
+				get("textOutput").appendChild(makeElem("span",userItemsLeftKeys[i] + " x " + userItemsLeft[userItemsLeftKeys[i]]));
+			}
 
 			for (var i in userItemsLeftKeys) {
 				if (userItemsLeft[userItemsLeftKeys[i]] >= 0) continue;
 				remainder[userItemsLeftKeys[i]] = -1 * userItemsLeft[userItemsLeftKeys[i]]
 			}
-			if (remainder.length != 0) {
+			if (Object.keys(remainder).length != 0) {
 				elem.appendChild(makeElem("div","You will be left with the following items:","boxSubtitle"));
 				var highQualityUsedNote = makeElem("em","(assuming all higher rarity items are used first)");
 				highQualityUsedNote.style= "display:block;font-size:13.3333px";
@@ -1046,7 +1087,7 @@
 		get("whatToObtain").appendChild(elem);
 	}
 
-	var resetItemLists = () => {
+	function resetItemLists () {
 		travelerAscensionDone = false;
 		items = {};
 		get("invBlock","class")[0].classList.add("empty");

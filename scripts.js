@@ -27,6 +27,8 @@ function get(id,option=null) {
 			return elementsWithOnlyClass;
 		case "name":
 			return document.getElementsByName(id);
+		case "tag":
+			return document.getElementsByTagName(id);
 		default:
 			throw new Error("An unknown option was used.");
 	}
@@ -36,9 +38,10 @@ function toggleClass(element, className) {
 }
 
 // Placement of HTML Elements is not done within this function.
-function makeElem(tag,textContent=undefined,classList=[]) {
+function makeElem(tag,textContent=undefined,classList=[],id) {
 	// Optional textContent that puts text at the START of the element.
 	// Optional classList for a list of classes. can be a space-separated string list or an array
+	// Optional id for the element's id
 	if(tag === undefined && typeof(textContent) === "string") {
 		return document.createTextNode(textContent);
 	} else if(typeof(tag) !== "string") {
@@ -50,7 +53,7 @@ function makeElem(tag,textContent=undefined,classList=[]) {
 	try {
 		let elem = Object.assign(document.createElement(tag));
 		if(typeof(textContent) === "number") {
-			textContent += "";
+			textContent = textContent.toString();
 		}
 		if(typeof(textContent) === "string") {
 			elem.textContent = textContent;
@@ -66,8 +69,15 @@ function makeElem(tag,textContent=undefined,classList=[]) {
 			for(let i in classList) {
 				elem.classList.add(classList[i]);
 			}
-		} else {
+		} else if(classList !== undefined) {
 			console.warn("[makeElem] classList was not valid. The element will not have any classes on it.")
+		}
+		if(typeof(id) === "string" && id !== "") {
+			if(get(id) !== null) {
+				console.warn("[makeElem] An element with that ID already exists. The newly created element will not have an ID.")
+			} else {
+				elem.id = id;
+			}
 		}
 		return elem;
 	}
@@ -191,6 +201,11 @@ var parseHTMLSafe = (string) => {
 var parseHTMLUnsafe = (string) => {
 	return string.replace(/&amp;/g,"&").replace(/&quot;/g,'"').replace(/&#39;/g,"'").replace(/&lt;/g,"<").replace(/&gt;/g,">");
 }
+// technically not regex but useful
+function capitalise(str) {
+	if(str.length === 1) return str.toUpperCase();
+	return str.slice(0,1).toUpperCase()+str.slice(1);
+}
 
 // Pick Character
 var pickChar = (choice,travType=null) => {
@@ -312,7 +327,6 @@ function makeItemIcon (item,count=1,rarity=-1,size="mini",showSource=false,force
 	}
 
 	var type, img;
-	// var html="";
 
 	if(itemDB[item] == undefined) {
 		if(!forcedValues) {
@@ -339,45 +353,22 @@ function makeItemIcon (item,count=1,rarity=-1,size="mini",showSource=false,force
 		img = spaceToUnderscore(item);
 		if(rarity == -1) rarity = itemDB[item].rarity;
 	}
-	// html = "<div class=\"itemIconContainer ";
 	var itemElem = makeElem("div",undefined,"itemIconContainer");
 	if(size == "micro" || size == "tiny" || size == "mini" || size == "small" || size == "normal") {
 		itemElem.classList.add(size);
 	}
-	// html += "\">;
-	// html += "<div class=\"itemIcon";
 	var itemIconElem = makeElem("div",undefined,"itemIcon");
 	if(rarity != undefined && rarity != 0) {
 		itemIconElem.classList.add("rarity-"+rarity);
-		// html+= " rarity-"+rarity;
-	}
-	// html += "\">";
-	if(showSource && itemDB[item].source != undefined) {
-		var showSrcImg = makeImg("images/icons/info.svg",20,20,["itemSource"]);
-		showSrcImg.addEventListener("click",function(e){
-			toggleClass(e.currentTarget,"active");
-		})
-		itemIconElem.appendChild(showSrcImg);
-		itemIconElem.appendChild(makeElem("div",itemDB[item].source,"itemSourceTooltip"));
-		// html += "<img draggable=\"false\" loading='lazy' onclick=\"toggleClass(this,'active')\" class=\"itemSource\" src=\"images/icons/info.svg\" width=\"20\" height=\"20\">";
-		// html += "<div class=\"itemSourceTooltip\">"+itemDB[item].source+"</div>";
 	}
 	if(!forcedValues && fallback != item) {
 		console.warn("[MakeItemIcon] Fallback doesn't match item.");
 	}
 	if(type=="crown") {type="other";} // crown item is placed in "other" directory
-
-	itemIconElem.appendChild(makeImg("images/"+type+"/"+img+".png",pixels[validSizes.indexOf(size)],pixels[validSizes.indexOf(size)],["itemIconImg"],fallback!=item?{"data-fallback":fallback}:{}));
-
-	// html += makeImg("images/"+type+"/"+img+".png",pixels[validSizes.indexOf(size)],pixels[validSizes.indexOf(size)],["itemIconImg"],fallback!=item?{"data-fallback":fallback}:{})
-
+	itemIconElem.appendChild(makeImg((itemDB[item].icon!==undefined?"images/"+itemDB[item].icon+".png":"images/"+type+"/"+img+".png"),pixels[validSizes.indexOf(size)],pixels[validSizes.indexOf(size)],["itemIconImg"],fallback!=item?{"data-fallback":fallback}:{}));
 	if(rarity != undefined && rarity != 0) {
 		itemIconElem.appendChild(makeImg("images/icons/rarity/"+rarity+".png","unset","unset",["rarityIcon","extraIcon"])); // height is set in css
-
-		// html += "<img loading=\"lazy\" draggable=\"false\" class=\"rarityIcon extraIcon\" src=\"images/icons/rarity/"+rarity+".png\">"; 
 	}
-	
-	// html +="<span class=\"itemCount\">"+count+"</span></div>";
 	if(typeof(count) === "string") {
 		itemIconElem.appendChild(makeElem("div",count,"itemCount"));
 	} else if(typeof(count) === "object") {
@@ -391,14 +382,18 @@ function makeItemIcon (item,count=1,rarity=-1,size="mini",showSource=false,force
 		// console.log(typeof(count));
 		console.warn("[MakeItemIcon] Cannot append count to element.")
 	}
+	if(showSource && itemDB[item].source != undefined) {
+		var showSrcImg = makeImg("images/icons/info.svg",20,20,["itemSource"]);
+		showSrcImg.addEventListener("click",function(e){
+			toggleClass(e.currentTarget,"active");
+		})
+		itemIconElem.appendChild(showSrcImg);
+		itemIconElem.appendChild(makeElem("div",itemDB[item].source,"itemSourceTooltip"));
+	}
 	itemElem.appendChild(itemIconElem);
 
 	var itemNameElem = makeElem("div",item,"itemName");
 	itemElem.appendChild(itemNameElem)
-	// html +="<div class=\"itemName\">"+item+"</div></div>";
-
-	// return html;
-
 	return itemElem;
 }
 
@@ -419,4 +414,21 @@ function makeImg(src,width=undefined,height=undefined,classList=[],otherProperti
 	}
 	if(useHTML) return elem.outerHTML;
 	return elem;
+}
+function searchDropdown(string,className) {
+	// TODO? - Sort by closest match? ie searching "zh" should bring Zhongli first then Baizhu.
+	var results = get(className,"class");
+	if(string != "") {
+			for(var i = 0; i < results.length; i++) {
+			if(results[i].getAttribute("name").toLowerCase().indexOf(string.replace(/[\s'"]+/g,"").toLowerCase()) == -1) {
+				results[i].style = "display:none";
+			} else {
+				results[i].removeAttribute("style");
+			}
+		}
+	} else {
+		for(var i = 0; i < results.length; i++) {
+			results[i].removeAttribute("style");
+		}
+	}
 }

@@ -169,8 +169,7 @@ async function insertPrefElements (options={}) {
 		})
 	}
 
-		container = makeElem("div");
-		container.id = "charInputs";
+		container = makeElem("div",undefined,undefined,"charInputs");
 		textContainer = makeElem("span");
 		textContainer.appendChild(makeElem(undefined,"Default "));
 		textContainer.appendChild(makeElem("strong","target"));
@@ -209,15 +208,13 @@ async function insertPrefElements (options={}) {
 
 	// Weapon Stuff
 	if(show.indexOf("weapInputs") != -1) {
-		container = makeElem("div");
-		container.id = "weapInputs";
+		container = makeElem("div",undefined,undefined,"weapInputs");
 
 		// Toggle for showing By Rarity
 		textContainer = makeElem("em");
 		textContainer.appendChild(makeLabelElem("Show weapons by rarity? ","showAdvancedWeaponInputs"))
-		input = makeElem("input");
+		input = makeElem("input",undefined,undefined,"showAdvancedWeaponInputs");
 		input.type = "checkbox";
-		input.id = "showAdvancedWeaponInputs";
 		input.setAttribute("name",input.id);
 		input.checked = getPref("weaponTargets","showAdvancedWeaponInputs");
 		input.addEventListener("change",function(e){
@@ -229,8 +226,7 @@ async function insertPrefElements (options={}) {
 		container.appendChild(textContainer);
 
 		// Weapons Basic stuff
-		container2 = makeElem("div");
-		container2.id = "basicWeaponInput";
+		container2 = makeElem("div",undefined,undefined,"basicWeaponInput");
 		textContainer = makeElem("span")
 		textContainer.appendChild(makeElem(undefined,"Default "));
 		textContainer.appendChild(makeElem("strong","target"));
@@ -239,8 +235,7 @@ async function insertPrefElements (options={}) {
 		textContainer = makeElem("span");
 		textContainer.setAttribute("title","Having this checked targets the highest level possible while having this unchecked sets it to level 1.")
 		textContainer.appendChild(makeLabelElem("Target Maximum Level? ","basicWeaponExp"));
-		input = makeElem("input",undefined,"defaultInput");
-		input.id = "basicWeaponExp";
+		input = makeElem("input",undefined,"defaultInput","basicWeaponExp");
 		input.type = "checkbox";
 		input.setAttribute("name",input.id);
 		input.checked = getPref("weaponTargets","basicTargetMaxLevel");
@@ -294,8 +289,7 @@ async function insertPrefElements (options={}) {
 			])
 		}
 
-		container2 = makeElem("div");
-		container2.id = "advancedWeaponInput";
+		container2 = makeElem("div",undefined,undefined,"advancedWeaponInput");
 		textContainer = makeElem("div");
 		textContainer.appendChild(makeElem(undefined,"Default "));
 		textContainer.appendChild(makeElem("strong","target"));
@@ -341,14 +335,12 @@ async function insertPrefElements (options={}) {
 
 
 	// Other Prefs
-	container = makeElem("div");
-	container.id = "otherPreferences";
+	container = makeElem("div",undefined,undefined,"otherPreferences");
 	if(show.indexOf("hideLimited") != -1) {
 		textContainer = makeElem("span");
 		textContainer.setAttribute("title","Limited-Timed items include Aloy and Flagship Event Weapons.");
 		textContainer.appendChild(makeLabelElem("Hide Limited-Timed Items ","toggleLimited"));
-		input = makeElem("input",undefined,"defaultInput");
-		input.id = "toggleLimited";
+		input = makeElem("input",undefined,"defaultInput","toggleLimited");
 		input.setAttribute("name",input.id);
 		input.type = "checkbox";
 		input.checked = getPref("prefs","hideLimited");
@@ -365,9 +357,8 @@ async function insertPrefElements (options={}) {
 		textContainer = makeElem("span");
 		textContainer.setAttribute("title","Icons that would be toggled include Visions, Weapons and Rarity Stars.");
 		textContainer.appendChild(makeLabelElem("Hide Extra Icons ","toggleExtraIcons"));
-		input = makeElem("input",undefined,"defaultInput");
+		input = makeElem("input",undefined,"defaultInput","toggleExtraIcons");
 		input.type = "checkbox";
-		input.id = "toggleExtraIcons";
 		input.setAttribute("name",input.id);
 		input.checked = getPref("prefs","hideExtraIcons");
 		input.addEventListener("change",function(e){
@@ -383,9 +374,8 @@ async function insertPrefElements (options={}) {
 		textContainer = makeElem("span");
 		textContainer.setAttribute("title","Allows usage of Dust of Azoth and Dream Solvent.");
 		textContainer.appendChild(makeLabelElem("Show Item Converting ","showConverts"));
-		input = makeElem("input",undefined,"defaultInput");
+		input = makeElem("input",undefined,"defaultInput","showConverts");
 		input.type = "checkbox";
-		input.id = "showConverts";
 		input.setAttribute("name",input.id);
 		input.checked = getPref("prefs","showConverts");
 		input.addEventListener("change",function(e){
@@ -401,8 +391,7 @@ async function insertPrefElements (options={}) {
 	if(show.indexOf("themeDropdown") != -1) {
 		textContainer = makeElem("span");
 		textContainer.appendChild(makeLabelElem("Select Site Theme ","siteTheme"));
-		var container2 = makeElem("select");
-		container2.id = "siteTheme";
+		var container2 = makeElem("select",undefined,undefined,"siteTheme");
 		container2.setAttribute("name",container2.id);
 		for(let i = 0; i < themes.length; i++) {
 			input = makeElem("option",themes[i][0].toUpperCase()+themes[i].slice(1),"capitalize");

@@ -99,16 +99,13 @@
 		broken.
 	-->
 	<body class="hideLimited">
+		<noscript>You need to enable JavaScript to use this page. It's all open source and no data is sent between this site and third parties. <a href="https://github.com/LeafyLuigi/GenshinCalc">Click here to view the GitHub Repo.</a></noscript>
 		<span><span style="font-size:xx-large;font-weight:bolder">Parties are currently borked and do not save.</span> Feel free to mess around on this page though. Please report any issues in the repo linked in the footer.</span>
 		<div class="warning">
 			<strong>A whole lot of things in localStorage have been reworked. You may need to reload. Your data should hopefully be fine.</strong>
 		</div>
 
-		<div>
-			<a href="index.html">Home</a>
-			<a href="inv.html">Inventory</a>
-			<a href="characters.html">Characters</a>
-		</div>
+		<div id="links"></div>
 
 		<p style="font-family:monospace">css isn't anywhere close to done. most stuff "works" and there hopefully isn't anymore issues with this.
 		<br>if you want to clear all your parties, paste the following command in the console:
@@ -140,6 +137,14 @@
 	var hideWarning = () => {
 		if(getLSItem("partiesVersion")==partiesVersion) get("warning","class")[0].style = "display:none";
 	}
+	
+	async function loadPage() {
+		await loadData();
+		get("skipLink").href = "#";
+	}
+	loadPage()
+
+	
 	window.addEventListener("load", () => {
 		hideWarning();
 		if(!prefs.hideLimited) document.getElementsByTagName("body")[0].classList.toggle("hideLimited");
@@ -681,7 +686,7 @@
 		if(title.toLowerCase().indexOf("character") != -1) {
 			html += " mini\">";
 			for (var i in data) {
-				if(charDB[data[i]].include == false) continue;
+				// if(charDB[data[i]].include == false) continue;
 				var charString = makeCharIcon(data[i],charDB[data[i]].type,charDB[data[i]].rarity);
 				charString = charString.replace("<div>","<div "+(data[i] == "Aloy"?"class=\"limited\" ":"")+"onclick=\"addCharFromPopup(this)\">");
 				html += charString;	

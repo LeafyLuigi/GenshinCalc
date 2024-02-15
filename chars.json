@@ -161,19 +161,18 @@
 		"conBonus": {"3":3,"2":5}
 	},
 	"Chevreuse": {
-		"include": false,
 		"rarity": 4,
 		"weapon": "Polearm",
 		"region": "Fontaine",
 		"visionType": "Ousia",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
-		"boss": null,
-		"local": null,
-		"common": null,
-		"books": null,
-		"weeklyBoss": null,
-		"conBonus": null
+		"boss": "Fontemer Unihorn",
+		"local": "Lumidouce Bell",
+		"common": "clockworkMeka",
+		"books": "Order",
+		"weeklyBoss": "Lightless Eye of the Maelstrom",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Chiori": {
 		"include": false,
@@ -363,18 +362,17 @@
 		"conBonus": {"2":3,"3":5}
 	},
 	"Gaming": {
-		"include": false,
 		"rarity": 4,
-		"weapon": null,
+		"weapon": "Claymore",
 		"region": "Liyue",
 		"type": "Pyro",
 		"gem": "Agnidus Agate",
-		"boss": null,
-		"local": null,
-		"common": null,
-		"books": null,
-		"weeklyBoss": null,
-		"conBonus": null
+		"boss": "Emperor's Resolution",
+		"local": "Starconch",
+		"common": "slime",
+		"books": "Prosperity",
+		"weeklyBoss": "Lightless Mass",
+		"conBonus": {"2":3,"3":5}
 	},
 	"Ganyu": {
 		"rarity": 5,
@@ -944,18 +942,17 @@
 		"conBonus": {"3":3,"2":5}
 	},
 	"Xianyun": {
-		"include": false,
 		"rarity": 5,
-		"weapon": null,
+		"weapon": "Catalyst",
 		"region": "Liyue",
 		"type": "Anemo",
 		"gem": "Vayuda Turquoise",
-		"boss": null,
-		"local": null,
-		"common": null,
-		"books": null,
-		"weeklyBoss": null,
-		"conBonus": null
+		"boss": "Cloudseam Scale",
+		"local": "Clearwater Jade",
+		"common": "samachurl",
+		"books": "Gold",
+		"weeklyBoss": "Lightless Eye of the Maelstrom",
+		"conBonus": {"3":3,"2":5}
 	},
 	"Xiao": {
 		"rarity": 5,

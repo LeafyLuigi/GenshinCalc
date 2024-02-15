@@ -1,8 +1,13 @@
+@use "sass:list";
+@use "sass:math";
+@use "sass:string";
+
 /*"Theme" Fallbacks*/
 body {
 	--page-background: #fff;
 	--text-color: #000;
 	--text-alt-color: #222;
+	--text-alt-color-2: #495366;
 	--exp-color: #00f;
 	--exp-text-color: #00f;
 	--invalid: #f00;
@@ -11,12 +16,18 @@ body {
 	--button-border: 2px outset #8f8f9d;
 	--button-hover: #d0d0d7;
 	--button-hover-border: 2px outset #676774;
-	--text-alt-color-2: #495366;
 	--box-border-color: #495366;
 	--text-on-light-color: #222;
 	--tooltip: #e9e5dc;
 	--tooltip-text: #000;
 	--tooltip-border: 2px solid currentcolor;
+	--refinement-text: #495366;
+	--refinement-background: #00000080;
+	--refinement-max-text: #ffe14b;
+	--refinement-max-background: #ffde4b80;
+	--popup-text: #000;
+	--popup-background: #ebe4d6;
+	--popup-border: 2px solid #4a5366;
 }
 .theme-white {
 	background-color: #fff;
@@ -35,6 +46,13 @@ body {
 	--tooltip: #16161b;
 	--tooltip-text: #f4e5c6;
 	--tooltip-border: 2px solid currentcolor;
+	--refinement-text: #b4b4b4;
+	--refinement-background: #00000080;
+	--refinement-max-text: #ffe14b;
+	--refinement-max-background: #ffde4b80;
+	// --popup-text: #000;
+	// --popup-background: #ebe4d6;
+	// --popup-border: 2px solid #4a5366;
 }
 .theme-light {
 	background-color: #fff;
@@ -59,12 +77,13 @@ body {
 	--tooltip-border: 2px solid #8E1F22;
 }
 body {
-	background-color: var(--page-background);
+	background: var(--page-background);
 	color: var(--text-color);
 	line-height: 1.6;
 	font-family: sans-serif;
+	direction: ltr;
 }
-a {
+:link {
 	color: var(--links);
 }
 .capitalize {
@@ -75,12 +94,12 @@ a {
 	justify-content: center;
 	align-items: center;
 	width: 100%;
-}
-.loadingSpin {
-	filter:	drop-shadow(0 0 3px var(--text-color));
-}
-.loadingText {
-	display: none;
+	&Spin {
+		filter:	drop-shadow(0 0 3px var(--text-color));
+	}
+	&Text {
+		display: none;
+	}
 }
 @media (prefers-reduced-motion) {
 	.loadingSpin {
@@ -90,7 +109,7 @@ a {
 		display: block;
 	}
 }
-@media not (prefers-reduced-motion) {
+@media (prefers-reduced-motion) {
 	body.noAnimation {
 		.loadingText {
 			display: block;
@@ -201,9 +220,10 @@ body:not(.showConverts) {
 	input {
 		max-width: 136px;
 	}
-	&:hover .dropdownContent,
-	&.active .dropdownContent {
-		display: block;
+	&:is(:focus-within,:hover,.active) {
+		.dropdownContent {
+			display: block;
+		}
 	}
 }
 .weaponDropdown.unusedFound {
@@ -232,11 +252,11 @@ body:not(.showConverts) {
 	max-height: 250px;
 	overflow-y: scroll;
 	min-width: inherit;
-	scrollbar-width: thin; 
+	scrollbar-width: thin;
 	> .fauxButton {
 		display: flex;
 		justify-content: space-between;
-		min-width: inherit;
+		min-width: 100%;
 		max-width: inherit;
 		> span:not([class]) {
 			display: flex;
@@ -259,7 +279,7 @@ body:not(.showConverts) {
 #inputs:not(:empty) {
 	margin-top: 8px;
 }
-:is(.testButton,.submitButton) {
+:is(.testButton,.submitButton,.clearInvButton) {
 	white-space: unset;
 	display: inline-block;
 	height: fit-content;
@@ -319,29 +339,63 @@ body:not(.showConverts) {
 	--vision-size: 12px;
 	--rarity-size: 8px;
 }
-:is(.micro,.tiny,.mini,.small,.normal) .itemIcon {
-	background-color: #a2a2a2;
-	background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 82.35%, 82.36%, #e9e5dc 100%);
-	background-image: url(images/rarity/mini-1.png);
-	&.rarity-2 {
-		background-color: #6cad8d;
-		background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 82.35%, 82.36%, #e9e5dc 100%);
-		background-image: url(images/rarity/mini-2.png);
+$rarities: (
+	(1 #a2a2a2 #707275),
+	(2 #6cad8d #5c7670),
+	(3 #6eaace #667896),
+	(4 #9674c5 #65608c),
+	(5 #e09552 #946a43)
+);
+@each $rarity in $rarities {
+	.rarity-#{list.nth($rarity,1)} {
+		@if list.nth($rarity,1) == 1 {
+			:is(.rarity-0, & ) {
+				background-color: list.nth($rarity,2);
+				background-image: linear-gradient(to bottom, list.nth($rarity,3) 0%, list.nth($rarity,2) 100%);
+				background-image: url("images/rarity/"+#{list.nth($rarity,1)}+".png");
+			}
+		} @else {
+			background-color: list.nth($rarity,2);
+			background-image: linear-gradient(to bottom, list.nth($rarity,3) 0%, list.nth($rarity,2) 100%);
+			background-image: url("images/rarity/"+#{list.nth($rarity,1)}+".png");
+		}
 	}
-	&.rarity-3 {
-		background-color: #6eaace;
-		background-image: linear-gradient(to bottom, #667896 0%, #6eaace 82.35%, 82.36%, #e9e5dc 100%);
-		background-image: url(images/rarity/mini-3.png);
+	:is(.micro,.tiny,.mini,.small,.normal) .itemIcon {
+		@if list.nth($rarity,1) == 1 {
+			&:is(.rarity-0,.rarity-1) {
+				background: list.nth($rarity,2) none;
+				background: linear-gradient(to bottom, list.nth($rarity,3) 0%, list.nth($rarity,2) 82.35%, 82.36%, #e9e5dc 100%) top/cover no-repeat, transparent;
+				background: url("images/rarity/mini-"+#{list.nth($rarity,1)}+".png") top/cover no-repeat, transparent;
+			}
+		} @else {
+			&.rarity-#{list.nth($rarity,1)} {
+				background: list.nth($rarity,2) none;
+				background: linear-gradient(to bottom, list.nth($rarity,3) 0%, list.nth($rarity,2) 82.35%, 82.36%, #e9e5dc 100%) top/cover no-repeat, transparent;
+				background: url("images/rarity/mini-"+#{list.nth($rarity,1)}+".png") top/cover no-repeat, transparent;
+			}
+		}
 	}
-	&.rarity-4 {
-		background-color: #9674c5;
-		background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 82.35%, 82.36%, #e9e5dc 100%);
-		background-image: url(images/rarity/mini-4.png);
-	}
-	&.rarity-5 {
-		background-color: #e09552;
-		background-image: linear-gradient(to bottom, #946a43 0%, #e09552 82.35%, 82.36%, #e9e5dc 100%);
-		background-image: url(images/rarity/mini-5.png);
+};
+$mixedRarities: (
+	("13" (#a2a2a2 #6cad8d #6eaace)),
+	("34" (#6eaace #9674c5)),
+	("45" (#9674c5 #e09552))
+);
+@each $mix in $mixedRarities {
+	.rarity-#{list.nth($mix,1)} {
+		$cols: list.nth($mix,2);
+		$offset: 0.625;
+		$gLen: math.div(1, list.length($cols));
+		@if list.length($cols) == 3 {
+			$offset: 0.5;
+		}
+		$g: "from "+($offset - $gLen)+"turn, ";
+		@for $i from length($cols) through 1 {
+			$g: #{$g}+""+#{list.nth($cols,$i)}+" "+(1 - ($i * $gLen))+"turn "+(1 - (($i - 1) * $gLen))+"turn,";
+		}
+		background: #{list.nth($cols,1)} !important;
+		background: conic-gradient(string.slice($g, 0, -2)) top/auto var(--size) no-repeat, #e9e5dc !important;
+		background: url("images/rarity/mini-"+#{list.nth($mix,1)}+".png") top/cover no-repeat, transparent !important;
 	}
 }
 .itemIconImg {
@@ -374,31 +428,7 @@ body:not(.showConverts) {
 	// 	outline: 0;
 	// }
 }
-.rarity-0,.rarity-1 {
-	background-color: #a2a2a2;
-	background-image: linear-gradient(to bottom, #707275 0%, #a2a2a2 100%);
-	background-image: url(images/rarity/1.png);
-}
-.rarity-2 {
-	background-color: #6cad8d;
-	background-image: linear-gradient(to bottom, #5c7670 0%, #6cad8d 100%);
-	background-image: url(images/rarity/2.png);
-}
-.rarity-3 {
-	background-color: #6eaace;
-	background-image: linear-gradient(to bottom, #667896 0%, #6eaace 100%);
-	background-image: url(images/rarity/3.png);
-}
-.rarity-4 {
-	background-color: #9674c5;
-	background-image: linear-gradient(to bottom, #65608c 0%, #9674c5 100%);
-	background-image: url(images/rarity/4.png);
-}
-.rarity-5 {
-	background-color: #e09552;
-	background-image: linear-gradient(to bottom, #946a43 0%, #e09552 100%);
-	background-image: url(images/rarity/5.png);
-}
+
 
 .outputRequired {
 	display: flex;
@@ -465,20 +495,23 @@ body:not(.showConverts) {
 }
 :is(.charDropdownButton, .weaponDropdownButton, .partyPopupWeapon) {
 	font-size: 14px;
+	&:is(.rarity-0,.rarity-1,.rarity-2,.rarity-3,.rarity-4,.rarity-5){
+		background-position: -1px 0px;
+	}
 	&:is(.rarity-0,.rarity-1) {
-		background-image: linear-gradient(to right, #707275 0%, #a2a2a2 20%, transparent 44px);
+		background-image: linear-gradient(to right, #707275, #a2a2a2 20%, transparent 44px);
 	}
 	&.rarity-2 {
-		background-image: linear-gradient(to right, #5c7670 0%, #6cad8d 20%, transparent 44px);
+		background-image: linear-gradient(to right, #5c7670, #6cad8d 20%, transparent 44px);
 	}
 	&.rarity-3 {
-		background-image: linear-gradient(to right, #667896 0%, #6eaace 20%, transparent 44px);
+		background-image: linear-gradient(to right, #667896, #6eaace 20%, transparent 44px);
 	}
 	&.rarity-4 {
-		background-image: linear-gradient(to right, #65608c 0%, #9674c5 20%, transparent 44px);
+		background-image: linear-gradient(to right, #65608c, #9674c5 20%, transparent 44px);
 	}
 	&.rarity-5 {
-		background-image: linear-gradient(to right, #946a43 0%, #e09552 20%, transparent 44px);
+		background-image: linear-gradient(to right, #946a43, #e09552 20%, transparent 44px);
 	}
 }
 
@@ -763,5 +796,163 @@ body:not(.showConverts) {
 	display: none;
 	.toggleNextVisible:checked + & {
 		display: block;
+	}
+}
+
+
+#links {
+	a:not(:last-child) {
+		margin-inline-end: 8px;
+	}
+}
+.skipLink {
+	&:not([href]) {
+		display: none;
+	}
+	&[href] {
+		font-size: 0;
+		&:not(:focus) {
+			margin: 0 !important;
+		}
+		&:focus {
+			font-size: unset;
+		}
+	}
+}
+
+// "Equipment Module" related classes 
+.equipment {
+	&Details {
+		summary {
+			width: fit-content;
+		}
+		&[open] summary {
+			margin-bottom: 10px;
+		}
+	}
+	
+	&Items {
+		padding-block: 10px;
+		display: flex;
+		gap: 16px;
+	}
+	
+	&Edit {
+		position: absolute;
+		top: -8px;
+		right: -8px;
+		padding: 0;
+		border: none;
+		background: none;
+		font-size: 0;
+		opacity: 0.5;
+		&:hover,&:focus {
+			opacity: 1;
+		}
+	}
+
+	&PopupContainer {
+		position: absolute;
+		z-index: 100;
+		// background: red;
+		// top: 0;
+		// left: 0;
+		&:empty {
+			display: none;
+		}
+	}
+}
+
+#popup {
+	position: absolute;
+	box-sizing: border-box;
+	padding: 4px;
+	color: var(--popup-text);
+	background: var(--popup-background);
+	border: var(--popup-border);
+	min-width: 50vw;
+	max-width: 80vw;
+	width: fit-content;
+	&.rendering {
+		visibility: hidden;
+		pointer-events: none;
+	}
+}
+html.popupExists {
+	overflow: hidden;
+}
+.popup {
+	&Title:not(:empty) {
+		margin-left: 4px;
+	}
+	&CloseButton {
+		padding: 0;
+		border: none;
+		background: none;
+	}
+	&SearchContainer {
+		display: block;
+		padding: 4px;
+		.hideSearch & {
+			display: none;
+		}
+	}
+	&Results {
+		.hideSearch & {
+			display: none;
+		}
+		display: flex;
+		flex-flow: row wrap;
+		gap: 4px;
+		padding: 0 8px;
+		justify-content: center;
+	}
+	&Result {
+		min-width: 60px;
+		min-height: 100px;
+		display: flex;
+		justify-content: center;
+		padding: 0;
+		border: none;
+		background: none;
+		.itemName {
+			color: var(--popup-text);
+		}
+		// font-size: 0;
+		// &Img{
+		// }
+		// &Name {
+		// }
+	}
+	&Content {
+		.hideContent & {
+			display: none;
+		}
+		display: block;
+	}
+}
+
+.equipDropdownReorder {
+	display: none;
+	&:not(:nth-child(2),:nth-child(3)) {
+		display: block;
+	}
+}
+
+.refinementLevel {
+	// positioning here
+	position: absolute;
+	top: 4px;
+	left: 4px;
+	color: var(--refinement-text);
+	background-color: var(--refinement-background);
+	padding: 2px;
+	border-radius: 2px;
+	&.max {
+		color: var(--refinement-max-text);
+		background-color: var(--refinement-max-background);
+	}
+	:is(.rarity-0,.rarity-1,.rarity-2) & {
+		display: none;
 	}
 }

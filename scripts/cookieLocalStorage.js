@@ -112,11 +112,11 @@ var clearLS = (sure=false) => {
 	}
 }
 
-var exportLS = () => {
+function exportLS() {
 	console.info("Below is the localStorage as a string.");
 	console.log(JSON.stringify(localStorage));
 }
-var importLS = (sure=false,importData) => {
+function importLS (sure=false,importData) {
 	var data;
 	// deny import of null, bools and empty arrays/objects
 	if(typeof(importData) == "string") {

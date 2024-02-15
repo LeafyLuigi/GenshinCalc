@@ -1,134 +1,29 @@
 'use strict';
-var pageType = ""; // valid values are "index", "party", "characters", "inventory" and "debug".
-var ids = {}; // should be id:<target>. example: "asdf" is a "Dull Blade" it should be asdf:"Dull Blade".
-var idIndex = []; // An array of currently used IDs.
-// var idCharNameIndex = []; // indexes the names :))))
-var selectedChars = []; // Should contain Name, ID, Current and Target stats. Gets saved to Local Storage.
-var selectedCharsIndex = []; // indexes the following in priority order: char name, traveler element (as number), weapon id
-var weaponInfoIndex = {}; // Contains info for currently saved weapons. Should match the localStorage item for them.
-var weaponIDIndex = {}; // Contains Weapons with an array of IDs.
-var artifactInfoIndex = {}; // Contains info for the currently saved artifacts. Should match the localStorage item for them.
-var artifactIDIndex = {}; // Contains Artifacts with either an object with an array of IDs or an array of IDs for sets with one type.
-var charInfoIndex = {}; // Contains info for every character. Should match the localStorage item for them.
-var setsIDIndex = {}; // Contains set IDs for characters, sorted by characters. The data for them are in charInfoIndex[$char].sets
+// var pageType = ""; // valid values are "index", "party", "characters", "inventory" and "debug".
+// var ids = {}; // should be id:<target>. example: "asdf" is a "Dull Blade" it should be asdf:"Dull Blade".
+// var idIndex = []; // An array of currently used IDs.
+// // var idCharNameIndex = []; // indexes the names :))))
+// var selectedChars = []; // Should contain Name, ID, Current and Target stats. Gets saved to Local Storage.
+// var selectedCharsIndex = []; // indexes the following in priority order: char name, traveler element (as number), weapon id
+// var weaponInfoIndex = {}; // Contains info for currently saved weapons. Should match the localStorage item for them.
+// var weaponIDIndex = {}; // Contains Weapons with an array of IDs.
+// var artifactInfoIndex = {}; // Contains info for the currently saved artifacts. Should match the localStorage item for them.
+// var artifactIDIndex = {}; // Contains Artifacts with either an object with an array of IDs or an array of IDs for sets with one type.
+// var charInfoIndex = {}; // Contains info for every character. Should match the localStorage item for them.
+// var setsIDIndex = {}; // Contains set IDs for characters, sorted by characters. The data for them are in charInfoIndex[$char].sets
 // var idsToCheck = []; // might be used later. not sure yet~
 
+var selectedChars = []; // Should contain Name, ID, Current and Target stats. Gets saved to Local Storage.
+var selectedCharsIndex = []; // indexes the following in priority order: char name, traveler element (as number), weapon id
 const selectedCharVersion = "0.02";
-
-// ids and idIndex initialization - Parties only get added on that page. These shouldn't go off on the inventory page.
-var loadIDs = () => {
-	if(pageType == "inventory" || pageType == "debug") return; // skip on inv and debug. skip on undefined page
-	loadWeaponIDs();
-	loadArtifactIDs();
-	loadCharacterIDs();
-}
-var loadWeaponIDs = () => {
-	if(typeof(weapDB) == "undefined") return;
-	// Weapons
-	for(let i in weapDB) {
-		if(getLSItem(i) === null) continue;
-		let lsItem = parseLSItem(i,[]);
-
-		if(JSON.stringify(lsItem) == "[]") {
-			console.warn(i+" exists in localStorage but could not be parsed. Skipping.");
-			continue;
-		}
-
-		weaponInfoIndex[i] = lsItem;
-		weaponIDIndex[i] = lsItem.map(i=>i.id);
-		let weapIndex = weaponIDIndex[i];
-		for(let j=0;j<weapIndex.length;j++) {
-			ids[weapIndex[j]] = "weap--"+i;
-			idIndex.push(weapIndex[j]);
-		}
-	}
-}
-var loadArtifactIDs = () => {
-	if(typeof(artifactDB) == "undefined") return;
-	// Artifacts
-	for(let i in artifactDB) {
-		if(getLSItem(i) === null) continue;
-		let lsItem = parseLSItem(i,{}); // set as object for more than one types. should be an array for sets with one type.
-
-		if(JSON.stringify(lsItem) == "{}") {
-			console.warn(i+" exists in localStorage but could not be parsed. Skipping.");
-			continue;
-		}
-		
-		if(allArtifactGroupsWithOneType.indexOf(i) != -1) {
-			// artifact sets with one type (eg Prayers for Wisdom) - lsItem should be an array.
-			artifactInfoIndex[i] = lsItem;
-			artifactIDIndex[i] = lsItem.map(i=>i.id);
-			let artiIndex = artifactIDIndex[i];
-			for(let j=0;j<artiIndex.length;j++) {
-				ids[artiIndex[j]] = "arti--"+i;
-				idIndex.push(artiIndex[j]);
-			}
-		} else {
-			// artifact sets with more than one type
-			artifactInfoIndex[i] = lsItem;
-			artifactIDIndex[i] = {}; // gotta initialize it
-			// aaaand go through each type now
-			for(let j=0;j<artifactTypes.length;j++) {
-				if(lsItem[artifactTypes[j]] == undefined) continue; // skip empty lists
-				let artiType = artifactTypes[j];
-				artifactIDIndex[i][artiType] = lsItem[artiType].map(i=>i.id);
-				let artiIndex = artifactIDIndex[i][artiType];
-				for(let k=0;k<artiIndex.length;k++) {
-					ids[artiIndex[k]] = "arti--"+i+"--"+artiType;
-					idIndex.push(artiIndex[k]);
-				}
-			}
-		}
-	}
-}
-var loadCharacterIDs = () => {
-	if(typeof(charDB) == "undefined") return;
-	// Characters - missing weapons and artifacts will be deleted from the character.
-	for(let i in charDB) {
-		if(getLSItem(i) === null) continue;
-		let lsItem = parseLSItem(i,[]);
-
-		if(JSON.stringify(lsItem) == "[]") {
-			console.warn(i+" exists in localStorage but could not be parsed. Skipping.");
-			continue;
-		}
-
-		charInfoIndex[i] = lsItem;
-		if(lsItem.sets != undefined) {
-			setsIDIndex[i] = [];
-			let setsMap = lsItem.sets.map(i=>i.id);
-			for(let j=0;j<setsMap.length;j++) {
-				let set = lsItem.sets[j];
-				setsIDIndex[i].push(set.id);
-				ids[set.id] = "set--"+i;
-				idIndex.push(set.id);
-				if(set.weapon != undefined && typeof(weapDB) != "undefined" && idIndex.indexOf(set.weapon) == -1) {
-					console.warn(i+" has a missing weapon in "+set.id+". It will be reset.");
-					delete set.weapon;
-				}
-				if(set.artifacts != undefined && typeof(artifactDB) != "undefined") {
-					for(let k=0;k<set.artifacts.length;k++) {
-						if(set.artifacts[k] == null) continue; // skip empty artifacts (null)
-						if(idIndex.indexOf(set.artifacts[k]) == -1) {
-							console.warn(i+" has a missing artifact in "+set.id+" for "+artifactTypes[k]+". That artifact will be reset.");
-							set.artifacts[k] = null;
-						}
-					}
-				}
-			}
-		}
-	}
-}
-loadIDs();
 
 var addSelectedChar = (type,selectedName,id=null,rarity=null) => {
 	var travType;
 	if(type === "char") {
-		if(selectedName.indexOf("Traveler") != -1) {
+		if(selectedName.indexOf("Traveler") !== -1) {
 			// Traveler stuff
 			travType = travTypeOrder.indexOf(selectedName.slice(0,selectedName.indexOf("Traveler") - 1));
-			if(selectedCharsIndex.indexOf("Traveler") != -1) {
+			if(selectedCharsIndex.indexOf("Traveler") !== -1) {
 				// trav exists in selected charDB
 				selectedChars.push({useTravElement: travType});
 				selectedChars[selectedCharsIndex.indexOf("Traveler")].byElement[travType].targetTalents = charTargets.talents;
@@ -165,36 +60,36 @@ var addSelectedChar = (type,selectedName,id=null,rarity=null) => {
 	}
 
 	selectedCharsIndex = selectedChars.map(i => {
-		if(i.id != undefined) {return i.id}
-		if(i.useTravElement != undefined && i.name == undefined) {return i.useTravElement}
+		if(i.id !== undefined) {return i.id}
+		if(i.useTravElement !== undefined && i.name === undefined) {return i.useTravElement}
 		return i.name;
 	});
 	setLSItem("selectedChars",JSON.stringify(selectedChars));
 }
 var editSelectedChar = (char,element,travElement=null,rarity=null) => {
+	// this changes target stats not saved stats
 	let item = null;
 	let id = element.id, value = element.valueAsNumber;
 	var offset = 0;
-	if(element.min != "") {
+	if(element.min !== "") {
 		let min = Math.floor(element.min);
 		if(min == 4 && element.classList.contains("conBonus")) offset = 3;
 	}
-	console.log(char,element)
 	if(travElement !== null) {
 		// console.log("travElement is not null. attempting to find trav.");
 		item = selectedChars[selectedCharsIndex.indexOf("Traveler")].byElement[travElement];
-	} else if( (char == "Traveler" && travElement === null) || char != "Traveler") {
+	} else if( (char === "Traveler" && travElement === null) || char !== "Traveler") {
 		item = selectedChars[selectedCharsIndex.indexOf(char)];
 	}
 	// rarity is for weapons
-	if(rarity !== null && (rarity > 5 || rarity < 1 || typeof(rarity) != "number")) {
+	if(rarity !== null && (rarity > 5 || rarity < 1 || typeof(rarity) !== "number")) {
 		throw new Error("Rarity must be a number between 1 and 5 inclusive.");
 	}
 
 	// target talents
-	let talToChange = id.indexOf("-targTal") != -1 ? Math.floor(id.slice(-1)) -1 : null;
-	if(talToChange != null) {
-		if(item.useTravElement != undefined) {
+	let talToChange = id.indexOf("-targTal") !== -1 ? Math.floor(id.slice(-1)) -1 : null;
+	if(talToChange !== null) {
+		if(item.useTravElement !== undefined) {
 			// "traveler" with byElement talent editing
 			item.byElement[item.useTravElement].targetTalents[talToChange] = value - offset;
 		} else {
@@ -204,25 +99,26 @@ var editSelectedChar = (char,element,travElement=null,rarity=null) => {
 		}
 	}
 	// target ascension
-	if(id.indexOf("-targAsc") != -1) {
+	if(id.indexOf("-targAsc") !== -1) {
 		item.ascension = value;
 	}
 	// target exp
-	if(id.indexOf("-targLvl") != -1 || id.indexOf("-targExpRemainder") != -1) {
+	if(id.indexOf("-targLvl") !== -1 || id.indexOf("-targExpRemainder") !== -1) {
 		// console.log("level stuff goes here. rarity needed for weapons");
 		if(rarity !== null) {
-			item.targetExp = getExpFromLevel("weap",val(char+"-targLvl"),rarity) // + val(char+"-targetExpRemainder");
+			item.targetExp = getExpFromLevel("weap",val(char+"-targLvl"),rarity) + val(char+"-targetExpRemainder");
 		} else {
-			item.targetExp = getExpFromLevel("char",val(char+"-targLvl")) //+ val(char+"-targetExpRemainder");
+			item.targetExp = getExpFromLevel("char",val(char+"-targLvl")) + val(char+"-targetExpRemainder");
 		}
 		// item.targetExp = value;
 	}
+	console.log(char,item)
 	setLSItem("selectedChars",JSON.stringify(selectedChars));
 }
 
 var getSelectedChars = () => {
 	selectedChars = parseLSItem("selectedChars",[]);
-	if(typeof(selectedChars) == "string") {
+	if(typeof(selectedChars) === "string") {
 		console.log("Somehow it needed another parse.")
 		try {
 			selectedChars = JSON.parse(selectedChars);
@@ -232,211 +128,211 @@ var getSelectedChars = () => {
 			return [];
 		}
 	}
-	// console.log(typeof(selectedChars),selectedChars)
-	if (getLSItem("selectedCharVersion") !== null && getLSItem("selectedCharVersion") != selectedCharVersion) {
-		console.warn("Saved character list version may not be fully compatible with the current version. It will attempt to be updated.");
+	// // console.log(typeof(selectedChars),selectedChars)
+	// if (getLSItem("selectedCharVersion") !== null && getLSItem("selectedCharVersion") !== selectedCharVersion) {
+	// 	console.warn("Saved character list version may not be fully compatible with the current version. It will attempt to be updated.");
 
-		// Convert old characters from asc/NA/S/B to lvl/asc/NA/S/B
-		if(getLSItem("selectedCharVersion") == undefined) {
-			for (var i = 0; i < selectedChars.length; i++) {
-				if(Array.isArray(selectedChars[i].current) && selectedChars[i].current.length == 4) {
-					selectedChars[i].current.unshift(1);				
-				}
-				if(Array.isArray(selectedChars[i].target) && selectedChars[i].target.length == 4) {
-					selectedChars[i].target.unshift(val("defaultTargetCharLvl"));
-				}
-			}
-		}
+	// 	// Convert old characters from asc/NA/S/B to lvl/asc/NA/S/B
+	// 	if(getLSItem("selectedCharVersion") === undefined) {
+	// 		for (var i = 0; i < selectedChars.length; i++) {
+	// 			if(Array.isArray(selectedChars[i].current) && selectedChars[i].current.length === 4) {
+	// 				selectedChars[i].current.unshift(1);				
+	// 			}
+	// 			if(Array.isArray(selectedChars[i].target) && selectedChars[i].target.length === 4) {
+	// 				selectedChars[i].target.unshift(val("defaultTargetCharLvl"));
+	// 			}
+	// 		}
+	// 	}
 		
-		// Convert from format [{name:$name,id:$id}] for charDB to [{name:$name}]. saved stats are within character now.
-		if(getLSItem("selectedCharVersion") === "\"0.01\"") {
-			var travExpDone = false, travAscDone = false, travPosition = undefined;
-			for(let i in selectedChars) {
-				// console.log(i)
-				let item = selectedChars[i];
-				var text = "";
-				// console.log("selectedChars[i]",selectedChars[i]);
+	// 	// Convert from format [{name:$name,id:$id}] for charDB to [{name:$name}]. saved stats are within character now.
+	// 	if(getLSItem("selectedCharVersion") === "\"0.01\"") {
+	// 		var travExpDone = false, travAscDone = false, travPosition = undefined;
+	// 		for(let i in selectedChars) {
+	// 			// console.log(i)
+	// 			let item = selectedChars[i];
+	// 			var text = "";
+	// 			// console.log("selectedChars[i]",selectedChars[i]);
 				
-				if(item.name.indexOf("Traveler") != -1) {
-					// TRAVELER
-					let travType = travTypeOrder.indexOf(item.name.slice(0,item.name.indexOf(" Traveler")));
-					if(travPosition === undefined) travPosition = i;
-					if(getLSItem("Traveler") != undefined) {
-						text = "Traveler exists within localStorage. selectedCharacters is using type "+travTypeOrder[travType]+".";
-						var lsItem = parseLSItem("Traveler",null);
-						if(lsItem === null) {
-							text += " Could not parse. Below is the localStorage's previous JSON.";
-							get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
-							get("selectedCharsIssues").appendChild(Object.assign(document.createElement("pre"),{textContent: getLSItem("Traveler")}));
-							continue;
-						}
-						var sc_exp = getExpFromLevel("char",item.current[0]), ls_exp = lsItem.exp != undefined ? lsItem.exp : 0;
-						if(!travExpDone) {
-							if(sc_exp != ls_exp) {
-								// lsItem.exp = sc_exp;
-								text += " Total exp (level + remainder) has been changed from "+ls_exp+" to "+sc_exp+".";
-							}
-							travExpDone = true;
-						}
-						var sc_asc = item.current[1], ls_asc = lsItem.ascension != undefined ? lsItem.ascension : 0;
-						if(!travAscDone) {
-							if(sc_asc != ls_asc) {
-								text += " Ascension has been changed from "+ls_asc+" to "+sc_asc+".";
-							}
-							travAscDone = true;
-						}
+	// 			if(item.name.indexOf("Traveler") !== -1) {
+	// 				// TRAVELER
+	// 				let travType = travTypeOrder.indexOf(item.name.slice(0,item.name.indexOf(" Traveler")));
+	// 				if(travPosition === undefined) travPosition = i;
+	// 				if(getLSItem("Traveler") !== undefined) {
+	// 					text = "Traveler exists within localStorage. selectedCharacters is using type "+travTypeOrder[travType]+".";
+	// 					var lsItem = parseLSItem("Traveler",null);
+	// 					if(lsItem === null) {
+	// 						text += " Could not parse. Below is the localStorage's previous JSON.";
+	// 						get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
+	// 						get("selectedCharsIssues").appendChild(Object.assign(document.createElement("pre"),{textContent: getLSItem("Traveler")}));
+	// 						continue;
+	// 					}
+	// 					var sc_exp = getExpFromLevel("char",item.current[0]), ls_exp = lsItem.exp !== undefined ? lsItem.exp : 0;
+	// 					if(!travExpDone) {
+	// 						if(sc_exp !== ls_exp) {
+	// 							// lsItem.exp = sc_exp;
+	// 							text += " Total exp (level + remainder) has been changed from "+ls_exp+" to "+sc_exp+".";
+	// 						}
+	// 						travExpDone = true;
+	// 					}
+	// 					var sc_asc = item.current[1], ls_asc = lsItem.ascension != undefined ? lsItem.ascension : 0;
+	// 					if(!travAscDone) {
+	// 						if(sc_asc !== ls_asc) {
+	// 							text += " Ascension has been changed from "+ls_asc+" to "+sc_asc+".";
+	// 						}
+	// 						travAscDone = true;
+	// 					}
 
-						if(lsItem.byElement === undefined) {
-							lsItem.byElement = [];
-							for(let i = 0;i < travTypeOrder.length;i++) {
-								lsItem.byElement[i] = {};
-							}
-						}
-						let element = lsItem.byElement[travType];
-						var sc_talents = [item.current[2],item.current[3],item.current[4]];
-						let ls_talents = element.talents != undefined ? element.talents : [1,1,1];
-						for(let i in charTalentNames) {
-							if(sc_talents[i] != ls_talents[i]) {
-								// lsItem.talents[i] = sc_talents[i];
-								text += " "+charTalentNames[i]+" has been changed from "+ls_talents[i]+" to "+sc_talents[i]+".";
-							}
-						}
-						// console.log(selectedChars[i],sc_exp,ls_exp);
-						setLSItem(item.name,JSON.stringify(lsItem));
+	// 					if(lsItem.byElement === undefined) {
+	// 						lsItem.byElement = [];
+	// 						for(let i = 0;i < travTypeOrder.length;i++) {
+	// 							lsItem.byElement[i] = {};
+	// 						}
+	// 					}
+	// 					let element = lsItem.byElement[travType];
+	// 					var sc_talents = [item.current[2],item.current[3],item.current[4]];
+	// 					let ls_talents = element.talents != undefined ? element.talents : [1,1,1];
+	// 					for(let i in charTalentNames) {
+	// 						if(sc_talents[i] != ls_talents[i]) {
+	// 							// lsItem.talents[i] = sc_talents[i];
+	// 							text += " "+charTalentNames[i]+" has been changed from "+ls_talents[i]+" to "+sc_talents[i]+".";
+	// 						}
+	// 					}
+	// 					// console.log(selectedChars[i],sc_exp,ls_exp);
+	// 					setLSItem(item.name,JSON.stringify(lsItem));
 
-					} else {
-						let newLSItem = {};
-						let emptyArrString = [];
-						newLSItem.byElement = [];
-						for(let i = 0;i < travTypeOrder.length;i++) {
-							newLSItem.byElement[i] = {};
-							emptyArrString[i] = {};
-						}
-						if(item.current[1] != 0) newLSItem.ascension = item.current[1];
-						travAscDone = true;
-						if(JSON.stringify([item.current[2],item.current[3],item.current[4]]) != "[1,1,1]") {
-							newLSItem.byElement[travType].talents = [item.current[2],item.current[3],item.current[4]];
-						}
-						if(item.current[0] != 1) newLSItem.exp = getExpFromLevel("char",item.current[0]);
-						travExpDone = true;
+	// 				} else {
+	// 					let newLSItem = {};
+	// 					let emptyArrString = [];
+	// 					newLSItem.byElement = [];
+	// 					for(let i = 0;i < travTypeOrder.length;i++) {
+	// 						newLSItem.byElement[i] = {};
+	// 						emptyArrString[i] = {};
+	// 					}
+	// 					if(item.current[1] !== 0) newLSItem.ascension = item.current[1];
+	// 					travAscDone = true;
+	// 					if(JSON.stringify([item.current[2],item.current[3],item.current[4]]) !== "[1,1,1]") {
+	// 						newLSItem.byElement[travType].talents = [item.current[2],item.current[3],item.current[4]];
+	// 					}
+	// 					if(item.current[0] !== 1) newLSItem.exp = getExpFromLevel("char",item.current[0]);
+	// 					travExpDone = true;
 						
-						if(JSON.stringify(newLSItem.byElement) != JSON.stringify(emptyArrString)) {
-							if(travType != 0 && travType != 1) newLSItem.byElement[travType].owned = true;
-						}
-						setLSItem("Traveler",JSON.stringify(newLSItem));
-						text = "Traveler did not exist in localStorage. Any warnings related to Traveler can be ignored.";
-					}
-					if(i != travPosition) {
-						selectedChars[travPosition].byElement[travType].targetTalents = [item.target[2],item.target[3],item.target[4]]; 
-						selectedChars[i] = new Object({useTravElement:travType})
-					} else {
-						let old = new Object({byElement:[],exp:getExpFromLevel("char",item.target[0]),asc:item.target[1],useTrav:travType});
-						for(let i = 0; i < travTypeOrder.length;i++) {
-							old.byElement[i] = {};
-						}
-						old.byElement[travType].targetTalents = [item.target[2],item.target[3],item.target[4]];
-						selectedChars[i] = {name:"Traveler",byElement:old.byElement,targetExp:old.exp,useTravElement:old.useTrav};
-					}
-					if(text!="") get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
+	// 					if(JSON.stringify(newLSItem.byElement) !== JSON.stringify(emptyArrString)) {
+	// 						if(travType !== 0 && travType != 1) newLSItem.byElement[travType].owned = true;
+	// 					}
+	// 					setLSItem("Traveler",JSON.stringify(newLSItem));
+	// 					text = "Traveler did not exist in localStorage. Any warnings related to Traveler can be ignored.";
+	// 				}
+	// 				if(i != travPosition) {
+	// 					selectedChars[travPosition].byElement[travType].targetTalents = [item.target[2],item.target[3],item.target[4]]; 
+	// 					selectedChars[i] = new Object({useTravElement:travType})
+	// 				} else {
+	// 					let old = new Object({byElement:[],exp:getExpFromLevel("char",item.target[0]),asc:item.target[1],useTrav:travType});
+	// 					for(let i = 0; i < travTypeOrder.length;i++) {
+	// 						old.byElement[i] = {};
+	// 					}
+	// 					old.byElement[travType].targetTalents = [item.target[2],item.target[3],item.target[4]];
+	// 					selectedChars[i] = {name:"Traveler",byElement:old.byElement,targetExp:old.exp,useTravElement:old.useTrav};
+	// 				}
+	// 				if(text!="") get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
 
 
-				} else if (charDB[item.name] != undefined) {
-					// NON-TRAVELER CHARACTERS
-					// console.debug(item.name+" found in charDB");
-					if(getLSItem(item.name) != undefined) {
-						text = item.name+" exists within localStorage.";
-						var lsItem = parseLSItem(item.name,null);
-						if(lsItem === null) {
-							text += " Could not parse. Below is the localStorage's previous JSON.";
-							get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
-							get("selectedCharsIssues").appendChild(Object.assign(document.createElement("pre"),{textContent: getLSItem(item.name)}));
-							continue;
-						}
-						var sc_exp = getExpFromLevel("char",item.current[0]), ls_exp = lsItem.exp != undefined ? lsItem.exp : 0;
-						if(sc_exp != ls_exp) {
-							text += " Total exp (level + remainder) has been changed from "+ls_exp+" to "+sc_exp+".";
-						}
-						var sc_asc = item.current[1], ls_asc = lsItem.ascension != undefined ? lsItem.ascension : 0;
-						if(sc_asc != ls_asc) {
-							text += " Ascension has been changed from "+ls_asc+" to "+sc_asc+".";
-						}
-						var sc_talents = [item.current[2],item.current[3],item.current[4]], ls_talents = lsItem.talents != undefined ? lsItem.talents : [1,1,1];
-						for(let i in charTalentNames) {
-							if(sc_talents[i] != ls_talents[i]) {
-								// lsItem.talents[i] = sc_talents[i];
-								text += " "+charTalentNames[i]+" has been changed from "+ls_talents[i]+" to "+sc_talents[i]+".";
-							}
-						}
-						// console.log(selectedChars[i],sc_exp,ls_exp);
-						setLSItem(item.name,JSON.stringify(lsItem));
-					} else {
-						if(item.current != undefined) {
-							let newLSItem = {};
-							if(item.current[0] != 1) newLSItem.exp = getLevelFromExp("char",item.current[0]);
-							if(item.current[1] != 0) newLSItem.ascension = item.current[1];
-							if(JSON.stringify([item.current[2],item.current[3],item.current[4]]) != "[1,1,1]") newLSItem.talents = [item.current[2],item.current[3],item.current[4]];
-							if(JSON.stringify(newLSItem) != "{}") setLSItem(item.name,JSON.stringify(newLSItem));
-						}
-					}
-					if(item.target != undefined) {
-						let old = new Object({name:item.name,exp:getExpFromLevel("char",item.target[0]),asc:item.target[1],tal:[item.target[2],item.target[3],item.target[4]]})
-						selectedChars[i] = {};
-						selectedChars[i].name = old.name;
-						selectedChars[i].targetExp = old.exp;
-						selectedChars[i].ascension = old.asc;
-						selectedChars[i].targetTalents = old.tal;
-					}
-					if(text!="") get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
-				} else {
-					// WEAPONS
-					// no pre-existing localStorage item existed for weapons HOWEVER if multiple are included in the same lot, this'll need to be used.
-					// console.debug(item.name+" found in selectedChars")
-					var lsItem = null,newItem = {};
-					if(getLSItem(item.name) != undefined) {
-						text = item.name+" exists within localStorage."
-						lsItem = parseLSItem(item.name,null);
-						if(lsItem !== null && !Array.isArray(lsItem)) {
-							text += " localStorage was either null or not able to be parsed. Aborting.";
-							get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
-							continue;
-						}
-					}
-					if(lsItem === null) {
-						lsItem = [];
-					}
-					selectedChars[i] = {};
-					selectedChars[i].name = item.name;
+	// 			} else if (charDB[item.name] != undefined) {
+	// 				// NON-TRAVELER CHARACTERS
+	// 				// console.debug(item.name+" found in charDB");
+	// 				if(getLSItem(item.name) != undefined) {
+	// 					text = item.name+" exists within localStorage.";
+	// 					var lsItem = parseLSItem(item.name,null);
+	// 					if(lsItem === null) {
+	// 						text += " Could not parse. Below is the localStorage's previous JSON.";
+	// 						get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
+	// 						get("selectedCharsIssues").appendChild(Object.assign(document.createElement("pre"),{textContent: getLSItem(item.name)}));
+	// 						continue;
+	// 					}
+	// 					var sc_exp = getExpFromLevel("char",item.current[0]), ls_exp = lsItem.exp != undefined ? lsItem.exp : 0;
+	// 					if(sc_exp != ls_exp) {
+	// 						text += " Total exp (level + remainder) has been changed from "+ls_exp+" to "+sc_exp+".";
+	// 					}
+	// 					var sc_asc = item.current[1], ls_asc = lsItem.ascension != undefined ? lsItem.ascension : 0;
+	// 					if(sc_asc != ls_asc) {
+	// 						text += " Ascension has been changed from "+ls_asc+" to "+sc_asc+".";
+	// 					}
+	// 					var sc_talents = [item.current[2],item.current[3],item.current[4]], ls_talents = lsItem.talents != undefined ? lsItem.talents : [1,1,1];
+	// 					for(let i in charTalentNames) {
+	// 						if(sc_talents[i] != ls_talents[i]) {
+	// 							// lsItem.talents[i] = sc_talents[i];
+	// 							text += " "+charTalentNames[i]+" has been changed from "+ls_talents[i]+" to "+sc_talents[i]+".";
+	// 						}
+	// 					}
+	// 					// console.log(selectedChars[i],sc_exp,ls_exp);
+	// 					setLSItem(item.name,JSON.stringify(lsItem));
+	// 				} else {
+	// 					if(item.current != undefined) {
+	// 						let newLSItem = {};
+	// 						if(item.current[0] != 1) newLSItem.exp = getLevelFromExp("char",item.current[0]);
+	// 						if(item.current[1] != 0) newLSItem.ascension = item.current[1];
+	// 						if(JSON.stringify([item.current[2],item.current[3],item.current[4]]) != "[1,1,1]") newLSItem.talents = [item.current[2],item.current[3],item.current[4]];
+	// 						if(JSON.stringify(newLSItem) != "{}") setLSItem(item.name,JSON.stringify(newLSItem));
+	// 					}
+	// 				}
+	// 				if(item.target != undefined) {
+	// 					let old = new Object({name:item.name,exp:getExpFromLevel("char",item.target[0]),asc:item.target[1],tal:[item.target[2],item.target[3],item.target[4]]})
+	// 					selectedChars[i] = {};
+	// 					selectedChars[i].name = old.name;
+	// 					selectedChars[i].targetExp = old.exp;
+	// 					selectedChars[i].ascension = old.asc;
+	// 					selectedChars[i].targetTalents = old.tal;
+	// 				}
+	// 				if(text!="") get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
+	// 			} else {
+	// 				// WEAPONS
+	// 				// no pre-existing localStorage item existed for weapons HOWEVER if multiple are included in the same lot, this'll need to be used.
+	// 				// console.debug(item.name+" found in selectedChars")
+	// 				var lsItem = null,newItem = {};
+	// 				if(getLSItem(item.name) != undefined) {
+	// 					text = item.name+" exists within localStorage."
+	// 					lsItem = parseLSItem(item.name,null);
+	// 					if(lsItem !== null && !Array.isArray(lsItem)) {
+	// 						text += " localStorage was either null or not able to be parsed. Aborting.";
+	// 						get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
+	// 						continue;
+	// 					}
+	// 				}
+	// 				if(lsItem === null) {
+	// 					lsItem = [];
+	// 				}
+	// 				selectedChars[i] = {};
+	// 				selectedChars[i].name = item.name;
 
-					newItem.id = item.id != undefined ? item.id : createID("weap--"+item.name);
-					selectedChars[i].id = newItem.id;
+	// 				newItem.id = item.id != undefined ? item.id : createID("weap--"+item.name);
+	// 				selectedChars[i].id = newItem.id;
 
-					newItem.ascension = item.current != undefined ? item.current : 0;
-					selectedChars[i].ascension = item.target;
+	// 				newItem.ascension = item.current != undefined ? item.current : 0;
+	// 				selectedChars[i].ascension = item.target;
 
-					newItem.exp = 0;
-					selectedChars[i].targetExp = newItem.exp;
+	// 				newItem.exp = 0;
+	// 				selectedChars[i].targetExp = newItem.exp;
 
-					if(weapDB[item.name].rarity > 2 && weapDB[item.name].canRefine !== false) {
-						newItem.refinement = 1;
-					}
-					lsItem.push(newItem);
-					if(weaponIDIndex[item.name] == undefined) weaponIDIndex[item.name] = [];
-					weaponIDIndex[item.name].push(newItem.id);
-					setLSItem(item.name,JSON.stringify(lsItem));
-					if(text!="") get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
-				}
-			}
-			if(JSON.stringify(weaponIDIndex != "{}")) {
-				setLSItem("weaponIDIndex",JSON.stringify(weaponIDIndex))
-			}
-		}
+	// 				if(weapDB[item.name].rarity > 2 && weapDB[item.name].canRefine !== false) {
+	// 					newItem.refinement = 1;
+	// 				}
+	// 				lsItem.push(newItem);
+	// 				if(weaponIDIndex[item.name] == undefined) weaponIDIndex[item.name] = [];
+	// 				weaponIDIndex[item.name].push(newItem.id);
+	// 				setLSItem(item.name,JSON.stringify(lsItem));
+	// 				if(text!="") get("selectedCharsIssues").appendChild(Object.assign(document.createElement("div"),{textContent:text}));
+	// 			}
+	// 		}
+	// 		if(JSON.stringify(weaponIDIndex != "{}")) {
+	// 			setLSItem("weaponIDIndex",JSON.stringify(weaponIDIndex))
+	// 		}
+	// 	}
 
-		// console.log(selectedCharVersion);
-		// console.log("newSelectedChars:",selectedChars);
+	// 	// console.log(selectedCharVersion);
+	// 	// console.log("newSelectedChars:",selectedChars);
 
-		setLSItem("selectedCharVersion",selectedCharVersion);
-		setLSItem("selectedChars",JSON.stringify(selectedChars))
-	}
+	// 	setLSItem("selectedCharVersion",selectedCharVersion);
+	// 	setLSItem("selectedChars",JSON.stringify(selectedChars))
+	// }
 	return selectedChars;
 }
 
@@ -528,7 +424,7 @@ var createID = (type="char",idLength=7,forcedID=null) => {
 		console.warn("Character name used for newID. Rerolling.");
 		console.trace(newID);
 		createID(type,idLength,null);
-	} else if(newID == "undefined" || newID == "null" || newID == "true" || newID == "false") {
+	} else if(newID === "undefined" || newID === "null" || newID === "true" || newID === "false") {
 		console.warn("newID was a blacklisted value. Rerolling.");
 		console.trace(newID);
 		createID(type,idLength,null);
@@ -543,6 +439,14 @@ var createID = (type="char",idLength=7,forcedID=null) => {
 	return newID;
 }
 var removeID = (id) => {
+	if(typeof(id.currentTarget) === "object" && id.currentTarget.nodeType !== undefined) {
+		if(id.currentTarget.getAttribute("data-target") !== undefined) {
+			id = id.currentTarget.getAttribute("data-target");
+		} else {
+			throw new Error("Somehow you used a HTML element without data-target.");
+		}
+	}
+
 	// console.log(id)
 	if(pageType == "index") {
 		// incoming ID would be one of the following: character name, trav type as word + "Traveler", weapon ID
@@ -861,13 +765,10 @@ function addCharBox (boxType=undefined,name="Ganyu",options={}) {
 	}
 
 	// Making the HTML element now.
-	let elem = makeElem("div",undefined,"charBlock"); // Using the same class because it's easier.
-	// For Traveler the box (and remove button) should be type + Traveler (ie "Anemo Traveler") rather than just "Traveler" for ID.
-	if(isChar && travType !== null) {
-		elem.id = travTypeOrder[travType]+" Traveler";
-	} else {
-		elem.id = id;
-	}
+	let elem = makeElem("div",undefined,"charBlock", // Using the same class because it's easier.
+		// For Traveler the box (and remove button) should be type + Traveler (ie "Anemo Traveler") rather than just "Traveler" for ID.
+		isChar && travType !== null ? travTypeOrder[travType]+" Traveler" : id
+	);
 	// Following that, subsequent Traveler IDs should be Traveler+(travType as number); Traveler1 for Anemo Trav.
 
 	let headerElem = makeElem("div",undefined,"topFlex"); // Contains headerNameContainer, Remove button.
@@ -880,11 +781,11 @@ function addCharBox (boxType=undefined,name="Ganyu",options={}) {
 		if(travType === null) {
 			// not traveler
 			var vision = charDB[name].region+"_"+charDB[name].type;
-			if(charDB[name].vision != undefined) {
+			if(charDB[name].vision !== undefined) {
 				headerNameContainer.appendChild(makeImg("images/icons/visions/"+charDB[name].vision+".png",48,48,["dropdownType","extraIcon","vision"]));
-			} else if(charDB[name].region != undefined) {
+			} else if(charDB[name].region !== undefined) {
 				var vision = charDB[name].region+"_"+charDB[name].type;
-				if(charDB[name].visionType != undefined && charDB[name].visionType != "") vision = charDB[name].vision+"_"+charDB[name].visionType;
+				if(charDB[name].visionType !== undefined && charDB[name].visionType !== "") vision = charDB[name].vision+"_"+charDB[name].visionType;
 				headerNameContainer.appendChild(makeImg("images/icons/visions/"+vision+".png",48,48,["dropdrownType","extraIcon","vision"]));
 				}
 		} else {
@@ -898,12 +799,25 @@ function addCharBox (boxType=undefined,name="Ganyu",options={}) {
 	}
 	headerElem.appendChild(headerNameContainer);
 
-	var removeButtonElem = makeElem("button","Remove","removeButton");
+	var buttonsContainer = makeElem("div",undefined,["vertFlex","alignEnd"]);
+	var removeButtonElem = makeElem("button","Remove",["fauxButton","removeButton"]);
 	removeButtonElem.setAttribute("data-target",(travType !== null ? travTypeOrder[travType]+" Traveler":id))
-	removeButtonElem.addEventListener("click",function(e){
-		removeID(e.currentTarget.getAttribute("data-target"));
-	});
-	headerElem.appendChild(removeButtonElem);
+	removeButtonElem.addEventListener("click",removeID);
+	buttonsContainer.appendChild(removeButtonElem);
+
+	if(!isChar) {
+		var deleteCheckboxContainer = makeElem("div");
+		deleteCheckboxContainer.appendChild(makeLabelElem("Uncheck to delete. ",id+"-deleteCheckbox"))
+		var deleteCheckbox = makeElem("input",undefined,undefined,id+"-deleteCheckbox");
+		deleteCheckbox.type = "checkbox";
+		deleteCheckbox.checked = true;
+		deleteCheckbox.addEventListener("change",confirmDeleteWeapon);
+
+		deleteCheckboxContainer.appendChild(deleteCheckbox);
+		buttonsContainer.appendChild(deleteCheckboxContainer);
+	}
+
+	headerElem.appendChild(buttonsContainer);
 	elem.appendChild(headerElem);
 
 	// Now that the Traveler Remove Button stuff should be done, we'll set the ID correctly here.
@@ -970,8 +884,7 @@ function addCharBox (boxType=undefined,name="Ganyu",options={}) {
 		currentStatsInputElem.appendChild(levelProgressElem);
 
 		// Exp Bar
-		var expBarElem = makeElem("div",undefined,"expBar");
-		expBarElem.id = (travType !== null ? "Traveler" : id)+"-expBar";
+		var expBarElem = makeElem("div",undefined,"expBar",(travType !== null ? "Traveler" : id)+"-expBar");
 		expBarElem.style = "--fill:"+(expNeeded==0?"100":((currentExpRem/expNeeded).toPrecision(3)*100))+"%";
 		currentStatsInputElem.appendChild(expBarElem);
 
@@ -1038,8 +951,11 @@ function addCharBox (boxType=undefined,name="Ganyu",options={}) {
 		// "Level progress: <input> / $val"
 		levelProgressElem.appendChild(makeLabelElem("Level progress:",(travType!==null?"Traveler":id)+"-targExpRemainder"));
 		input = makeNumberInputElem((travType !== null?"Traveler":id)+"-targExpRemainder",targetExpRem,"0",expNeeded,"8","expTotal");
+		if(!isChar) {
+			input.setAttribute("data-rarity",rarity);
+		}
 		input.addEventListener("change",function(e){
-			updateBar(e.currentTarget);
+			updateBar(e.currentTarget,e.currentTarget.getAttribute("data-rarity"),true);
 		})
 		input.addEventListener("wheel",function(e){
 			adjustStep(e.currentTarget.id,true,true);
@@ -1052,8 +968,7 @@ function addCharBox (boxType=undefined,name="Ganyu",options={}) {
 		targetStatsInputElem.appendChild(levelProgressElem);
 
 		// Exp Bar
-		var expBarElem = makeElem("div",undefined,"expBar");
-		expBarElem.id = (travType !== null ? "Traveler" : id)+"-targExpBar";
+		var expBarElem = makeElem("div",undefined,"expBar",(travType !== null ? "Traveler" : id)+"-targExpBar");
 		expBarElem.style = "--fill:"+(expNeeded==0?"100":((targetExpRem/expNeeded).toPrecision(3)*100))+"%";
 		targetStatsInputElem.appendChild(expBarElem);
 
@@ -1090,12 +1005,7 @@ function addCharBox (boxType=undefined,name="Ganyu",options={}) {
 	elem.appendChild(targetStatsInputElem);
 
 	// Item Output part
-	var outputElem = makeElem("div");
-	if(isChar && travType !== null) {
-		outputElem.id = "Traveler"+travType+"-output";
-	} else {
-		outputElem.id = id+"-output";
-	}
+	var outputElem = makeElem("div",undefined,undefined,(isChar && travType !== null ? "Traveler"+travType : id)+"-output");
 	elem.appendChild(outputElem);
 	return elem;
 }
@@ -1125,9 +1035,8 @@ function addCharacter (char="Lynette",fromInit=false,travElement=null,targetExp=
 		weapon = charDB[char].weapon;
 		conBonus = typeof(charDB[char].conBonus) == "object" ? charDB[char].conBonus : undefined;
 	}
-	if(idIndex.indexOf((travType !== null ?type+" Traveler" : char)) != -1) return; // abort on duplicate characters
-	ids[(travType !== null ? type+" Traveler" : id)] = "char";
-	idIndex.push((travType !== null ? type+" Traveler" : id));
+
+	if(!fromInit && selectedCharsIndex.indexOf(id) !== -1) return; // Abort on duplicate characters
 
 	if(!fromInit) resetItemLists();
 	get("dropdownCharIcon").setAttribute("src","images/char/Unknown.png");
@@ -1148,17 +1057,12 @@ function addCharacter (char="Lynette",fromInit=false,travElement=null,targetExp=
 		skipLevel = true;
 	}
 	
-	var level, expRemainder, targetLevel, targetExpRemainder, ascension, talents, con;
+	var exp, ascension, talents, con;
 	let lsItem = parseLSItem(char,{});
-	// if(lsItem.exp != undefined) {
-	// 	let exp = getLevelFromExp("char",lsItem.exp);
-	// 	level = exp[0];
-	// 	expRemainder = exp[1];
-	// } else {
-	// 	level = 1;
-	// 	expRemainder = 0;
-	// }
+
+	exp = lsItem.exp != undefined ? lsItem.exp : 0;
 	ascension = lsItem.ascension != undefined ? lsItem.ascension : 0;
+
 	if(lsItem.byElement != undefined) {
 		let elem = lsItem.byElement[travType];
 		talents = elem.talents != undefined ? elem.talents : [1,1,1];
@@ -1169,8 +1073,6 @@ function addCharacter (char="Lynette",fromInit=false,travElement=null,targetExp=
 	}
 
 	targetExp = getLevelFromExp("char",targetExp);
-	targetLevel = targetExp[0];
-	targetExpRemainder = targetExp[1];
 
 	if(!Number.isInteger(targetAscension)) {
 		if(travType === null) {
@@ -1181,248 +1083,11 @@ function addCharacter (char="Lynette",fromInit=false,travElement=null,targetExp=
 		}
 	}
 
-	// if(!Array.isArray(targetTalents)) {
-	// 	console.warn("Targeted talents must be an array.");
-	// 	targetTalents = charTargets.talents;
-	// }
-
-	// var charElem = makeElem("div",undefined,"charBlock");
-	// charElem.id = (travType!==null ? type+" Traveler":id);
-
-	// var img = spaceToUnderscore(char);
-	// if(travType !== null) {
-	// 	charElem.setAttribute("data-travtype",travType);
-	// 	img = "Traveler";
-	// }
-
-	// var topFlexElem = makeElem("div",undefined,"topFlex");
-	// var boxNameElem = makeElem("div",undefined,"boxName");
-	// boxNameElem.appendChild(makeImg("images/char/"+img+".png",64,64));
-	// boxNameElem.appendChild(makeElem("span",travType!=undefined?type+" "+char:char));
-	// if(travType === null) {
-	// 	var vision = region+"_"+type;
-	// 	if(charDB[char].vision != undefined) {
-	// 		boxNameElem.appendChild(makeImg("images/icons/visions/"+charDB[char].vision+".png",48,48,["dropdownType","extraIcon","vision"]));
-	// 	} else if(charDB[char].region != undefined) {
-	// 		var vision = charDB[char].region+"_"+charDB[char].type;
-	// 		if(charDB[char].visionType != undefined && charDB[char].visionType != "") vision = vision+"_"+charDB[char].visionType;
-	// 		boxNameElem.appendChild(makeImg("images/icons/visions/"+vision+".png",48,48,["dropdrownType","extraIcon","vision"]));
-	// 		}
-	// } else {
-	// 	boxNameElem.appendChild(makeImg("images/icons/visions/Traveler_"+type+".png",48,48,["extraIcon","vision"]));
-	// }
-	// if(weapon !== undefined) {
-	// 	boxNameElem.appendChild(makeImg("images/icons/weapon/"+weapon+".png",32,32,["extraIcon"]));
-	// }
-	// topFlexElem.appendChild(boxNameElem);
-
-	// var removeButtonElem = makeElem("button","Remove","removeButton");
-	// removeButtonElem.setAttribute("data-target",(travType !== null ? type+" Traveler":char))
-	// removeButtonElem.addEventListener("click",function(e){
-	// 	removeID(e.currentTarget.getAttribute("data-target"));
-	// });
-	// topFlexElem.appendChild(removeButtonElem);
-
-	// charElem.appendChild(topFlexElem);
-	// charElem.appendChild(makeElem("span","Current Stats:","boxTitle"));
-
-	// var currentStatsInputElem = makeElem("div",undefined,"charWeapInputs");
-	// if(!skipLevel) {
-	// 	var lavelLabelElem = makeElem("label","Level:");
-	// 	lavelLabelElem.setAttribute("for",(travType !== null ? "Traveler" : id)+"-lvl");
-	// 	currentStatsInputElem.appendChild(lavelLabelElem);
-
-	// 	var charLevelInput = makeElem("input");
-	// 	charLevelInput.type = "number";
-	// 	charLevelInput.size = "3";
-	// 	charLevelInput.min = "1";
-	// 	charLevelInput.max = charLevelValues.length+1;
-	// 	charLevelInput.value = level;
-	// 	charLevelInput.id = (travType !== null ? "Traveler" : id)+"-lvl";
-	// 	charLevelInput.setAttribute("name",charLevelInput.id);
-	// 	charLevelInput.addEventListener("change",function(e){
-	// 		updateExp(e.currentTarget);
-	// 	})
-	// 	currentStatsInputElem.appendChild(charLevelInput);
-	// 	currentStatsInputElem.appendChild(makeElem("span","/"));
-	// 	currentStatsInputElem.appendChild(makeElem("span",(charLevelValues.length+1).toString(),"expMaxLevel"));
-
-	// 	var maxExpNeeded = charLevelValues[level-1];
-	// 	if(maxExpNeeded == undefined) {
-	// 		maxExpNeeded = 0;
-	// 	}
-	// 	var levelProgressElem = makeElem("div");
-	// 	if(level === charLevelValues.length+1) {
-	// 		levelProgressElem.style = "display:none";
-	// 	}
-	// 	var levelProgressLabel = makeElem("label","Level progress:");
-	// 	levelProgressLabel.setAttribute("for",(travType !== null ? "Traveler" : id)+"-expRemainder");
-	// 	levelProgressElem.appendChild(levelProgressLabel);
-
-	// 	var levelProgressInputElem = makeElem("input",undefined,"expTotal");
-	// 	levelProgressInputElem.type = "number";
-	// 	levelProgressInputElem.size = "8";
-	// 	levelProgressInputElem.min = "0";
-	// 	levelProgressInputElem.max = maxExpNeeded;
-	// 	levelProgressInputElem.value = expRemainder;
-	// 	levelProgressInputElem.id = (travType !== null ? "Traveler" : id)+"-expRemainder";
-	// 	levelProgressInputElem.addEventListener("change",function(e){
-	// 		updateBar(e.currentTarget);
-	// 	})
-	// 	levelProgressInputElem.addEventListener("wheel",function(e){
-	// 		adjustStep(e.currentTarget.id,true,true);
-	// 	})
-	// 	levelProgressInputElem.addEventListener("keydown",function(e){
-	// 		adjustStep(e.currentTarget.id,false,true);
-	// 	})
-	// 	levelProgressElem.appendChild(levelProgressInputElem);
-
-	// 	levelProgressElem.appendChild(makeElem("span","/"+maxExpNeeded,"expTotal"));
-		
-	// 	currentStatsInputElem.appendChild(levelProgressElem);
-
-	// 	var expBarElem = makeElem("div",undefined,"expBar");
-	// 	expBarElem.id = (travType !== null ? "Traveler" : id)+"-expBar";
-	// 	expBarElem.style = "--fill:"+(maxExpNeeded==0?"100":((expRemainder/maxExpNeeded).toPrecision(3)*100))+"%";
-	// 	currentStatsInputElem.appendChild(expBarElem);
-
-	// 	var ascLabelElem = makeElem("label","Ascension level:");
-	// 	ascLabelElem.setAttribute("for",(travType !== null ? "Traveler" : id)+"-asc");
-	// 	currentStatsInputElem.appendChild(ascLabelElem);
-
-	// 	var ascInputElem = makeElem("input");
-	// 	ascInputElem.type = "number";
-	// 	ascInputElem.size = "3";
-	// 	ascInputElem.min = "0";
-	// 	ascInputElem.max = "6";
-	// 	ascInputElem.value = ascension;
-	// 	ascInputElem.id = (travType !== null ? "Traveler" : id)+"-asc";
-	// 	ascInputElem.setAttribute("name",ascInputElem.id);
-	// 	ascInputElem.setAttribute("data-char",(travType !== null ? "Traveler" : id));
-	// 	ascInputElem.addEventListener("change",function(e){
-	// 		forceValue(e.currentTarget);
-	// 		saveCharacter(e.currentTarget.getAttribute("data-char"),"ascension",(e.currentTarget.valueAsNumber === 0 ? undefined : e.currentTarget.valueAsNumber));
-	// 	})
-	// 	currentStatsInputElem.appendChild(ascInputElem);
-	// }
-
-	// for(let i = 0; i < charTalentNames.length; i++) {
-	// 	var labelElem = makeElem("label",charTalentNames[i]+" level:");
-	// 	labelElem.setAttribute("for",(travType !== null ? "Traveler" : id)+"-asc");
-	// 	currentStatsInputElem.appendChild(labelElem);
-	// 	var min = 1, max = charMaxTalents[i], value = talents[i];
-	// 	var inputElem = makeElem("input");
-	// 	if(conBonus != undefined && conBonus[(i+1).toString()] <= con) {
-	// 		min+=3;
-	// 		max+=3;
-	// 		value+=3;
-	// 		inputElem.classList.add("conBonus");
-	// 	}
-	// 	inputElem.type = "number";
-	// 	inputElem.size = "3";
-	// 	inputElem.min = min;
-	// 	inputElem.max = max;
-	// 	inputElem.value = value;
-	// 	inputElem.id = id+charTalentSuffix[i];
-	// 	inputElem.setAttribute("name",inputElem.id);
-	// 	inputElem.setAttribute("data-char",(isTrav?id:char));
-	// 	inputElem.addEventListener("change",function(e){
-	// 		forceValue(e.currentTarget);
-	// 		saveTalents(e.currentTarget.getAttribute("data-char"));
-	// 	})
-	// 	currentStatsInputElem.appendChild(inputElem);
-	// }
-	// charElem.appendChild(currentStatsInputElem);
-	// charElem.appendChild(makeElem("br"));
-	// charElem.appendChild(makeElem("span","Targeted Stats:","boxTitle"));
-	// var targetStatsInputElem = makeElem("div",undefined,"charWeapInputs");
-	// if(!skipLevel) {
-	// 	var targetCharLevelLabel = makeElem("label","Character level:");
-	// 	targetCharLevelLabel.setAttribute("for",(travType !== null ? "Traveler" : id)+"-targetLvl");
-	// 	targetStatsInputElem.appendChild(targetCharLevelLabel);
-
-	// 	var targetCharLevelInputElem = makeElem("input");
-	// 	targetCharLevelInputElem.type = "number";
-	// 	targetCharLevelInputElem.size = "3";
-	// 	targetCharLevelInputElem.min = "1";
-	// 	targetCharLevelInputElem.max = "90";
-	// 	targetCharLevelInputElem.value = targetLevel;
-	// 	targetCharLevelInputElem.id = (travType !== null ? "Traveler" : id)+"-targetLvl";
-	// 	targetCharLevelInputElem.setAttribute("name",targetCharLevelInputElem.id);
-	// 	targetCharLevelInputElem.setAttribute("data-char",(travType !== null ? "Traveler" : id));
-	// 	if(travType!==null) {
-	// 		targetCharLevelInputElem.setAttribute("data-travtype",travType);
-	// 	}
-	// 	targetCharLevelInputElem.addEventListener("change",function(e){
-	// 		forceValue(e.currentTarget);
-	// 		editSelectedChar(e.currentTarget.getAttribute("data-char"),e.currentTarget,e.currentTarget.getAttribute("data-travtype"));
-	// 	});
-	// 	targetStatsInputElem.appendChild(targetCharLevelInputElem);
-	
-	// 	var targetCharAscLabel = makeElem("label","Ascension level:");
-	// 	targetCharAscLabel.setAttribute("for",(travType !== null ? "Traveler" : id)+"-targetAsc");
-	// 	targetStatsInputElem.appendChild(targetCharAscLabel);
-
-	// 	var targetCharAscInputElem = makeElem("input");
-	// 	targetCharAscInputElem.type = "number";
-	// 	targetCharAscInputElem.size = "3";
-	// 	targetCharAscInputElem.min = "0";
-	// 	targetCharAscInputElem.max = "6";
-	// 	targetCharAscInputElem.value = targetAscension;
-	// 	targetCharAscInputElem.id = (travType !== null ? "Traveler" : id)+"-targetAsc";
-	// 	targetCharAscInputElem.setAttribute("name",targetCharAscInputElem.id);
-	// 	targetCharAscInputElem.setAttribute("data-char",(travType !== null ? "Traveler" : id));
-	// 	if(travType!==null) {
-	// 		targetCharAscInputElem.setAttribute("data-travtype",travType);
-	// 	}
-	// 	targetCharAscInputElem.addEventListener("change",function(e){
-	// 		forceValue(e.currentTarget);
-	// 		editSelectedChar(e.currentTarget.getAttribute("data-char"),e.currentTarget,e.currentTarget.getAttribute("data-travtype"));
-	// 	});
-	// 	targetStatsInputElem.appendChild(targetCharAscInputElem);
-		
-	// }
-
-	// for(let i = 0; i < charTalentNames.length; i++) {
-	// 	var labelElem = makeElem("label",charTalentNames[i]+" level:");
-	// 	labelElem.setAttribute("for",(travType !== null ? "Traveler" : id)+"-targetTal"+(i+1));
-	// 	targetStatsInputElem.appendChild(labelElem);
-
-	// 	var min = 1, max = charMaxTalents[i], value = targetTalents[i];
-
-	// 	var inputElem = makeElem("input");
-	// 	if(conBonus != undefined && conBonus[(i+1).toString()] <= con) {
-	// 		min+=3;
-	// 		max+=3;
-	// 		value+=3;
-	// 	}
-	// 	inputElem.type = "number";
-	// 	inputElem.size = "3";
-	// 	inputElem.min = min;
-	// 	inputElem.max = max;
-	// 	inputElem.value = value;
-	// 	inputElem.id = id+"-targetTal"+(i+1);
-	// 	inputElem.setAttribute("name",inputElem.id);
-	// 	inputElem.setAttribute("data-char",(isTrav?id:char));
-	// 	if(travType!==null) {
-	// 		inputElem.setAttribute("data-travtype",travType);
-	// 	}
-	// 	inputElem.addEventListener("change",function(e){
-	// 		forceValue(e.currentTarget);
-	// 		editSelectedChar(e.currentTarget.getAttribute("data-char"),e.currentTarget,e.currentTarget.getAttribute("data-travtype"));
-	// 	})
-	// 	targetStatsInputElem.appendChild(inputElem);
-	// }
-	// charElem.appendChild(targetStatsInputElem);
-	
-	// var outputElem = makeElem("div");
-	// outputElem.id = id+"-output";
-	// charElem.appendChild(outputElem);
-
+	console.log(targetTalents)
 	var options = {}
 	options.skipLevel = skipLevel;
 	options.currentStats = {
-		exp:0,
+		exp:exp,
 		asc:ascension,
 		con:con,
 		talents:talents
@@ -1434,14 +1099,49 @@ function addCharacter (char="Lynette",fromInit=false,travElement=null,targetExp=
 	}
 	options.travType = travType;
 
-	var charElem2 = addCharBox("char",char,options)
+	var charElem = addCharBox("char",char,options)
 
-	get("inputs").appendChild(charElem2);
+	get("inputs").appendChild(charElem);
 	if(char === "Traveler") {
 		char = travTypeOrder[travType]+" Traveler";
 	}
 	if(!fromInit) addSelectedChar("char",char);
 }
+
+var confirmDeleteWeaps = [];
+function confirmDeleteWeapon(el) {
+	el = el.currentTarget;
+	var id = el.id.slice(0,-15);
+	console.log(id);
+	var checked = el.checked;
+	var confirmDelete = el.getAttribute("data-confirm") === "true" ? true : false;
+	if(!checked && !confirmDelete) {
+		console.log("hello");
+		el.removeEventListener("change",confirmDeleteWeapon);
+		el.checked = true;
+		el.previousSibling.innerText = "Uncheck again to confirm deletion. ";
+		confirmDeleteWeaps.push(id);
+		el.setAttribute("data-confirm","true");
+		window.setTimeout(function(){
+			console.log("oh");
+			if(!el.checked){
+				console.log("weapon totally deleted");
+				// Delete weapon code goes here
+
+				confirmDeleteWeaps = confirmDeleteWeaps.filter(item => item !== id);
+			} else {
+				el.removeAttribute("data-confirm");
+				el.previousSibling.innerText = "Uncheck to delete. ";
+				el.addEventListener("change",confirmDeleteWeapon);
+			}
+		},5000);
+	}
+}
+function confirmDeleteWeaponID(id) {
+	confirmDeleteWeaps = confirmDeleteWeaps.filter(item => item !== id);
+	// saveCharacter(id,"owned",undefined);
+}
+
 var addWeapon = (char="The Catch",fromInit=false,forcedID=null,targetExp=undefined,targetAscension=undefined,targetRefinement=undefined) => {
 	char = removeQuotes(char);
 	if(weapDB[char] == undefined) return;
@@ -1451,7 +1151,7 @@ var addWeapon = (char="The Catch",fromInit=false,forcedID=null,targetExp=undefin
 	get("dropdownWeaponIcon").setAttribute("src","images/weapon/Unknown.png");
 	get("dropdownWeaponName").setAttribute("rarity",0);
 	get("dropdownWeaponName").value = "";
-	var title = weapDB[char].title != undefined ? weapDB[char].title : char;
+	// var title = weapDB[char].title != undefined ? weapDB[char].title : char;
 	let maxAsc = 6;
 	if(targetExp===undefined) {
 		targetExp = !prefs[showAdvancedWeaponInputs] ? maxWeapExp[rarity] : weaponTargets.byRarity[rarity - 1].exp;
@@ -1474,10 +1174,15 @@ var addWeapon = (char="The Catch",fromInit=false,forcedID=null,targetExp=undefin
 	if(weaponIDIndex[char] == undefined) weaponIDIndex[char] = [];
 
 	if(getLSItem(char) !== null) {
+		console.log("GET ID HERE");
+		console.log(char,weaponIDIndex,id);
 		var lsItem = parseLSItem(char,{});
+		console.log(lsItem)
 		if(JSON.stringify(lsItem) != "{}") {
 			if(weaponIDIndex[char].indexOf(id) != -1) {
+				console.log("IT HERE",lsItem)
 				lsItem = lsItem[weaponIDIndex[char].indexOf(id)];
+				console.log(lsItem)
 			} else {
 				console.log("ID not in localStorage.");
 				var obj = {};
@@ -1495,67 +1200,21 @@ var addWeapon = (char="The Catch",fromInit=false,forcedID=null,targetExp=undefin
 		// check refinement for non-refineable
 	}
 
-	if(weaponIDIndex[char].indexOf(id) == -1) weaponIDIndex[char].push(id);
-
-	var level, expRemainder;
-	exp = getLevelFromExp("weap",exp,rarity);
-	level = exp[0];
-	expRemainder = exp[1];
+	if(weaponIDIndex[char].indexOf(id) == -1) {
+		console.warn("IT WAS NOT IN HERE")
+		weaponIDIndex[char].push(id);
+	}
 
 	if(!prefs.showAdvancedWeaponInputs && !weaponTargets.basicTargetMaxLevel) {
 		targetExp = [1,0];
 	} else {
 		targetExp = getLevelFromExp("weap",targetExp,rarity);
 	}
-	var targetLevel = targetExp[0];
-	var targetExpRemainder = targetExp[1];
-
-	var type = weapDB[char].type;
-	// var html = "<div class='weaponBlock' id=\""+id+"\">";
-	// html += "<div class='topFlex'>";
-	// html += "<div class='boxName'>";
-	// html += makeImg("images/weapon/"+spaceToUnderscore(char)+".png",64,64);
-	// html += title;
-	// html += makeImg("images/icons/weapon/"+type+".png",32,32,["extraIcon"]);
-	// html += "</div>";
-	// html += "<button class='removeButton' onclick='removeID(&quot;"+id+"&quot;)'>Remove</button>";
-	// html += "</div>";
-	// html += "<div class='boxTitle'>Current Stats:</div>";
-	// html += "<div class='charWeapInputs'>";
-
-	// html+="<div>Level: <input type='number' size='3' min='1' max='"+(weapLevelValues[rarity - 1].length+1)+"' value='"+level+"' id='"+id+"-lvl' onchange='updateExp(this,"+rarity+")'> / <span class='expMaxLevel'>"+(weapLevelValues[rarity - 1].length+1)+"</span>";
-	// let maxExpNeeded = weapLevelValues[rarity-1][level-1];
-	// if(maxExpNeeded == undefined) {
-	// 	maxExpNeeded = 0;
-	// }
-	// html+="<div";
-	// if(level == weapLevelValues[rarity-1].length+1) {
-	// 	html+=" style='display:none'";
-	// }
-	// html+=">Level progress: <input class='expTotal' type='number' min='0' max='"+maxExpNeeded+"' value='"+expRemainder+"' id='"+id+"-expRemainder' onwheel=\"adjustStep(this.id,true,true)\" onkeydown=\"adjustStep(this.id,false,true)\" onchange='updateBar(this,"+rarity+")'><span class='expTotal'>/"+maxExpNeeded+"</span>";
-	// html+="</div><div class='expBar' id='"+id+"-expBar' style='--fill:";
-	// if(maxExpNeeded == 0) {
-	// 	html += "100";
-	// } else {
-	// 	html+=((expRemainder/maxExpNeeded).toPrecision(3)*100);
-	// }
-	// html+="%'></div>";
-
-	// html += "<span>Ascension level: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+ascension+"' id='"+id+"-asc'>";
-	// html += "</div>";
-	// html += "<br><div class='boxTitle'>Targeted Stats:</div>";
-	// html += "<div class='charWeapInputs'>";
-	// html += "<span>Weapon level: </span><input size='3' type='number' min='1' max='"+(weapLevelValues[rarity - 1].length+1)+"' value='"+targetLevel+"' id='"+id+"-targetLvl' onchange='forceValue(this);editSelectedChar(\""+id+"\",this,null,"+rarity+")'>";
-	// html += " <span>Ascension: </span><input size='3' type='number' min='0' max='"+maxAsc+"' value='"+targetAscension+"' id='"+id+"-targetAsc'>";
-	// html += "</div>";
-	// html += "<div id='"+id+"-output'></div>";
-	// html += "</div>";
-	// get("inputs").innerHTML += html;
 
 	var options = {}
 	options.forcedID = id;
 	options.currentStats = {
-		exp:0,
+		exp:exp,
 		asc:ascension,
 		ref:refinement
 	}
@@ -1564,6 +1223,8 @@ var addWeapon = (char="The Catch",fromInit=false,forcedID=null,targetExp=undefin
 		asc:targetAscension,
 		ref:targetRefinement
 	}
+
+	console.log(options)
 
 	var weapElem = addCharBox("weap",char,options)
 
@@ -1602,7 +1263,8 @@ var saveCharacter = (char,key,value,mustExist=false) => {
 		if(char == "Traveler") {
 			// catch if traveler and clear the "byElement" instead
 			lsItem = parseLSItem(char,{});
-			if(JSON.parse(char) == "{}") {
+			console.log(char,lsItem)
+			if(JSON.stringify(lsItem) == "{}") {
 				clearLSItem("Traveler");
 				return;
 			}
@@ -1795,27 +1457,39 @@ var updateExp = (element,rarity=null) => {
 		}
 		newExp = charLevelValues[newLevel - 1];
 	}
-	var id = element.id.slice(0,-4); // remove "-exp"
+	var type = element.id.split("-")[1] == "lvl" ? "current" : "target";
+	var expR, isTarg=false;
 	if(newExp == undefined) {
 		newExp = 0;
 	}
-	let expR = get(id+"-expRemainder");
-	expR.value = 0;
-	expR.max = newExp;
+
+	console.log(type);
+	if(type == "current") {
+		var id = element.id.slice(0,-4); // remove "-lvl"
+		expR = get(id+"-expRemainder");
+		expR.value = 0;
+		expR.max = newExp;
+	} else {
+		isTarg = true;
+		var id = element.id.slice(0,-8);
+		expR = get(id+"-targExpRemainder");
+		expR.value = 0;
+		expR.max = newExp;
+	}
 	if(newExp != 0) {
 		expR.parentNode.removeAttribute("style");
 		expR.nextSibling.innerText = "/"+newExp;
 	} else {
 		expR.parentNode.style = "display:none";
 	}
-	updateBar(expR,rarity);
+	updateBar(expR,rarity,isTarg);
 }
-var updateBar = (element,rarity=null) => {
+var updateBar = (element,rarity=null,isTarg=false) => {
 	var value = element.value;
 	var max = element.max;
-	var id = element.id.slice(0,-13); // removes "-expRemainder"
+	var id = element.id.split("-")[0]; // removes "-[targ]ExpRemainder"
 	if(max != 0 && value != 0 && max == value) {
-		let newLevel = Math.floor(get(id+"-lvl").value) + 1;
+		let newLevel = Math.floor(get(id+(isTarg ? "-targLvl" : "-lvl")).value) + 1;
 
 		var newMax;
 		if(rarity !== null || (typeof(rarity) == "number" && rarity > 0 && rarity < 6)) {
@@ -1834,12 +1508,12 @@ var updateBar = (element,rarity=null) => {
 
 		if(newMax == undefined) {
 			newMax = 0;
-			get(id+"-expBar").style = "--fill:100%";
+			get(id+(isTarg ? "-targExpBar" : "-expBar")).style = "--fill:100%";
 			element.parentNode.style = "display:none";
 		} else {
-			get(id+"-expBar").style = "--fill:0%";
+			get(id+(isTarg ? "-targExpBar" : "-expBar")).style = "--fill:0%";
 		}
-		setVal(id+"-lvl",newLevel);
+		setVal(id+(isTarg ? "-targLvl" : "-lvl"),newLevel);
 		element.max = newMax;
 		element.nextSibling.innerText = "/"+newMax;
 		setVal(element,0,true);
@@ -1847,15 +1521,15 @@ var updateBar = (element,rarity=null) => {
 		return;
 	}
 	if(max != 0) {
-		get(id+"-expBar").style = "--fill:"+((value/max).toPrecision(3)*100)+"%";
+		get(id+(isTarg ? "-targExpBar" : "-expBar")).style = "--fill:"+((value/max).toPrecision(3)*100)+"%";
 	} else {
-		get(id+"-expBar").style = "--fill:100%";
+		get(id+(isTarg ? "-targExpBar" : "-expBar")).style = "--fill:100%";
 	}
-	saveExp(id,rarity);
+	saveExp(id,rarity,isTarg);
 }
-var saveExp = (id,rarity=null) => {
-	var level = val(id+"-lvl");
-	var rem = val(id+"-expRemainder");
+var saveExp = (id,rarity=null,isTarg=false) => {
+	var level = val(id+(isTarg ? "-targLvl" : "-lvl"));
+	var rem = val(id+(isTarg ? "-targExpRemainder" : "-expRemainder"));
 	var exp = undefined;
 	if(rarity != null) {
 		exp = getExpFromLevel("weap",level,rarity) + rem;
@@ -1865,7 +1539,17 @@ var saveExp = (id,rarity=null) => {
 	if(exp == 0) {
 		exp = undefined;
 	}
-	saveCharacter(id,"exp",exp);
+	if(!isTarg) {
+		saveCharacter(id,"exp",exp);
+		return;
+	} else {
+		// it should always be "null" for the traveler as this is for EXP.
+		// function doesn't use the elements value thankfully
+		let element = makeElem("input",undefined,undefined,"-targLvl");
+		editSelectedChar(id,element,null,rarity);
+		element.id = "";
+		return;
+	}
 }
 
 var saveTalents = (id) => {

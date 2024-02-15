@@ -10,6 +10,10 @@
 		"priority": 1,
 		"items": ["Mystic Enhancement Ore","Fine Enhancement Ore","Enhancement Ore"]
 	},
+	"artiExp": {
+		"priority": 2,
+		"items": ["Sanctifying Unction","Sanctifying Essence"]
+	},
 
 	"slime": {
 		"priority": 0,
@@ -165,6 +169,11 @@
 		"priority": 30,
 		"source": "Dropped by Fatui Operatives.",
 		"items": ["Old Operative's Pocket Watch", "Operative's Standard Pocket Watch", "Operative's Constancy"]
+	},
+	"fins": {
+		"priority": 31,
+		"source": "Dropped by Xuanwen Beasts.",
+		"items": ["Lunar Fin","Feathery Fin","Chasmlight Fin"]
 	},
 	
 	"decarabianTiles": {

@@ -12,6 +12,7 @@
 		<script type="text/javascript" src="scripts/charWeapHandling.js"></script>
 	</head>
 	<body>
+		<noscript>You need to enable JavaScript to use this page. It's all open source and no data is sent between this site and third parties. <a href="https://github.com/LeafyLuigi/GenshinCalc">Click here to view the GitHub Repo.</a></noscript>
 		<div id="links"></div>
 		<div id="prefsContainer"></div>
 		<div class="invBlock" id="inventory">
@@ -28,11 +29,8 @@
 				</div>
 			</div>
 			<br>
-			<button id="clearinvbutton" onclick="clearInventory()">Clear Inventory</button>
+			<div id="clearinvbutton" class="fauxButton clearInvButton">Clear Inventory</div>
 		</div>
-		<footer style="font-size:12px;overflow-x:auto;">
-			Images are copyrighted by miHoYo / HoYoverse. Data was obtained using the Fandom site, the interactive map and from the game itself. This site <strong>does not</strong> use Cookies and is completely open source. You can view the repo <a href="https://github.com/LeafyLuigi/GenshinCalc">here</a>.
-		</footer>
 	</body>
 	<script>
 	'use strict';
@@ -40,13 +38,17 @@
 	var inv = parseLSItem("inv",{})
 	
 	async function loadPage() {
-		await loadData();
+		get("clearinvbutton").addEventListener("click",e=>clearInventory());
+
 		await loadAllPrefs();
+		await loadData();
+		get("skipLink").href = "#inventory";
 		await insertPrefElements({include:["hideExtraIcons","themeDropdown"]});
 
 		var itemKeys = [];
 		for(let i in itemDB) {
-			itemKeys[itemKeys.length] = i;
+			// if(itemDB[i].include == false) continue;
+			itemKeys.push(i);
 		}
 		orderItems(itemKeys);
 		for(let i in itemKeys) {
@@ -75,24 +77,6 @@
 		iconElemContainer.classList.add("itemIcon");
 		if(rarity != undefined && rarity != 0) {
 			iconElemContainer.classList.add("rarity-"+rarity);
-		}
-
-		if(itemDB[item].source !== undefined) {
-			let sourceImg = Object.assign(document.createElement("img"));
-			sourceImg.classList.add("itemSource");
-			sourceImg.height = 20;
-			sourceImg.width = 20;
-			sourceImg.src = "images/icons/info.svg";
-			sourceImg.setAttribute("draggable","false");
-			sourceImg.setAttribute("loading","lazy");
-			sourceImg.addEventListener("click",function(e) {
-				toggleClass(e.currentTarget,"active");
-			});
-			iconElemContainer.appendChild(sourceImg)
-
-			let sourceDiv = Object.assign(document.createElement("div"),{textContent:itemDB[item].source});
-			sourceDiv.classList.add("itemSourceTooltip");
-			iconElemContainer.appendChild(sourceDiv);
 		}
 
 		if(type=="crown") {type="other";} // crown item is placed in "other" directory
@@ -132,6 +116,26 @@
 		});
 
 		iconElemContainer.appendChild(input);
+
+		if (itemDB[item].source !== undefined) {
+			let sourceImg = Object.assign(document.createElement("img"));
+			sourceImg.classList.add("itemSource");
+			sourceImg.height = 20;
+			sourceImg.width = 20;
+			sourceImg.src = "images/icons/info.svg";
+			sourceImg.setAttribute("tabindex","0");
+			sourceImg.setAttribute("draggable", "false");
+			sourceImg.setAttribute("loading", "lazy");
+			sourceImg.addEventListener("click", function (e) {
+				toggleClass(e.currentTarget, "active");
+			});
+			iconElemContainer.appendChild(sourceImg)
+
+			let sourceDiv = Object.assign(document.createElement("div"), { textContent: itemDB[item].source });
+			sourceDiv.classList.add("itemSourceTooltip");
+			iconElemContainer.appendChild(sourceDiv);
+		}
+
 		container.appendChild(iconElemContainer);
 
 		let nameContainer = Object.assign(document.createElement("div"),{textContent:item});

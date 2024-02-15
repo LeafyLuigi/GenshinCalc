@@ -27,7 +27,7 @@
 		},
 		"iconUseSubgroups": {
 			"description": "Bool for grouping each item within the group as an icon instead of the main group. Appends a number (starting at 0) to the file name. Icon must be a string.",
-			"type": ["boolean"]
+			"type": "boolean"
 		},
 		"items": {
 			"description": "The list of (unique) items within the group. An item can only be part of a single group. Items should be listed in ascending rarity.",
@@ -40,16 +40,16 @@
 		},
 		"source": {
 			"description": "Where you can get the item(s). This shows up in a tooltip if set.",
-			"type": ["string"]
+			"type": "string"
 		},
 		"craftUp": {
 			"description": "A boolean if the items within the group can be crafted into the next one. Default true.",
-			"type": ["boolean"],
+			"type": "boolean",
 			"default": true
 		},
 		"canConvertTo": {
 			"description": "A boolean if the items within the group can be converted between same-rarity items of the same item kind. i.e. \"Varunada Lazurite Sliver\" can be converted to \"Agnidus Agate Sliver\". Default true.",
-			"type": ["boolean"],
+			"type": "boolean",
 			"default": true
 		},
 		"convertTo": {

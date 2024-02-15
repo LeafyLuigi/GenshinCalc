@@ -179,7 +179,7 @@ DESPITE EVERYTHING BEING SURROUNDED BY QUOTATION MARKS, NOT EVERYTHING WILL BE.
 	"id": "$id",
 	"exp": 0,
 	"ascension": 0,
-	"refinement": 1, // (not really possible for rarity 1/2 weapons but yea. some exceptions exist tho.)
+	"refinement": 1, // (not really possible for rarity 1/2 weapons but yea. one exception to 3*+ exists tho)
 	
 	// (if the weapon is used as equipment anywhere)
 	"usedIn": {
@@ -238,7 +238,7 @@ DESPITE EVERYTHING BEING SURROUNDED BY QUOTATION MARKS, NOT EVERYTHING WILL BE.
 		"id": "lkjh",
 		"rarity": 4,
 		"exp": 122675, // max exp for 4*, level 16
-		"mainStat": "CR%" // Along with the rarity and level, this means the value for Crit Rate% is 23.2(%).
+		"mainStat": "CR" // Along with the rarity and level, this means the value for Crit Rate% is 23.2(%).
 	}
 ]
 
@@ -257,7 +257,7 @@ DESPITE EVERYTHING BEING SURROUNDED BY QUOTATION MARKS, NOT EVERYTHING WILL BE.
 "artifactIDIndex": {
 	"Lucky Dog": {
 		"flower":["ty12"],
-		"goblet": ["qwer"]
+		"goblet":["qwer"]
 	},
 	"Prayers for Illumination": ["lkjh"]
 }
@@ -356,7 +356,7 @@ DESPITE EVERYTHING BEING SURROUNDED BY QUOTATION MARKS, NOT EVERYTHING WILL BE.
 	"sets": [
 		{
 			"id": "$id",
-			"note": "string",
+			"name": "string", // limited to 20 char
 			"weapon": "$id", // (id of weapon)
 			"artifacts": [ // length should be 5.
 				"$id", // (id of artifact used)

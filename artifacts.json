@@ -413,5 +413,23 @@
 		"circlet": "Golden Troupe's Reward",
 		"rarityMin": 4,
 		"rarityMax": 5
+	},
+	"Song of Days Past": {
+		"flower": "Forgotten Oath of Days Past",
+		"plume": "Recollection of Days Past",
+		"sands": "Echoing Sound From Days Past",
+		"goblet": "Promised Dream of Days Past",
+		"circlet": "Poetry of Days Past",
+		"rarityMin": 4,
+		"rarityMax": 5
+	},
+	"Nighttime Whispers in the Echoing Woods": {
+		"flower": "Selfless Floral Accessory",
+		"plume": "Honest Quill",
+		"sands": "Faithful Hourglass",
+		"goblet": "Magnanimous Ink Bottle",
+		"circlet": "Compassionate Ladies' Hat",
+		"rarityMin": 4,
+		"rarityMax": 5
 	}
 }

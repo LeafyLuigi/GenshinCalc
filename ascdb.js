@@ -133,6 +133,13 @@ for(let i in weapLevelValues) {
 	weapLevelValues[i].forEach(num => sum+=num);
 	maxWeapExp.push(sum);
 }
+const weapAscAtExp = [
+	[24325,148875,274500,460025],
+	[36400,223225,411650,689950],
+	[53475,327475,603825,1011975,1583600,2353725],
+	[81000,496125,914850,1533250,2399300,3566175],
+	[121550,744350,1372500,2300175,3599300,5349675]
+];
 const weapRefinementCost = [
 	null,
 	null,

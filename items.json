@@ -21,6 +21,26 @@
 		"source": "Purchased from Limited-Time Flagship Event shops or Offerings.",
 		"type": "crown"
 	},
+
+	"Character EXP": {
+		"rarity": 3,
+		"type": "other",
+		"include": false
+	},
+	"Weapon EXP": {
+		"rarity": 3,
+		"type": "other",
+		"include": false,
+		"source": "NOTE: No official icon exists for this so this is using the Mystic Enhancement Ore's icon instead.",
+		"icon": "exp/Mystic Enhancement Ore"
+	},
+	"Artifact EXP": {
+		"rarity": 3,
+		"type": "other",
+		"include": false,
+		"source": "NOTE: No official icon exists for this so this is using the Sanctifying Essence's icon instead.",
+		"icon": "exp/Sanctifying Essence"
+	},
 	
 	"Hurricane Seed": {
 		"rarity": 4,
@@ -168,6 +188,11 @@
 		"source": "Dropped by Hydro Tulpas.",
 		"type": "boss"
 	},
+	"Cloudseam Scale": {
+		"rarity": 4,
+		"source": "Dropped by Solitary Suanni",
+		"type": "boss"
+	},
 
 	"Hero's Wit": {
 		"rarity": 4,
@@ -193,7 +218,15 @@
 		"rarity": 1,
 		"type": "exp"
 	},
-	
+	"Sanctifying Unction": {
+		"rarity": 3,
+		"type": "exp"
+	},
+	"Sanctifying Essence": {
+		"rarity": 4,
+		"type": "exp"
+	},
+
 	"Crystalline Cyst Dust": {
 		"rarity": 3,
 		"type": "common"
@@ -564,6 +597,18 @@
 		"type": "elite"
 	},
 	"Old Operative's Pocket Watch": {
+		"rarity": 2,
+		"type": "elite"
+	},
+	"Chasmlight Fin": {
+		"rarity": 4,
+		"type": "elite"
+	},
+	"Lunar Fin": {
+		"rarity": 3,
+		"type": "elite"
+	},
+	"Feathery Fin": {
 		"rarity": 2,
 		"type": "elite"
 	},
@@ -957,6 +1002,11 @@
 		"type": "local",
 		"region": "Liyue",
 		"source": "Found all throughout Liyue's more interior and mountainous regions. Best found in The Chasm, Cuijue Slope and Mt. Hulao."
+	},
+	"Clearwater Jade": {
+		"type": "local",
+		"region": "Liyue",
+		"source": "Found in Chenyu Vale. Best spotted around the south-east river and the mountain opposite Yilong Wharf."
 	},
 	"Onikabuto": {
 		"type": "local",

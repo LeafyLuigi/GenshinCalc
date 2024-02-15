@@ -23,12 +23,20 @@
 			"description": "Used as a replacement name when displaying the name.",
 			"type": "string"
 		},
+		"include": {
+			"description": "Bool if the item should be included in the Inventory page. Default true, set to false to hide it.",
+			"type": "boolean"
+		},
 		"rarity": {
 			"description": "The item's rarity. Affects background and star count. Leave unset for a rarity of 0.",
 			"type": "integer",
 			"maximum": 5,
 			"minimum": 0,
 			"default": 0
+		},
+		"icon": {
+			"description": "Replacement icon (without \".png\") instead of the item name. This WILL override the type stuff.\nActual icon must still remain within ./images/ though.",
+			"type": "string"
 		},
 		"type": {
 			"description": "The category the item will fall into.",
@@ -40,11 +48,11 @@
 		},
 		"source": {
 			"description": "Where you can get the item. This shows up in a tooltip if set.",
-			"type": ["string"]
+			"type": "string"
 		},
 		"region": {
 			"description": "Which region the item can be found in. Currently does nothing.",
-			"type": ["string"]
+			"type": "string"
 		}
 	}
 }

@@ -27,6 +27,7 @@
 		</style>
 	</head>
 	<body>
+		<noscript>You need to enable JavaScript to use this page. It's all open source and no data is sent between this site and third parties. <a href="https://github.com/LeafyLuigi/GenshinCalc">Click here to view the GitHub Repo.</a></noscript>
 		<div id="prefsContainer"></div>
 		<h1>This is a debug page for testing.</h1>
 		<div id="characters"><h2>Characters:</h2></div>
@@ -41,9 +42,9 @@
 	"use strict";
 	pageType = "debug";
 	async function loadPage() {
-		await loadData();
 		await loadAllPrefs();
 		await insertPrefElements({include:["themeDropdown"]});
+		await loadData();
 
 		let itemGroupExtraImages = [];
 		let visions = [];
@@ -258,7 +259,17 @@
 			let issues = [];
 
 			if(c.include !== undefined) {
-				issues.push(" \"include\" should not be added to items");
+				if(typeof(c.include) !== "boolean") {
+					issues.push(" include is not a bool");
+				}
+			}
+
+			if(c.icon !== undefined) {
+				if(typeof(c.icon) !== "string") {
+					issues.push(" icon is not a string");
+				} else if(c.icon.indexOf(".") != -1) {
+					issues.push(" icon contains a dot (likely file extention?) and should probably not have this in the name");
+				}
 			}
 
 			if (c.rarity !== undefined) {
@@ -285,7 +296,11 @@
 			}
 
 			if(c.type !== undefined) {
-				dimg(c.type+"/"+spaceToUnderscore(i)+".png","images");
+				if(c.icon !== undefined) {
+					dimg(spaceToUnderscore(c.icon)+".png","images");
+				} else {
+					dimg(c.type+"/"+spaceToUnderscore(i)+".png","images");
+				}
 			}
 			if(issues.length != 0) {
 				dp(i+" has the following issues:"+issues,"items");
@@ -329,11 +344,11 @@
 					issues.push(" convertType set to \"intra\" while convertTo is not undefined");
 				}
 			}
+			if(g.convertTo !== undefined && g.icon === undefined) {
+				issues.push(" icon defined while convertType is not defined");
+			}
 
 			if(g.icon !== undefined) {
-				if(g.convertTo !== undefined) {
-					issues.push(" icon defined while convertType is not defined");
-				}
 				if(typeof(g.icon) === "string") {
 					if(g.iconUseSubgroups !== true) {
 						dimg("itemGroups/"+spaceToUnderscore(g.icon)+".png","images");
@@ -495,6 +510,9 @@
 			dimg("rarity/mini-"+i+".png","images");
 			dimg("icons/rarity/"+i+".png","images");
 		}
+		dimg("rarity/mini-13.png","images");
+		dimg("rarity/mini-34.png","images");
+		dimg("rarity/mini-45.png","images");
 		dimg("icons/elements/Physical.svg","images");
 		for(let i in charTypes) {
 			let t = charTypes[i];
