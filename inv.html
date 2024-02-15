@@ -75,11 +75,16 @@
 		
 		let iconElemContainer = Object.assign(document.createElement("div"));
 		iconElemContainer.classList.add("itemIcon");
-		if(rarity != undefined && rarity != 0) {
+		if(rarity !== undefined) {
 			iconElemContainer.classList.add("rarity-"+rarity);
+		} else {
+			iconElemContainer.classList.add("rarity-0");
 		}
 
-		if(type=="crown") {type="other";} // crown item is placed in "other" directory
+		// crown item is placed in "other" directory
+		if(type === "crown") {
+			type="other";
+		}
 
 		let elemItemImg = Object.assign(document.createElement("img"));
 		elemItemImg.src = "images/"+type+"/"+img+".png";
@@ -88,7 +93,7 @@
 		elemItemImg.classList.add("itemIconImg");
 		iconElemContainer.appendChild(elemItemImg)
 
-		if(rarity != undefined && rarity != 0) {
+		if(rarity !== undefined && rarity !== 0) {
 			let rarityIcon = Object.assign(document.createElement("img"));
 			rarityIcon.classList.add("rarityIcon");
 			rarityIcon.classList.add("extraIcon");
